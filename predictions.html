@@ -1,0 +1,700 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Predictions & Simulation Suite — RetailMind AI</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Sora:wght@400;500;600;700;800&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/dashboard.css">
+  <link rel="stylesheet" href="css/responsive.css">
+  <style>
+    .prediction-tab {
+      padding: 0.5rem 1.25rem;
+      border-radius: var(--radius-full);
+      border: 1px solid var(--border);
+      background: var(--surface);
+      font-size: 0.8125rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: var(--transition-fast);
+    }
+
+    .prediction-tab.active {
+      background: var(--primary);
+      color: #FFFFFF;
+      border-color: var(--primary);
+      box-shadow: 0 4px 12px rgba(90, 17, 136, 0.25);
+    }
+
+    .factor-bar-row {
+      margin-bottom: 0.875rem;
+    }
+
+    .factor-bar-header {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.8125rem;
+      margin-bottom: 0.25rem;
+    }
+
+    .factor-track {
+      width: 100%;
+      height: 7px;
+      background: #E5E7EB;
+      border-radius: 999px;
+      overflow: hidden;
+    }
+
+    .factor-progress-fill {
+      height: 100%;
+      border-radius: 999px;
+    }
+
+    .range-slider {
+      -webkit-appearance: none;
+      width: 100%;
+      height: 8px;
+      border-radius: 5px;
+      background: #E5E7EB;
+      outline: none;
+    }
+
+    .range-slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: var(--primary);
+      cursor: pointer;
+      box-shadow: 0 0 10px rgba(90, 17, 136, 0.4);
+      border: 2px solid #FFFFFF;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="app-layout">
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <a href="dashboard.html" class="brand-logo">
+          <div class="brand-icon">
+            <i class="fa-solid fa-brain"></i>
+          </div>
+          <span class="brand-text">RetailMind</span>
+          <span class="brand-badge">AI</span>
+        </a>
+      </div>
+
+      <nav class="sidebar-nav">
+        <div>
+          <div class="nav-group-title">Main</div>
+          <ul class="nav-list">
+            <li>
+              <a href="dashboard.html" class="nav-link">
+                <div class="nav-link-content">
+                  <i class="fa-solid fa-chart-pie"></i>
+                  <span>Dashboard</span>
+                </div>
+              </a>
+            </li>
+            <li>
+              <a href="inventory.html" class="nav-link">
+                <div class="nav-link-content">
+                  <i class="fa-solid fa-boxes-stacked"></i>
+                  <span>Inventory</span>
+                </div>
+
+                <span id="inventoryLowStockBadge" class="nav-badge badge-warning"
+                  style="font-size: 0.6875rem; display: none;">
+                </span>
+              </a>
+            </li>
+            <li>
+              <a href="sales.html" class="nav-link">
+                <div class="nav-link-content">
+                  <i class="fa-solid fa-cart-shopping"></i>
+                  <span>Sales & POS</span>
+                </div>
+              </a>
+            </li>
+            <li>
+              <a href="orders.html" class="nav-link">
+                <div class="nav-link-content">
+                  <i class="fa-solid fa-receipt"></i>
+                  <span>Orders</span>
+                </div>
+              </a>
+            </li>
+            <li>
+              <a href="customers.html" class="nav-link">
+                <div class="nav-link-content">
+                  <i class="fa-solid fa-users"></i>
+                  <span>Customers</span>
+                </div>
+              </a>
+            </li>
+            <li>
+              <a href="suppliers.html" class="nav-link">
+                <div class="nav-link-content">
+                  <i class="fa-solid fa-truck"></i>
+                  <span>Suppliers</span>
+                </div>
+              </a>
+            </li>
+          </ul>
+        </div>
+
+        <div>
+          <div class="nav-group-title">Intelligence</div>
+          <ul class="nav-list">
+            <li>
+              <a href="ai-assistant.html" class="nav-link">
+                <div class="nav-link-content">
+                  <i class="fa-solid fa-robot"></i>
+                  <span>AI Assistant</span>
+                </div>
+                <span class="nav-badge badge-ai" style="font-size: 0.6875rem;">PRO</span>
+              </a>
+            </li>
+            <li>
+              <a href="analytics.html" class="nav-link">
+                <div class="nav-link-content">
+                  <i class="fa-solid fa-chart-line"></i>
+                  <span>Analytics</span>
+                </div>
+              </a>
+            </li>
+            <li>
+              <a href="predictions.html" class="nav-link active">
+                <div class="nav-link-content">
+                  <i class="fa-solid fa-brain"></i>
+                  <span>Predictions</span>
+                </div>
+              </a>
+            </li>
+            <li>
+              <a href="reports.html" class="nav-link">
+                <div class="nav-link-content">
+                  <i class="fa-solid fa-file-lines"></i>
+                  <span>Reports</span>
+                </div>
+              </a>
+            </li>
+          </ul>
+        </div>
+
+        <div>
+          <div class="nav-group-title">Management</div>
+          <ul class="nav-list">
+            <li>
+              <a href="notifications.html" class="nav-link">
+                <div class="nav-link-content">
+                  <i class="fa-solid fa-bell"></i>
+                  <span>Notifications</span>
+                </div>
+                <span class="sidebar-notification-count" hidden>0</span>
+              </a>
+            </li>
+            <li>
+              <a href="health.html" class="nav-link">
+                <div class="nav-link-content">
+                  <i class="fa-solid fa-heart-pulse"></i>
+                  <span>Business Health</span>
+                </div>
+                <span class="nav-badge badge-success" style="font-size: 0.6875rem;">87%</span>
+              </a>
+            </li>
+
+            <li>
+              <a href="members.html" class="nav-link">
+                <div class="nav-link-content">
+                  <i class="fa-solid fa-user-group"></i>
+                  <span>Business Members</span>
+                </div>
+              </a>
+            </li>
+
+            <li>
+              <a href="setup.html" class="nav-link">
+                <div class="nav-link-content">
+                  <i class="fa-solid fa-sliders"></i>
+                  <span>Setup Wizard</span>
+                </div>
+              </a>
+            </li>
+          </ul>
+        </div>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="user-mini-card" onclick="window.location.href='profile.html'">
+          <div class="user-avatar-circle">SM</div>
+          <div class="user-info">
+            <div class="user-name">Sana Mondal</div>
+            <div class="user-role">Administrator</div>
+          </div>
+          <i class="fa-solid fa-chevron-right text-muted" style="font-size: 0.75rem;"></i>
+        </div>
+      </div>
+    </aside>
+
+    <!-- MAIN WRAPPER -->
+    <div class="main-wrapper">
+      <header class="topbar">
+        <div class="topbar-left">
+          <button class="mobile-toggle" aria-label="Toggle navigation">
+            <i class="fa-solid fa-bars"></i>
+          </button>
+          <div class="breadcrumb-area">
+            <div class="breadcrumb">
+              <a href="dashboard.html">RetailMind</a>
+              <i class="fa-solid fa-chevron-right" style="font-size: 0.625rem;"></i>
+              <span>Intelligence</span>
+            </div>
+            <div class="page-title">AI Predictive Analytics Suite</div>
+          </div>
+        </div>
+
+        <div class="topbar-right">
+          <span class="badge badge-ai"><i class="fa-solid fa-sparkles"></i> Model v2.4 (Ensemble XGBoost + LSTM)</span>
+          <div class="user-avatar-circle" onclick="window.location.href='profile.html'"
+            style="cursor: pointer; width: 38px; height: 38px;">SM</div>
+        </div>
+      </header>
+
+      <main class="page-container">
+        <!-- Page Header -->
+        <div class="page-header">
+          <div>
+            <h1>Intelligent Demand Forecasting & Predictive ML</h1>
+            <p>High-confidence sales forecasting, attribution causality factors, and dynamic pricing elasticity.</p>
+          </div>
+          <!-- Timeframe Tabs -->
+          <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+            <button class="prediction-tab active" data-period="Daily">Daily</button>
+            <button class="prediction-tab" data-period="Weekly">Weekly</button>
+            <button class="prediction-tab" data-period="Monthly">Monthly</button>
+            <button class="prediction-tab" data-period="Quarterly">Quarterly</button>
+            <button class="prediction-tab" data-period="Yearly">Yearly</button>
+          </div>
+        </div>
+
+        <!-- 1. AI PREDICTION SUMMARY CARDS -->
+        <div class="kpi-grid" style="grid-template-columns: repeat(4, 1fr); margin-bottom: 1.75rem;">
+          <div class="kpi-card">
+            <span class="kpi-title">Predicted Sales (Units)</span>
+            <div class="kpi-value" id="predSalesVal">420 units</div>
+            <div class="kpi-footer text-muted">Core retail SKU: Fresh Milk 1L</div>
+          </div>
+          <div class="kpi-card" style="border-left: 3px solid var(--accent);">
+            <span class="kpi-title text-accent">Model Confidence</span>
+            <div class="kpi-value text-dark">92% High</div>
+            <div class="kpi-footer text-success"><i class="fa-solid fa-shield-check"></i> Certified Reliable</div>
+          </div>
+          <div class="kpi-card">
+            <span class="kpi-title">Expected Revenue</span>
+            <div class="kpi-value text-primary" id="predRevVal">₹25,200</div>
+            <div class="kpi-footer trend-up" id="predGrowthVal"><i class="fa-solid fa-arrow-up"></i> +18.4% growth</div>
+          </div>
+          <div class="kpi-card">
+            <span class="kpi-title">Suggested PO Lead</span>
+            <div class="kpi-value text-warning">Tomorrow</div>
+            <div class="kpi-footer text-muted">Safe replenishment buffer</div>
+          </div>
+        </div>
+
+        <!-- 2. EXPLAINABLE AI & "WHAT-IF" SIMULATOR GRID -->
+        <div class="grid grid-cols-2" style="margin-bottom: 1.75rem;">
+          <!-- Explainable AI Panel -->
+          <div class="card card-ai">
+            <div class="card-header">
+              <div>
+                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                  <span class="badge badge-ai"><i class="fa-solid fa-diagram-project"></i> Explainable AI (XAI)</span>
+                  <h3 class="card-title">Why is Demand Increasing?</h3>
+                </div>
+                <p class="card-subtitle">Factor weights & causality decomposition driving demand lift</p>
+              </div>
+              <span class="badge badge-success">Confidence: 92%</span>
+            </div>
+            <div class="card-body">
+              <div class="factor-bar-row">
+                <div class="factor-bar-header">
+                  <span class="font-semibold text-dark"><i class="fa-solid fa-calendar-week text-primary"></i> Weekend
+                    Demand Peak</span>
+                  <span class="font-bold text-primary">+32%</span>
+                </div>
+                <div class="factor-track">
+                  <div class="factor-progress-fill" data-width="32%" style="background: var(--primary);"></div>
+                </div>
+              </div>
+
+              <div class="factor-bar-row">
+                <div class="factor-bar-header">
+                  <span class="font-semibold text-dark"><i class="fa-solid fa-champagne-glasses text-accent"></i>
+                    Festival / Event Lift</span>
+                  <span class="font-bold text-accent">+21%</span>
+                </div>
+                <div class="factor-track">
+                  <div class="factor-progress-fill" data-width="21%" style="background: var(--accent);"></div>
+                </div>
+              </div>
+
+              <div class="factor-bar-row">
+                <div class="factor-bar-header">
+                  <span class="font-semibold text-dark"><i class="fa-solid fa-tag text-info"></i> Active
+                    Promotions</span>
+                  <span class="font-bold text-info">+18%</span>
+                </div>
+                <div class="factor-track">
+                  <div class="factor-progress-fill" data-width="18%" style="background: var(--info);"></div>
+                </div>
+              </div>
+
+              <div class="factor-bar-row">
+                <div class="factor-bar-header">
+                  <span class="font-semibold text-dark"><i class="fa-solid fa-chart-line text-warning"></i> Previous
+                    Month Trend Momentum</span>
+                  <span class="font-bold text-warning">+14%</span>
+                </div>
+                <div class="factor-track">
+                  <div class="factor-progress-fill" data-width="14%" style="background: var(--warning);"></div>
+                </div>
+              </div>
+
+              <div class="factor-bar-row">
+                <div class="factor-bar-header">
+                  <span class="font-semibold text-dark"><i class="fa-solid fa-cloud-sun" style="color: #EC4899;"></i>
+                    Weather & Temperature Index</span>
+                  <span class="font-bold" style="color: #EC4899;">+7%</span>
+                </div>
+                <div class="factor-track">
+                  <div class="factor-progress-fill" data-width="7%" style="background: #EC4899;"></div>
+                </div>
+              </div>
+
+              <div
+                style="background: #FFFFFF; padding: 0.75rem 1rem; border-radius: var(--radius-md); border: 1px solid var(--border); font-size: 0.8125rem; margin-top: 1rem; color: var(--muted);">
+                <i class="fa-solid fa-brain text-primary"></i> Multi-variable regression model confirms <strong>92%
+                  historical correlation</strong> with weekend footfall spikes.
+              </div>
+            </div>
+          </div>
+
+          <!-- Interactive AI Sales Simulator ("What If?") -->
+          <div class="card"
+            style="border: 2px solid var(--primary-subtle); background: linear-gradient(135deg, #FFFFFF 0%, #FAF5FF 100%);">
+            <div class="card-header">
+              <div>
+                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                  <span class="badge badge-primary"><i class="fa-solid fa-sliders"></i> Scenario Lab</span>
+                  <h3 class="card-title">AI Sales Simulator ("What If?")</h3>
+                </div>
+                <p class="card-subtitle">Simulate real-time business outcomes under demand variations</p>
+              </div>
+              <span class="badge badge-ai" id="sliderPercentLabel">+30%</span>
+            </div>
+            <div class="card-body">
+              <div style="margin-bottom: 1.5rem;">
+                <label class="form-label" style="display: flex; justify-content: space-between;">
+                  <span>What happens if customer demand increases by:</span>
+                  <span class="font-bold text-primary" style="font-size: 1rem;">0% → 100%</span>
+                </label>
+                <input type="range" class="range-slider" id="demandSimulatorSlider" min="0" max="100" value="30"
+                  step="5">
+              </div>
+
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.25rem;">
+                <div
+                  style="background: #FFFFFF; border: 1px solid var(--border); padding: 1rem; border-radius: var(--radius-md);">
+                  <span class="text-muted" style="font-size: 0.75rem;">Predicted Revenue</span>
+                  <div class="font-heading font-bold text-primary" style="font-size: 1.35rem;" id="simRevenueVal">₹10.95
+                    Lakhs</div>
+                  <div class="text-muted" style="font-size: 0.6875rem;">Base: ₹8.42L (+₹2.53L)</div>
+                </div>
+
+                <div
+                  style="background: #FFFFFF; border: 1px solid var(--border); padding: 1rem; border-radius: var(--radius-md);">
+                  <span class="text-muted" style="font-size: 0.75rem;">Predicted Net Profit</span>
+                  <div class="font-heading font-bold text-accent-dark" style="font-size: 1.35rem;" id="simProfitVal">
+                    ₹3.10 Lakhs</div>
+                  <div class="text-muted" style="font-size: 0.6875rem;">Base: ₹2.18L (+₹92,000)</div>
+                </div>
+
+                <div
+                  style="background: #FFFFFF; border: 1px solid var(--border); padding: 1rem; border-radius: var(--radius-md);">
+                  <span class="text-muted" style="font-size: 0.75rem;">Additional Inventory Needed</span>
+                  <div class="font-heading font-bold text-dark" style="font-size: 1.35rem;" id="simInventoryVal">+360
+                    units</div>
+                  <div class="text-muted" style="font-size: 0.6875rem;">Requires 2 bulk POs</div>
+                </div>
+
+                <div
+                  style="background: #FFFFFF; border: 1px solid var(--border); padding: 1rem; border-radius: var(--radius-md);">
+                  <span class="text-muted" style="font-size: 0.75rem;">Stockout Risk Assessment</span>
+                  <div style="margin-top: 0.25rem;">
+                    <span class="badge badge-warning" id="simRiskBadge">
+                      <span class="badge-dot"></span> Moderate Risk (Restock Advised)
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              <div style="text-align: right;">
+                <button class="btn btn-outline-primary btn-sm"
+                  onclick="showToast('Scenario saved to quarterly strategy log', 'success', 'fa-floppy-disk')">
+                  <i class="fa-solid fa-bookmark"></i> Save Simulation Scenario
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 3. SMART REORDER RECOMMENDATIONS TABLE -->
+        <div class="card" id="reorder" style="margin-bottom: 1.75rem;">
+          <div class="card-header">
+            <div>
+              <div style="display: flex; align-items: center; gap: 0.5rem;">
+                <span class="badge badge-ai"><i class="fa-solid fa-bolt text-accent"></i> Autonomous Procurement</span>
+                <h3 class="card-title">Smart Reorder Recommendations</h3>
+              </div>
+              <p class="card-subtitle">AI-calculated purchase orders to prevent stockouts while preventing overstock</p>
+            </div>
+            <button class="btn btn-primary" id="btnApproveAllReorder">
+              <i class="fa-solid fa-check-double"></i> Approve All Recommendations
+            </button>
+          </div>
+          <div class="table-responsive">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>Product</th>
+                  <th>Recommended Qty</th>
+                  <th>Preferred Supplier</th>
+                  <th>Estimated Cost</th>
+                  <th>Lead Time</th>
+                  <th>Target Delivery</th>
+                  <th>AI Confidence</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody id="reorderRecommendationsBody">
+                <tr>
+                  <td>
+                    <div class="font-bold text-dark">Fresh Milk 1L</div>
+                    <div class="text-muted" style="font-size: 0.75rem;">Current: 12 • Safety: 50</div>
+                  </td>
+                  <td><strong class="text-primary">+120 units</strong></td>
+                  <td>Heritage Dairy Farms</td>
+                  <td><strong>₹5,760</strong></td>
+                  <td>1 Day</td>
+                  <td>Tomorrow, 08:00 AM</td>
+                  <td><span class="badge badge-success">98% High</span></td>
+                  <td>
+                    <button class="btn btn-sm btn-primary btn-reorder-action"
+                      onclick="this.innerHTML='Ordered'; this.disabled=true; showToast('PO sent to Heritage Dairy', 'success', 'fa-check');">Approve</button>
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <div class="font-bold text-dark">Whole Wheat Bread 400g</div>
+                    <div class="text-muted" style="font-size: 0.75rem;">Current: 18 • Safety: 40</div>
+                  </td>
+                  <td><strong class="text-primary">+85 units</strong></td>
+                  <td>Golden Crust Bakers</td>
+                  <td><strong>₹2,720</strong></td>
+                  <td>Same Day</td>
+                  <td>Today, 06:00 PM</td>
+                  <td><span class="badge badge-success">95% High</span></td>
+                  <td>
+                    <button class="btn btn-sm btn-primary btn-reorder-action"
+                      onclick="this.innerHTML='Ordered'; this.disabled=true; showToast('PO sent to Golden Crust', 'success', 'fa-check');">Approve</button>
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <div class="font-bold text-dark">Sunflower Cooking Oil 1L</div>
+                    <div class="text-muted" style="font-size: 0.75rem;">Current: 18 • Safety: 30</div>
+                  </td>
+                  <td><strong class="text-primary">+60 units</strong></td>
+                  <td>AgroPure Refineries</td>
+                  <td><strong>₹8,100</strong></td>
+                  <td>2 Days</td>
+                  <td>Wednesday</td>
+                  <td><span class="badge badge-warning">89% Fair</span></td>
+                  <td>
+                    <button class="btn btn-sm btn-primary btn-reorder-action"
+                      onclick="this.innerHTML='Ordered'; this.disabled=true; showToast('PO sent to AgroPure', 'success', 'fa-check');">Approve</button>
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <div class="font-bold text-dark">Basmati Rice 5kg</div>
+                    <div class="text-muted" style="font-size: 0.75rem;">Current: 24 • Safety: 40</div>
+                  </td>
+                  <td><strong class="text-primary">+45 units</strong></td>
+                  <td>Punjab Royal Mills</td>
+                  <td><strong>₹17,100</strong></td>
+                  <td>3 Days</td>
+                  <td>Thursday</td>
+                  <td><span class="badge badge-success">94% High</span></td>
+                  <td>
+                    <button class="btn btn-sm btn-primary btn-reorder-action"
+                      onclick="this.innerHTML='Ordered'; this.disabled=true; showToast('PO sent to Punjab Royal', 'success', 'fa-check');">Approve</button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- 4. DEAD STOCK MONITOR & DYNAMIC PRICING -->
+        <div class="grid grid-cols-2" style="margin-bottom: 2rem;">
+          <!-- Dead Stock Monitor -->
+          <div class="card">
+            <div class="card-header">
+              <div>
+                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                  <span class="badge badge-danger"><i class="fa-solid fa-triangle-exclamation"></i> Working Capital
+                    Risk</span>
+                  <h3 class="card-title">Dead Stock Monitor</h3>
+                </div>
+                <p class="card-subtitle">Zero movement and slow turning retail inventory</p>
+              </div>
+            </div>
+            <div class="card-body">
+              <div class="grid grid-cols-4" style="gap: 0.5rem; margin-bottom: 1rem; text-align: center;">
+                <div style="background: var(--surface-subtle); padding: 0.5rem; border-radius: var(--radius-md);">
+                  <div class="text-muted" style="font-size: 0.6875rem;">Dead Capital</div>
+                  <div class="font-bold text-danger">₹14,280</div>
+                </div>
+                <div style="background: var(--surface-subtle); padding: 0.5rem; border-radius: var(--radius-md);">
+                  <div class="text-muted" style="font-size: 0.6875rem;">Slow SKUs</div>
+                  <div class="font-bold text-warning">8 Items</div>
+                </div>
+                <div style="background: var(--surface-subtle); padding: 0.5rem; border-radius: var(--radius-md);">
+                  <div class="text-muted" style="font-size: 0.6875rem;">Near Expiry</div>
+                  <div class="font-bold text-dark">29 units</div>
+                </div>
+                <div style="background: var(--surface-subtle); padding: 0.5rem; border-radius: var(--radius-md);">
+                  <div class="text-muted" style="font-size: 0.6875rem;">Recovery Est.</div>
+                  <div class="font-bold text-success">₹11,400</div>
+                </div>
+              </div>
+
+              <div class="table-responsive">
+                <table class="table" style="font-size: 0.8125rem;">
+                  <thead>
+                    <tr>
+                      <th>Product</th>
+                      <th>Zero Sale</th>
+                      <th>Stock Val</th>
+                      <th>Recommendation</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td><strong>Organic Honey 500g</strong></td>
+                      <td class="text-danger">42 days</td>
+                      <td>₹8,360</td>
+                      <td><span class="badge badge-warning">Bundle with Tea</span></td>
+                    </tr>
+                    <tr>
+                      <td><strong>Herbal Conditioner</strong></td>
+                      <td class="text-danger">35 days</td>
+                      <td>₹4,560</td>
+                      <td><span class="badge badge-danger">20% Clearance</span></td>
+                    </tr>
+                    <tr>
+                      <td><strong>Sugar-Free Biscuits</strong></td>
+                      <td class="text-warning">24 days</td>
+                      <td>₹1,360</td>
+                      <td><span class="badge badge-info">POS Checkout Add-on</span></td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <!-- Dynamic Pricing Recommendations -->
+          <div class="card card-ai">
+            <div class="card-header">
+              <div>
+                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                  <span class="badge badge-ai"><i class="fa-solid fa-tag text-accent"></i> Elasticity Model</span>
+                  <h3 class="card-title">AI Dynamic Pricing Recommendations</h3>
+                </div>
+                <p class="card-subtitle">Maximize margins and clearing volume based on price elasticity</p>
+              </div>
+            </div>
+            <div class="card-body">
+              <div class="table-responsive">
+                <table class="table" style="font-size: 0.8125rem;">
+                  <thead>
+                    <tr>
+                      <th>Product</th>
+                      <th>Current</th>
+                      <th>Recommended</th>
+                      <th>Demand Impact</th>
+                      <th>AI Rationale</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td><strong>Fresh Milk 1L</strong></td>
+                      <td>₹60</td>
+                      <td><strong class="text-success">₹58 (-₹2)</strong></td>
+                      <td><span class="trend-up">+12% vol</span></td>
+                      <td style="font-size: 0.75rem; color: var(--muted);">Elasticity suggests price cut yields +₹25.6k
+                        gross revenue</td>
+                    </tr>
+                    <tr>
+                      <td><strong>Arabica Coffee 200g</strong></td>
+                      <td>₹340</td>
+                      <td><strong class="text-primary">₹355 (+₹15)</strong></td>
+                      <td><span class="trend-neutral">-1% vol</span></td>
+                      <td style="font-size: 0.75rem; color: var(--muted);">Inelastic demand enables margin expansion
+                        without volume drop</td>
+                    </tr>
+                    <tr>
+                      <td><strong>Greek Yogurt 400g</strong></td>
+                      <td>₹95</td>
+                      <td><strong class="text-danger">₹82 (-₹13)</strong></td>
+                      <td><span class="trend-up">+28% vol</span></td>
+                      <td style="font-size: 0.75rem; color: var(--muted);">Expiry approaching in 3 days; prompt
+                        liquidation recommended</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <script src="js/app.js"></script>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase.js"></script>
+
+  <script src="js/predictions.js"></script>
+  <script src="js/inventory.js"></script>
+
+</body>
+
+</html>

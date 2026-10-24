@@ -1,0 +1,913 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard — RetailMind AI</title>
+
+  <!-- Google Fonts & Font Awesome -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Sora:wght@400;500;600;700;800&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/dashboard.css">
+  <link rel="stylesheet" href="css/responsive.css">
+</head>
+
+<body>
+
+  <div class="app-layout">
+    <!-- ========================================== -->
+    <!-- SIDEBAR NAVIGATION                         -->
+    <!-- ========================================== -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <a href="dashboard.html" class="brand-logo">
+          <div class="brand-icon">
+            <i class="fa-solid fa-brain"></i>
+          </div>
+          <span class="brand-text">RetailMind</span>
+          <span class="brand-badge">AI</span>
+        </a>
+      </div>
+
+      <nav class="sidebar-nav">
+        <!-- Main Section -->
+        <div>
+          <div class="nav-group-title">Main</div>
+          <ul class="nav-list">
+            <li>
+              <a href="dashboard.html" class="nav-link active">
+                <div class="nav-link-content">
+                  <i class="fa-solid fa-chart-pie"></i>
+                  <span>Dashboard</span>
+                </div>
+              </a>
+            </li>
+            <li>
+              <a href="inventory.html" class="nav-link">
+                <div class="nav-link-content">
+                  <i class="fa-solid fa-boxes-stacked"></i>
+                  <span>Inventory</span>
+                </div>
+
+                <span id="inventoryLowStockBadge" class="nav-badge badge-warning"
+                  style="font-size: 0.6875rem; display: none;">
+                </span>
+              </a>
+            </li>
+            <li>
+              <a href="sales.html" class="nav-link">
+                <div class="nav-link-content">
+                  <i class="fa-solid fa-cart-shopping"></i>
+                  <span>Sales & POS</span>
+                </div>
+              </a>
+            </li>
+            <li>
+              <a href="orders.html" class="nav-link">
+                <div class="nav-link-content">
+                  <i class="fa-solid fa-receipt"></i>
+                  <span>Orders</span>
+                </div>
+              </a>
+            </li>
+            <li>
+              <a href="customers.html" class="nav-link">
+                <div class="nav-link-content">
+                  <i class="fa-solid fa-users"></i>
+                  <span>Customers</span>
+                </div>
+              </a>
+            </li>
+            <li>
+              <a href="suppliers.html" class="nav-link">
+                <div class="nav-link-content">
+                  <i class="fa-solid fa-truck"></i>
+                  <span>Suppliers</span>
+                </div>
+              </a>
+            </li>
+          </ul>
+        </div>
+
+        <!-- Intelligence Section -->
+        <div>
+          <div class="nav-group-title">Intelligence</div>
+          <ul class="nav-list">
+            <li>
+              <a href="ai-assistant.html" class="nav-link">
+                <div class="nav-link-content">
+                  <i class="fa-solid fa-robot"></i>
+                  <span>AI Assistant</span>
+                </div>
+                <span class="nav-badge badge-ai" style="font-size: 0.6875rem;">PRO</span>
+              </a>
+            </li>
+            <li>
+              <a href="analytics.html" class="nav-link">
+                <div class="nav-link-content">
+                  <i class="fa-solid fa-chart-line"></i>
+                  <span>Analytics</span>
+                </div>
+              </a>
+            </li>
+            <li>
+              <a href="predictions.html" class="nav-link">
+                <div class="nav-link-content">
+                  <i class="fa-solid fa-brain"></i>
+                  <span>Predictions</span>
+                </div>
+              </a>
+            </li>
+            <li>
+              <a href="reports.html" class="nav-link">
+                <div class="nav-link-content">
+                  <i class="fa-solid fa-file-lines"></i>
+                  <span>Reports</span>
+                </div>
+              </a>
+            </li>
+          </ul>
+        </div>
+
+        <!-- Management Section -->
+        <div>
+          <div class="nav-group-title">Management</div>
+          <ul class="nav-list">
+            <li>
+              <a href="notifications.html" class="nav-link">
+                <div class="nav-link-content">
+                  <i class="fa-solid fa-bell"></i>
+                  <span>Notifications</span>
+                </div>
+                <span class="sidebar-notification-count" hidden>0</span>
+              </a>
+            </li>
+            <li>
+              <a href="health.html" class="nav-link">
+                <div class="nav-link-content">
+                  <i class="fa-solid fa-heart-pulse"></i>
+                  <span>Business Health</span>
+                </div>
+                <span class="nav-badge badge-success" style="font-size: 0.6875rem;">87%</span>
+              </a>
+            </li>
+
+            <li>
+              <a href="members.html" class="nav-link">
+                <div class="nav-link-content">
+                  <i class="fa-solid fa-user-group"></i>
+                  <span>Business Members</span>
+                </div>
+              </a>
+            </li>
+
+            <li>
+              <a href="setup.html" class="nav-link">
+                <div class="nav-link-content">
+                  <i class="fa-solid fa-sliders"></i>
+                  <span>Setup Wizard</span>
+                </div>
+              </a>
+            </li>
+          </ul>
+        </div>
+      </nav>
+
+      <!-- Sidebar Mini Profile -->
+      <div class="sidebar-footer">
+        <div class="user-mini-card" onclick="window.location.href='profile.html'">
+          <div class="user-avatar-circle">SM</div>
+          <div class="user-info">
+            <div class="user-name">Sana Mondal</div>
+            <div class="user-role">Administrator</div>
+          </div>
+          <i class="fa-solid fa-chevron-right text-muted" style="font-size: 0.75rem;"></i>
+        </div>
+      </div>
+    </aside>
+
+    <!-- ========================================== -->
+    <!-- MAIN CONTENT WRAPPER                       -->
+    <!-- ========================================== -->
+    <div class="main-wrapper">
+      <!-- TOP NAVIGATION -->
+      <header class="topbar">
+        <div class="topbar-left">
+          <button class="mobile-toggle" aria-label="Toggle navigation">
+            <i class="fa-solid fa-bars"></i>
+          </button>
+          <div class="breadcrumb-area">
+            <div class="breadcrumb">
+              <a href="dashboard.html">RetailMind</a>
+              <i class="fa-solid fa-chevron-right" style="font-size: 0.625rem;"></i>
+              <span>Dashboard</span>
+            </div>
+            <div class="page-title">Executive Dashboard</div>
+          </div>
+        </div>
+
+        <div class="topbar-right">
+          <!-- Live Search Input -->
+          <div class="topbar-search">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <input type="text" placeholder="Search inventory, orders, SKUs..."
+              onkeydown="if(event.key==='Enter') window.location.href='inventory.html'">
+          </div>
+
+          <!-- Quick AI Assistant Action -->
+          <button class="btn-ai-quick" id="aiQuickBtn">
+            <i class="fa-solid fa-wand-magic-sparkles"></i>
+            <span>Ask AI</span>
+          </button>
+
+          <!-- Live Supabase Notifications Dropdown -->
+          <div class="dropdown-wrapper">
+            <button class="notif-trigger" id="notifToggle" type="button" aria-label="Notifications"
+              aria-expanded="false" aria-controls="notifDropdown">
+              <i class="fa-regular fa-bell"></i>
+              <span class="notif-badge" id="dashboardNotifBadge" style="display:none;"></span>
+            </button>
+
+            <div class="dropdown-menu" id="notifDropdown">
+              <div class="dropdown-header">
+                <h5>Notifications</h5>
+                <a href="notifications.html">View all</a>
+              </div>
+
+              <div class="notif-list" id="dashboardNotifList" aria-live="polite">
+                <div class="notif-empty">
+                  <i class="fa-solid fa-spinner fa-spin"></i>
+                  Loading notifications...
+                </div>
+              </div>
+
+              <div class="dashboard-notif-footer">
+                <button id="dashboardMarkAllRead" type="button">
+                  <i class="fa-solid fa-check-double"></i>
+                  Mark all as read
+                </button>
+              </div>
+            </div>
+          </div>
+
+
+          <!-- User Profile Dropdown Trigger -->
+          <div class="dropdown-wrapper">
+            <div class="user-avatar-circle" id="profileToggle" style="cursor: pointer; width: 38px; height: 38px;">SM
+            </div>
+            <div class="dropdown-menu" id="profileDropdown" style="width: 220px;">
+              <div style="padding: 1rem; border-bottom: 1px solid var(--border);">
+                <div class="font-bold text-dark">Sana Mondal</div>
+                <div class="text-muted" style="font-size: 0.75rem;">admin@retailmind.ai</div>
+              </div>
+              <div style="padding: 0.5rem 0;">
+                <a href="profile.html" class="nav-link" style="padding: 0.5rem 1rem;">
+                  <i class="fa-solid fa-user-gear"></i> Store Settings
+                </a>
+                <a href="setup.html" class="nav-link" style="padding: 0.5rem 1rem;">
+                  <i class="fa-solid fa-sliders"></i> Setup Wizard
+                </a>
+                <a href="#" id="signOutBtn" class="nav-link text-danger" style="padding: 0.5rem 1rem;">
+                  <i class="fa-solid fa-right-from-bracket"></i> Sign Out
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <!-- ========================================== -->
+      <!-- PAGE BODY                                  -->
+      <!-- ========================================== -->
+      <main class="page-container">
+        <!-- Page Greeting Header -->
+        <div class="page-header">
+          <div class="page-greeting">
+            <h1 id="dashboardGreeting">Good morning, 👋</h1>
+            <p>Here's what's happening with your business today across retail intelligence and sales streams.</p>
+          </div>
+          <div style="display: flex; gap: 0.75rem; align-items: center;">
+            <div class="chart-time-pills">
+              <button class="time-pill">7D</button>
+              <button class="time-pill active" data-timeframe="30D">Last 30 days ▼</button>
+              <button class="time-pill">90D</button>
+              <button class="time-pill">1Y</button>
+            </div>
+            <button class="btn btn-primary btn-sm" onclick="window.location.href='sales.html'">
+              <i class="fa-solid fa-cash-register"></i> Open POS
+            </button>
+          </div>
+        </div>
+
+        <!-- ========================================== -->
+        <!-- 6 PREMIUM KPI CARDS                        -->
+        <!-- ========================================== -->
+        <section class="kpi-grid">
+          <!-- KPI 1: Total Revenue -->
+          <div class="kpi-card">
+            <div class="kpi-header">
+              <span class="kpi-title">Total Revenue</span>
+              <div class="kpi-icon" style="background: #F3E8FF; color: var(--primary);">
+                <i class="fa-solid fa-indian-rupee-sign"></i>
+              </div>
+            </div>
+
+            <div class="kpi-value" id="totalRevenue">₹0</div>
+
+            <div class="kpi-footer trend-up">
+              <i class="fa-solid fa-arrow-trend-up"></i>
+              <span>+12.8%</span>
+              <span class="trend-neutral">vs last month</span>
+            </div>
+          </div>
+
+          <!-- KPI 2: Net Profit -->
+          <div class="kpi-card">
+            <div class="kpi-header">
+              <span class="kpi-title">Net Profit</span>
+              <div class="kpi-icon" style="background: #E6FBF5; color: var(--accent-dark);">
+                <i class="fa-solid fa-chart-pie"></i>
+              </div>
+            </div>
+            <div class="kpi-value" id="netProfit">₹0</div>
+            <div class="kpi-footer trend-up">
+              <i class="fa-solid fa-arrow-trend-up"></i>
+              <span>+8.4%</span>
+              <span class="trend-neutral">25.9% margin</span>
+            </div>
+          </div>
+
+          <!-- KPI 3: Total Orders -->
+          <div class="kpi-card">
+            <div class="kpi-header">
+              <span class="kpi-title">Total Orders</span>
+              <div class="kpi-icon" style="background: #EFF6FF; color: var(--info);">
+                <i class="fa-solid fa-bag-shopping"></i>
+              </div>
+            </div>
+            <div class="kpi-value" id="totalOrders">0</div>
+            <div class="kpi-footer trend-up">
+              <i class="fa-solid fa-arrow-trend-up"></i>
+              <span>+15.2%</span>
+              <span class="trend-neutral">42/day avg</span>
+            </div>
+          </div>
+
+          <!-- KPI 4: Inventory Value -->
+          <div class="kpi-card">
+            <div class="kpi-header">
+              <span class="kpi-title">Inventory Value</span>
+              <div class="kpi-icon" style="background: #FFFBEB; color: var(--warning);">
+                <i class="fa-solid fa-boxes-stacked"></i>
+              </div>
+            </div>
+
+            <div class="kpi-value" id="inventoryValue">₹0</div>
+
+            <div class="kpi-footer trend-down">
+              <i class="fa-solid fa-arrow-trend-down"></i>
+              <span>-3.6%</span>
+              <span class="trend-neutral">optimized stock</span>
+            </div>
+          </div>
+
+          <!-- KPI 5: Low Stock -->
+          <div class="kpi-card" style="border-left: 3px solid var(--danger);">
+            <div class="kpi-header">
+              <span class="kpi-title">Low Stock</span>
+              <div class="kpi-icon" style="background: #FEF2F2; color: var(--danger);">
+                <i class="fa-solid fa-triangle-exclamation"></i>
+              </div>
+            </div>
+            <div class="kpi-value text-danger" id="lowStockCount">0 Products</div>
+            <div class="kpi-footer">
+              <span class="badge badge-danger" style="font-size: 0.6875rem;">Needs attention</span>
+            </div>
+          </div>
+
+          <!-- KPI 6: Business Health -->
+          <div class="kpi-card" style="border-left: 3px solid var(--accent);">
+            <div class="kpi-header">
+              <span class="kpi-title">Business Health</span>
+              <div class="kpi-icon" style="background: #E6FBF5; color: var(--accent-dark);">
+                <i class="fa-solid fa-heart-pulse"></i>
+              </div>
+            </div>
+            <div class="kpi-value text-dark" id="businessHealth">0 / 100</div>
+            <div class="kpi-footer">
+              <span class="badge badge-success" id="businessHealthStatus" style="font-size: 0.6875rem;">
+                Good Condition
+              </span>
+            </div>
+          </div>
+        </section>
+
+        <!-- ========================================== -->
+        <!-- AI BUSINESS INSIGHTS BANNER                -->
+        <!-- ========================================== -->
+        <section class="ai-insight-banner">
+          <div class="ai-insight-content">
+            <div class="ai-badge-chip">
+              <i class="fa-solid fa-sparkles"></i> AI Business Insight
+            </div>
+            <div class="ai-insight-text">
+              Your beverage category is expected to experience a <strong>21% demand surge</strong> next week driven by
+              rising ambient temperature and local weekend events.
+            </div>
+            <div class="ai-insight-action-box">
+              <i class="fa-solid fa-circle-check"></i> Recommended Action: <span>Increase beverage inventory by approx.
+                85 units before Friday.</span>
+            </div>
+          </div>
+          <div class="ai-insight-metrics">
+            <div class="confidence-box">
+              <div class="confidence-val">92%</div>
+              <div class="confidence-label">AI Confidence</div>
+            </div>
+            <a href="predictions.html" class="btn btn-accent btn-sm">
+              <i class="fa-solid fa-arrow-right"></i> View Prediction
+            </a>
+          </div>
+        </section>
+
+        <!-- ========================================== -->
+        <!-- CHARTS SECTION: SALES OVERVIEW + FORECAST  -->
+        <!-- ========================================== -->
+        <div class="grid grid-cols-2" style="margin-bottom: 1.75rem;">
+          <!-- Sales Overview Chart -->
+          <div class="card">
+            <div class="card-header">
+              <div>
+                <h3 class="card-title">Sales Overview</h3>
+                <p class="card-subtitle">Revenue and order performance over time.</p>
+              </div>
+              <div class="chart-time-pills">
+                <button class="time-pill" data-timeframe="7D">7D</button>
+                <button class="time-pill active" data-timeframe="30D">30D</button>
+                <button class="time-pill" data-timeframe="90D">90D</button>
+                <button class="time-pill" data-timeframe="1Y">1Y</button>
+              </div>
+            </div>
+            <div class="card-body" style="height: 320px;">
+              <canvas id="salesOverviewChart"></canvas>
+            </div>
+          </div>
+
+          <!-- Next 7 Days Demand Forecast -->
+          <div class="card card-ai">
+            <div class="card-header">
+              <div>
+                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                  <span class="badge badge-ai"><i class="fa-solid fa-brain"></i> Predictive AI</span>
+                  <h3 class="card-title">Next 7 Days Demand Forecast</h3>
+                </div>
+                <p class="card-subtitle">Historical actuals vs. machine learning projections with confidence envelope.
+                </p>
+              </div>
+              <a href="predictions.html" class="btn btn-ghost btn-sm text-primary">
+                Deep Dive <i class="fa-solid fa-arrow-right"></i>
+              </a>
+            </div>
+            <div class="card-body" style="height: 320px;">
+              <canvas id="demandForecastChart"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <!-- ========================================== -->
+        <!-- PRODUCT RANKINGS & INVENTORY OVERVIEW      -->
+        <!-- ========================================== -->
+        <div class="grid grid-cols-3" style="margin-bottom: 1.75rem;">
+          <!-- Top Selling Products -->
+          <div class="card" style="grid-column: span 2;">
+            <div class="card-header">
+              <div>
+                <h3 class="card-title">Top Selling Products</h3>
+                <p class="card-subtitle">Highest revenue generating retail lines this month</p>
+              </div>
+              <a href="inventory.html" class="btn btn-ghost btn-sm text-primary">View Inventory</a>
+            </div>
+            <div class="table-responsive">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th>Rank</th>
+                    <th>Product</th>
+                    <th>Category</th>
+                    <th>Units Sold</th>
+                    <th>Revenue</th>
+                    <th>Trend</th>
+                  </tr>
+                </thead>
+                <tbody id="topSellingProductsBody">
+                  <tr>
+                    <td><span class="badge badge-primary">#1</span></td>
+                    <td>
+                      <div class="font-bold text-dark">Fresh Milk 1L</div>
+                      <div class="text-muted" style="font-size: 0.75rem;">Heritage Dairy Farms</div>
+                    </td>
+                    <td><span class="badge badge-primary">Dairy</span></td>
+                    <td>420 units</td>
+                    <td><strong>₹26,040</strong></td>
+                    <td><span class="trend-up"><i class="fa-solid fa-arrow-up"></i> 18.4%</span></td>
+                  </tr>
+                  <tr>
+                    <td><span class="badge badge-primary">#2</span></td>
+                    <td>
+                      <div class="font-bold text-dark">Whole Wheat Bread 400g</div>
+                      <div class="text-muted" style="font-size: 0.75rem;">Golden Crust Bakers</div>
+                    </td>
+                    <td><span class="badge badge-primary">Bakery</span></td>
+                    <td>310 units</td>
+                    <td><strong>₹13,950</strong></td>
+                    <td><span class="trend-up"><i class="fa-solid fa-arrow-up"></i> 12.1%</span></td>
+                  </tr>
+                  <tr>
+                    <td><span class="badge badge-primary">#3</span></td>
+                    <td>
+                      <div class="font-bold text-dark">Sunflower Cooking Oil 1L</div>
+                      <div class="text-muted" style="font-size: 0.75rem;">AgroPure Refineries</div>
+                    </td>
+                    <td><span class="badge badge-primary">Oils</span></td>
+                    <td>240 units</td>
+                    <td><strong>₹39,600</strong></td>
+                    <td><span class="trend-up"><i class="fa-solid fa-arrow-up"></i> 9.5%</span></td>
+                  </tr>
+                  <tr>
+                    <td><span class="badge badge-primary">#4</span></td>
+                    <td>
+                      <div class="font-bold text-dark">Basmati Rice 5kg</div>
+                      <div class="text-muted" style="font-size: 0.75rem;">Punjab Royal Mills</div>
+                    </td>
+                    <td><span class="badge badge-primary">Grains</span></td>
+                    <td>185 units</td>
+                    <td><strong>₹88,800</strong></td>
+                    <td><span class="trend-up"><i class="fa-solid fa-arrow-up"></i> 14.2%</span></td>
+                  </tr>
+                  <tr>
+                    <td><span class="badge badge-primary">#5</span></td>
+                    <td>
+                      <div class="font-bold text-dark">Premium Assam Tea 500g</div>
+                      <div class="text-muted" style="font-size: 0.75rem;">Valley Tea Estates</div>
+                    </td>
+                    <td><span class="badge badge-primary">Beverages</span></td>
+                    <td>165 units</td>
+                    <td><strong>₹47,850</strong></td>
+                    <td><span class="trend-down"><i class="fa-solid fa-arrow-down"></i> 2.8%</span></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Inventory Status Overview Card -->
+          <div class="card">
+            <div class="card-header">
+              <div>
+                <h3 class="card-title">Inventory Overview</h3>
+                <p class="card-subtitle">Real-time catalog stock distribution</p>
+              </div>
+              <a href="inventory.html" class="btn btn-outline btn-sm">Manage</a>
+            </div>
+            <div class="card-body">
+              <div style="display: flex; flex-direction: column; gap: 1rem;">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                  <span class="text-muted">Total Products:</span>
+                  <span id="totalProductsCount" class="font-bold text-dark" style="font-size: 1.125rem;">0 SKUs</span>
+                </div>
+
+                <!-- Status Pills -->
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
+                  <div style="background: var(--success-bg); padding: 0.75rem; border-radius: var(--radius-md);">
+                    <div style="font-size: 0.75rem; color: #065F46; font-weight: 600;">In Stock</div>
+                    <div id="inStockCount" style="font-size: 1.25rem; font-weight: 800; color: #065F46;">0</div>
+                  </div>
+                  <div style="background: var(--warning-bg); padding: 0.75rem; border-radius: var(--radius-md);">
+                    <div style="font-size: 0.75rem; color: #92400E; font-weight: 600;">Low Stock</div>
+                    <div id="overviewLowStockCount" style="font-size: 1.25rem; font-weight: 800; color: #92400E;">0
+                    </div>
+                  </div>
+                  <div style="background: var(--danger-bg); padding: 0.75rem; border-radius: var(--radius-md);">
+                    <div style="font-size: 0.75rem; color: #991B1B; font-weight: 600;">Out of Stock</div>
+                    <div id="outOfStockCount" style="font-size: 1.25rem; font-weight: 800; color: #991B1B;">0</div>
+                  </div>
+                  <div
+                    style="background: #FAF5FF; padding: 0.75rem; border-radius: var(--radius-md); border: 1px solid #E9D5FF;">
+                    <div style="font-size: 0.75rem; color: var(--primary); font-weight: 600;">Near Expiry</div>
+                    <div style="font-size: 1.25rem; font-weight: 800; color: var(--primary);">29</div>
+                  </div>
+                </div>
+
+                <!-- Visual Stacked Progress Bar -->
+                <div style="margin-top: 0.5rem;">
+                  <div
+                    style="font-size: 0.75rem; color: var(--muted); margin-bottom: 0.375rem; display: flex; justify-content: space-between;">
+                    <span>Stock Health Ratio</span>
+                    <span>88.3% Healthy</span>
+                  </div>
+                  <div style="height: 8px; border-radius: 999px; display: flex; overflow: hidden; background: #E5E7EB;">
+                    <div style="width: 88%; background: var(--success);" title="In Stock"></div>
+                    <div style="width: 8%; background: var(--warning);" title="Low Stock"></div>
+                    <div style="width: 4%; background: var(--danger);" title="Critical"></div>
+                  </div>
+                </div>
+
+                <div
+                  style="background: var(--surface-subtle); padding: 0.875rem; border-radius: var(--radius-md); border: 1px dashed var(--border); font-size: 0.8125rem;">
+                  <i class="fa-solid fa-lightbulb text-warning"></i>
+                  AI suggests bundling <strong>29 near-expiry products</strong> to recover ₹14,200 in working capital.
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ========================================== -->
+        <!-- LOW STOCK ALERTS & RECENT ORDERS           -->
+        <!-- ========================================== -->
+        <div class="grid grid-cols-2" style="margin-bottom: 1.75rem;">
+          <!-- Low Stock Alerts Table -->
+          <div class="card" style="border-top: 3px solid var(--danger);">
+            <div class="card-header">
+              <div>
+                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                  <span class="badge badge-danger"><i class="fa-solid fa-triangle-exclamation"></i> Action
+                    Required</span>
+                  <h3 class="card-title">Low Stock Alerts</h3>
+                </div>
+                <p class="card-subtitle">Products needing replenishment before weekend stockout</p>
+              </div>
+              <a href="predictions.html#reorder" class="btn btn-primary btn-sm">Smart Reorder All</a>
+            </div>
+            <div class="table-responsive">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th>Product</th>
+                    <th>Current</th>
+                    <th>Reorder Level</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody id="lowStockAlertsBody">
+                  <tr>
+                    <td>
+                      <div class="font-bold text-dark">Fresh Milk 1L</div>
+                      <div class="text-muted" style="font-size: 0.75rem;">Heritage Dairy</div>
+                    </td>
+                    <td><span class="text-danger font-bold">12 units</span></td>
+                    <td>50 units</td>
+                    <td><span class="badge badge-danger">Critical</span></td>
+                    <td>
+                      <button class="btn btn-sm btn-primary btn-reorder" data-product="Fresh Milk 1L"
+                        data-supplier="Heritage Dairy Farms">
+                        Reorder
+                      </button>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <div class="font-bold text-dark">Basmati Rice 5kg</div>
+                      <div class="text-muted" style="font-size: 0.75rem;">Punjab Royal Mills</div>
+                    </td>
+                    <td><span class="text-warning font-bold">24 units</span></td>
+                    <td>40 units</td>
+                    <td><span class="badge badge-warning">Low</span></td>
+                    <td>
+                      <button class="btn btn-sm btn-primary btn-reorder" data-product="Basmati Rice 5kg"
+                        data-supplier="Punjab Royal Mills">
+                        Reorder
+                      </button>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <div class="font-bold text-dark">Sunflower Cooking Oil 1L</div>
+                      <div class="text-muted" style="font-size: 0.75rem;">AgroPure Refineries</div>
+                    </td>
+                    <td><span class="text-warning font-bold">18 units</span></td>
+                    <td>30 units</td>
+                    <td><span class="badge badge-warning">Low</span></td>
+                    <td>
+                      <button class="btn btn-sm btn-primary btn-reorder" data-product="Sunflower Cooking Oil 1L"
+                        data-supplier="AgroPure Refineries">
+                        Reorder
+                      </button>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <div class="font-bold text-dark">Whole Wheat Bread 400g</div>
+                      <div class="text-muted" style="font-size: 0.75rem;">Golden Crust Bakers</div>
+                    </td>
+                    <td><span class="text-warning font-bold">18 units</span></td>
+                    <td>40 units</td>
+                    <td><span class="badge badge-warning">Low</span></td>
+                    <td>
+                      <button class="btn btn-sm btn-primary btn-reorder" data-product="Whole Wheat Bread 400g"
+                        data-supplier="Golden Crust Bakers">
+                        Reorder
+                      </button>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Recent Orders Table -->
+          <div class="card">
+            <div class="card-header">
+              <div>
+                <h3 class="card-title">Recent Orders</h3>
+                <p class="card-subtitle">Live in-store and POS transactions</p>
+              </div>
+              <a href="orders.html" class="btn btn-outline btn-sm">View All Orders</a>
+            </div>
+            <div class="table-responsive">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th>Order ID</th>
+                    <th>Customer</th>
+                    <th>Date</th>
+                    <th>Amount</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody id="recentOrdersBody">
+                  <tr>
+                    <td><code>ORD-10248</code></td>
+                    <td><strong>Ananya Sharma</strong></td>
+                    <td class="text-muted">Today, 02:45 PM</td>
+                    <td><strong>₹169</strong></td>
+                    <td><span class="badge badge-success"><span class="badge-dot"></span> Completed</span></td>
+                  </tr>
+                  <tr>
+                    <td><code>ORD-10247</code></td>
+                    <td><strong>Vikram Malhotra</strong></td>
+                    <td class="text-muted">Today, 01:15 PM</td>
+                    <td><strong>₹810</strong></td>
+                    <td><span class="badge badge-success"><span class="badge-dot"></span> Completed</span></td>
+                  </tr>
+                  <tr>
+                    <td><code>ORD-10246</code></td>
+                    <td><strong>Pooja Verma</strong></td>
+                    <td class="text-muted">Today, 11:30 AM</td>
+                    <td><strong>₹455</strong></td>
+                    <td><span class="badge badge-info"><span class="badge-dot"></span> Processing</span></td>
+                  </tr>
+                  <tr>
+                    <td><code>ORD-10245</code></td>
+                    <td><strong>Rahul Deshmukh</strong></td>
+                    <td class="text-muted">Yesterday, 06:20 PM</td>
+                    <td><strong>₹1,000</strong></td>
+                    <td><span class="badge badge-success"><span class="badge-dot"></span> Completed</span></td>
+                  </tr>
+                  <tr>
+                    <td><code>ORD-10244</code></td>
+                    <td><strong>Sneha Patel</strong></td>
+                    <td class="text-muted">Yesterday, 04:10 PM</td>
+                    <td><strong>₹408</strong></td>
+                    <td><span class="badge badge-warning"><span class="badge-dot"></span> Pending</span></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- ========================================== -->
+        <!-- BUSINESS HEALTH SCORE DETAILED SECTION     -->
+        <!-- ========================================== -->
+        <section class="card card-ai" style="margin-bottom: 2rem;">
+          <div class="card-header">
+            <div>
+              <div style="display: flex; align-items: center; gap: 0.5rem;">
+                <span class="badge badge-ai"><i class="fa-solid fa-heart-pulse"></i> Diagnostic Score</span>
+                <h3 class="card-title">Business Health Score</h3>
+              </div>
+              <p class="card-subtitle">Comprehensive operational efficiency and solvency rating</p>
+            </div>
+            <a href="health.html" class="btn btn-outline-primary btn-sm">Full Health Diagnostic</a>
+          </div>
+          <div class="card-body">
+            <div class="grid grid-cols-3 items-center">
+              <!-- Circular Progress Gauge -->
+              <div class="health-score-card">
+                <div class="circular-score-wrapper">
+                  <svg width="140" height="140">
+                    <circle cx="70" cy="70" r="56" fill="none" stroke="#F3E8FF" stroke-width="12"></circle>
+                    <circle id="healthCircleProgress" cx="70" cy="70" r="56" fill="none" stroke="url(#healthGradient)"
+                      stroke-width="12" stroke-linecap="round"></circle>
+                    <defs>
+                      <linearGradient id="healthGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" stop-color="#5A1188" />
+                        <stop offset="100%" stop-color="#00D4A0" />
+                      </linearGradient>
+                    </defs>
+                  </svg>
+                  <div class="circular-score-center">
+                    <div class="score-big-num" id="healthDetailedScore">87</div>
+                    <div class="score-max">/ 100</div>
+                  </div>
+                </div>
+                <div class="badge badge-success" id="healthDetailedStatus"
+                  style="font-size: 0.8125rem; padding: 0.35rem 0.875rem;">125rem; padding: 0.35rem 0.875rem;">
+                  <i class="fa-solid fa-circle-check"></i> Excellent Health
+                </div>
+              </div>
+
+              <!-- Metric Breakdown Bars -->
+              <div class="health-metrics-list" style="grid-column: span 2;">
+                <!-- Row 1: Profitability -->
+                <div class="health-metric-row">
+                  <div class="health-metric-info">
+                    <span class="font-semibold text-dark">Profitability Margins</span>
+                    <span class="font-bold text-primary" id="healthProfitability">91%</span>
+                  </div>
+                  <div class="health-bar-track">
+                    <div class="health-bar-fill" id="healthProfitabilityBar"
+                      style="width: 91%; background: var(--primary);"></div>
+                  </div>
+                </div>
+                <!-- Row 2: Inventory Turnover -->
+                <div class="health-metric-row">
+                  <div class="health-metric-info">
+                    <span class="font-semibold text-dark">Inventory Turnover Speed</span>
+                    <span class="font-bold text-accent" id="healthInventory">84%</span>
+                  </div>
+                  <div class="health-bar-track">
+                    <div class="health-bar-fill" id="healthInventoryBar" style="width: 84%; background: var(--accent);">
+                    </div>
+                  </div>
+                </div>
+                <!-- Row 3: Customer Growth -->
+                <div class="health-metric-row">
+                  <div class="health-metric-info">
+                    <span class="font-semibold text-dark">Customer Retention & Growth</span>
+                    <span class="font-bold text-info" id="healthCustomer">89%</span>
+                  </div>
+                  <div class="health-bar-track">
+                    <div class="health-bar-fill" id="healthCustomerBar" style="width: 89%; background: var(--info);">
+                    </div>
+                  </div>
+                </div>
+                <!-- Row 4: Stock Accuracy -->
+                <div class="health-metric-row">
+                  <div class="health-metric-info">
+                    <span class="font-semibold text-dark">Stock Accuracy & Replenishment</span>
+                    <span class="font-bold text-primary-light" id="healthStock">86%</span>
+                  </div>
+                  <div class="health-bar-track">
+                    <div class="health-bar-fill" id="healthStockBar"
+                      style="width: 86%; background: var(--primary-light);"></div>
+                  </div>
+                </div>
+                <!-- Row 5: Supplier Performance -->
+                <div class="health-metric-row">
+                  <div class="health-metric-info">
+                    <span class="font-semibold text-dark">Supplier Fulfillment Reliability</span>
+                    <span class="font-bold text-warning" id="healthSupplier">85%</span>
+                  </div>
+                  <div class="health-bar-track">
+                    <div class="health-bar-fill" id="healthSupplierBar" style="width: 85%; background: var(--warning);">
+                    </div>
+                  </div>
+                </div>
+
+                <!-- AI Diagnostic Explanation Quote -->
+                <div id="healthDiagnosticText"
+                  style="margin-top: 0.75rem; background: #FFFFFF; padding: 0.875rem 1.25rem; border-radius: var(--radius-md); border: 1px solid var(--border); font-size: 0.875rem; line-height: 1.5; color: var(--text);">
+                  <i class="fa-solid fa-quote-left text-primary" style="margin-right: 0.5rem;"></i>
+                  "Your business is performing strongly. Inventory turnover improved this month, while supplier delivery
+                  delays remain the primary operational risk to address before Diwali season."
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+  </div>
+
+  <!-- Chart.js & Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <!-- Supabase -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase.js"></script>
+  <script src="js/app.js"></script>
+  <script src="js/charts.js"></script>
+  <script src="js/dashboard.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard — RetailMind AI Demo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Sora:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/responsive.css">
+<style>
+:root { --demo-purple:#5A1188; --demo-mint:#42E8C2; }
+.demo-wrap { max-width:1200px; margin:0 auto; padding:2rem; }
+.demo-top { display:flex; justify-content:space-between; align-items:center; gap:1rem; flex-wrap:wrap; margin-bottom:1.5rem; }
+.demo-brand { display:flex; align-items:center; gap:.6rem; font-family:var(--font-heading); font-weight:800; font-size:1.15rem; }
+.demo-banner { border:1px solid #e9d5ff; background:#faf5ff; color:#581c87; border-radius:12px; padding:.8rem 1rem; font-size:.88rem; margin-bottom:1.25rem; }
+.demo-card { background:#fff; border:1px solid var(--border,#e5e7eb); border-radius:16px; padding:1.2rem; box-shadow:0 8px 24px rgba(17,24,39,.04); }
+.demo-grid { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:1rem; }
+.demo-value { font-family:var(--font-heading); font-size:1.65rem; font-weight:800; margin:.45rem 0; }
+.demo-muted { color:#6b7280; font-size:.85rem; }
+.demo-pill { display:inline-block; border-radius:999px; background:#f3e8ff; color:#6b21a8; padding:.25rem .6rem; font-size:.75rem; font-weight:700; }
+.demo-btn { cursor:pointer; border:0; border-radius:9px; padding:.65rem .9rem; font-weight:700; background:#5A1188; color:#fff; }
+.demo-btn.secondary { background:#f3e8ff; color:#5A1188; }
+.demo-btn:disabled { opacity:.5; cursor:not-allowed; }
+.demo-table { width:100%; border-collapse:collapse; font-size:.9rem; }
+.demo-table th,.demo-table td { padding:.8rem .65rem; border-bottom:1px solid #eee; text-align:left; }
+.demo-table th { color:#6b7280; font-size:.75rem; text-transform:uppercase; letter-spacing:.04em; }
+.demo-row { display:flex; justify-content:space-between; gap:1rem; align-items:center; padding:.8rem 0; border-bottom:1px solid #eee; }
+.demo-input,.demo-select { width:100%; padding:.65rem; border:1px solid #d1d5db; border-radius:8px; background:#fff; }
+.demo-footer { text-align:center; color:#6b7280; font-size:.8rem; padding:2rem; }
+.demo-nav { display:flex; flex-wrap:wrap; gap:.7rem; }
+.demo-nav a { text-decoration:none; border:1px solid #e5e7eb; padding:.55rem .75rem; border-radius:8px; color:#374151; font-weight:600; font-size:.85rem; }
+.demo-nav a:hover { border-color:#c084fc; color:#5A1188; }
+@media(max-width:800px) { .demo-grid {grid-template-columns:repeat(2,minmax(0,1fr));} .demo-wrap {padding:1rem;} }
+@media(max-width:480px) { .demo-grid {grid-template-columns:1fr 1fr;} .demo-value {font-size:1.25rem;} .demo-table {font-size:.8rem;} }
+</style>
+</head>
+<body>
+<div class="demo-wrap">
+  <div class="demo-top">
+    <a href="index.html" style="text-decoration:none;color:inherit" class="demo-brand"><span class="brand-icon"><i class="fa-solid fa-brain"></i></span> RetailMind <span class="brand-badge">AI</span></a>
+    <nav class="demo-nav">
+      <a href="index.html"><i class="fa-solid fa-house"></i> Landing page</a>
+      <a href="demo-dashboard.html"><i class="fa-solid fa-chart-line"></i> Dashboard</a>
+      <a href="demo-pos.html"><i class="fa-solid fa-cash-register"></i> POS Demo</a>
+      <a href="demo-predictions.html"><i class="fa-solid fa-wand-magic-sparkles"></i> AI Predictions</a>
+      <a href="login.html"><i class="fa-solid fa-right-to-bracket"></i> Sign in</a>
+    </nav>
+  </div>
+  <div class="demo-banner"><i class="fa-solid fa-circle-info"></i> <strong>Interactive demo mode:</strong> all products, sales, totals, and predictions on this page are mock data. Nothing is saved to Supabase or your real business.</div>
+
+  <h1 style="font-family:var(--font-heading);margin-bottom:.35rem">Retail overview</h1>
+  <p class="demo-muted" style="margin-bottom:1.4rem">A sample merchant dashboard with simulated sales and inventory activity.</p>
+  <div class="demo-grid">
+    <div class="demo-card"><div class="demo-muted">TOTAL REVENUE</div><div class="demo-value" id="revenue">₹8,42,650</div><span style="color:#059669;font-size:.8rem;font-weight:700"><i class="fa-solid fa-arrow-trend-up"></i> +12.8% vs last month</span></div>
+    <div class="demo-card"><div class="demo-muted">NET PROFIT</div><div class="demo-value">₹2,18,420</div><span style="color:#059669;font-size:.8rem;font-weight:700">25.9% margin</span></div>
+    <div class="demo-card"><div class="demo-muted">LOW STOCK ITEMS</div><div class="demo-value" style="color:#dc2626">24</div><span class="demo-muted">Restock recommended</span></div>
+    <div class="demo-card"><div class="demo-muted">ORDERS TODAY</div><div class="demo-value" id="ordersToday">126</div><span class="demo-muted">Across all demo channels</span></div>
+  </div>
+  <div class="demo-grid" style="grid-template-columns:1.5fr 1fr;margin-top:1rem">
+    <section class="demo-card">
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:1rem;flex-wrap:wrap"><h2 style="font-size:1.1rem">Revenue performance</h2><span class="demo-pill">Last 7 days · sample</span></div>
+      <div style="height:220px;display:flex;align-items:end;gap:12px;padding:1.5rem .5rem .2rem;border-bottom:1px solid #eee">
+        <div style="flex:1;text-align:center"><div style="height:85px;background:#d8b4fe;border-radius:7px 7px 0 0"></div><small>M</small></div>
+        <div style="flex:1;text-align:center"><div style="height:112px;background:#c084fc;border-radius:7px 7px 0 0"></div><small>T</small></div>
+        <div style="flex:1;text-align:center"><div style="height:98px;background:#a855f7;border-radius:7px 7px 0 0"></div><small>W</small></div>
+        <div style="flex:1;text-align:center"><div style="height:140px;background:#9333ea;border-radius:7px 7px 0 0"></div><small>T</small></div>
+        <div style="flex:1;text-align:center"><div style="height:126px;background:#7e22ce;border-radius:7px 7px 0 0"></div><small>F</small></div>
+        <div style="flex:1;text-align:center"><div style="height:170px;background:#6b21a8;border-radius:7px 7px 0 0"></div><small>S</small></div>
+        <div style="flex:1;text-align:center"><div style="height:150px;background:#5A1188;border-radius:7px 7px 0 0"></div><small>S</small></div>
+      </div>
+      <p class="demo-muted" style="margin-top:.8rem">Bars are illustrative demo values, not connected to live sales.</p>
+    </section>
+    <section class="demo-card">
+      <h2 style="font-size:1.1rem;margin-bottom:.8rem">AI business insights</h2>
+      <div class="demo-row"><div><strong><i class="fa-solid fa-bottle-water" style="color:#7c3aed"></i> Beverages</strong><div class="demo-muted">Demand likely to rise next week</div></div><strong style="color:#059669">+21%</strong></div>
+      <div class="demo-row"><div><strong><i class="fa-solid fa-box" style="color:#d97706"></i> Pantry essentials</strong><div class="demo-muted">3 items nearing reorder point</div></div><span class="demo-pill">Review</span></div>
+      <div class="demo-row"><div><strong><i class="fa-solid fa-clock" style="color:#dc2626"></i> Slow movers</strong><div class="demo-muted">Check long-stay inventory</div></div><span class="demo-pill">Tip</span></div>
+      <a class="demo-btn" style="display:inline-block;text-decoration:none;margin-top:1rem" href="demo-predictions.html">Explore AI predictions</a>
+    </section>
+  </div>
+  <section class="demo-card" style="margin-top:1rem">
+    <div style="display:flex;justify-content:space-between;align-items:center;gap:1rem;flex-wrap:wrap"><h2 style="font-size:1.1rem">Recent demo sales</h2><a href="demo-pos.html" class="demo-btn secondary" style="text-decoration:none">Open POS terminal</a></div>
+    <table class="demo-table"><thead><tr><th>Order</th><th>Customer</th><th>Items</th><th>Payment</th><th>Total</th><th>Status</th></tr></thead><tbody id="salesRows">
+    <tr><td>#RM-1048</td><td>Priya Das</td><td>4</td><td>UPI</td><td>₹1,240.00</td><td><span style="color:#059669">Completed</span></td></tr>
+    <tr><td>#RM-1047</td><td>Walk-in customer</td><td>2</td><td>Cash</td><td>₹385.00</td><td><span style="color:#059669">Completed</span></td></tr>
+    <tr><td>#RM-1046</td><td>Arjun Sen</td><td>3</td><td>Card</td><td>₹798.00</td><td><span style="color:#059669">Completed</span></td></tr>
+    </tbody></table>
+  </section>
+  <div class="demo-footer">RetailMind AI · Sample dashboard only · <a href="login.html">Sign in to your account</a></div>
+</div>
+<script>
+(() => {
+  // Reflect mock checkout totals in the demo dashboard within this browser only.
+  const sales = JSON.parse(sessionStorage.getItem('rm_demo_sales') || '[]');
+  if (sales.length) {
+    const total = sales.reduce((sum, sale) => sum + sale.total, 0);
+    document.getElementById('revenue').textContent = '₹' + (842650 + total).toLocaleString('en-IN');
+    document.getElementById('ordersToday').textContent = String(126 + sales.length);
+    const rows = document.getElementById('salesRows');
+    sales.slice().reverse().forEach((sale, i) => {
+      const tr = document.createElement('tr');
+      [sale.id, sale.customer, sale.items, sale.payment, '₹' + sale.total.toLocaleString('en-IN',{minimumFractionDigits:2,maximumFractionDigits:2}), 'Demo completed'].forEach((value) => {
+        const td = document.createElement('td'); td.textContent = value; tr.appendChild(td);
+      });
+      rows.prepend(tr);
+    });
+  }
+})();
+</script>
+</body></html>

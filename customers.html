@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Customer Intelligence & Segments — RetailMind AI</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Sora:wght@400;500;600;700;800&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/dashboard.css">
+  <link rel="stylesheet" href="css/responsive.css">
+</head>
+
+<body>
+  <div class="app-layout">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <a href="dashboard.html" class="brand-logo">
+          <div class="brand-icon">
+            <i class="fa-solid fa-brain"></i>
+          </div>
+          <span class="brand-text">RetailMind</span>
+          <span class="brand-badge">AI</span>
+        </a>
+      </div>
+
+      <nav class="sidebar-nav">
+        <div>
+          <div class="nav-group-title">Main</div>
+          <ul class="nav-list">
+            <li>
+              <a href="dashboard.html" class="nav-link">
+                <div class="nav-link-content">
+                  <i class="fa-solid fa-chart-pie"></i>
+                  <span>Dashboard</span>
+                </div>
+              </a>
+            </li>
+            <li>
+              <a href="inventory.html" class="nav-link">
+                <div class="nav-link-content">
+                  <i class="fa-solid fa-boxes-stacked"></i>
+                  <span>Inventory</span>
+                </div>
+                <span id="inventoryLowStockBadge" class="nav-badge badge-warning"
+                  style="font-size:0.6875rem;display:none;"></span>
+              </a>
+            </li>
+            <li>
+              <a href="sales.html" class="nav-link">
+                <div class="nav-link-content">
+                  <i class="fa-solid fa-cart-shopping"></i>
+                  <span>Sales & POS</span>
+                </div>
+              </a>
+            </li>
+            <li>
+              <a href="orders.html" class="nav-link">
+                <div class="nav-link-content">
+                  <i class="fa-solid fa-receipt"></i>
+                  <span>Orders</span>
+                </div>
+              </a>
+            </li>
+            <li>
+              <a href="customers.html" class="nav-link active">
+                <div class="nav-link-content">
+                  <i class="fa-solid fa-users"></i>
+                  <span>Customers</span>
+                </div>
+              </a>
+            </li>
+            <li>
+              <a href="suppliers.html" class="nav-link">
+                <div class="nav-link-content">
+                  <i class="fa-solid fa-truck"></i>
+                  <span>Suppliers</span>
+                </div>
+              </a>
+            </li>
+          </ul>
+        </div>
+
+        <div>
+          <div class="nav-group-title">Intelligence</div>
+          <ul class="nav-list">
+            <li>
+              <a href="ai-assistant.html" class="nav-link">
+                <div class="nav-link-content">
+                  <i class="fa-solid fa-robot"></i>
+                  <span>AI Assistant</span>
+                </div>
+                <span class="nav-badge badge-ai" style="font-size:0.6875rem;">PRO</span>
+              </a>
+            </li>
+            <li>
+              <a href="analytics.html" class="nav-link">
+                <div class="nav-link-content">
+                  <i class="fa-solid fa-chart-line"></i>
+                  <span>Analytics</span>
+                </div>
+              </a>
+            </li>
+            <li>
+              <a href="predictions.html" class="nav-link">
+                <div class="nav-link-content">
+                  <i class="fa-solid fa-brain"></i>
+                  <span>Predictions</span>
+                </div>
+              </a>
+            </li>
+            <li>
+              <a href="reports.html" class="nav-link">
+                <div class="nav-link-content">
+                  <i class="fa-solid fa-file-lines"></i>
+                  <span>Reports</span>
+                </div>
+              </a>
+            </li>
+          </ul>
+        </div>
+
+        <div>
+          <div class="nav-group-title">Management</div>
+          <ul class="nav-list">
+            <li>
+              <a href="notifications.html" class="nav-link">
+                <div class="nav-link-content">
+                  <i class="fa-solid fa-bell"></i>
+                  <span>Notifications</span>
+                </div>
+                <span class="sidebar-notification-count" hidden>0</span>
+              </a>
+            </li>
+            <li>
+              <a href="health.html" class="nav-link">
+                <div class="nav-link-content">
+                  <i class="fa-solid fa-heart-pulse"></i>
+                  <span>Business Health</span>
+                </div>
+                <span class="nav-badge badge-success" style="font-size:0.6875rem;">87%</span>
+              </a>
+            </li>
+            <li>
+              <a href="members.html" class="nav-link">
+                <div class="nav-link-content">
+                  <i class="fa-solid fa-user-group"></i>
+                  <span>Business Members</span>
+                </div>
+              </a>
+            </li>
+            <li>
+              <a href="setup.html" class="nav-link">
+                <div class="nav-link-content">
+                  <i class="fa-solid fa-sliders"></i>
+                  <span>Setup Wizard</span>
+                </div>
+              </a>
+            </li>
+          </ul>
+        </div>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="user-mini-card" onclick="window.location.href='profile.html'">
+          <div class="user-avatar-circle">SM</div>
+          <div class="user-info">
+            <div class="user-name">Sana Mondal</div>
+            <div class="user-role">Administrator</div>
+          </div>
+          <i class="fa-solid fa-chevron-right text-muted" style="font-size:0.75rem;"></i>
+        </div>
+      </div>
+    </aside>
+
+    <!-- MAIN WRAPPER -->
+    <div class="main-wrapper">
+
+      <header class="topbar">
+        <div class="topbar-left">
+          <button class="mobile-toggle" aria-label="Toggle navigation">
+            <i class="fa-solid fa-bars"></i>
+          </button>
+          <div class="breadcrumb-area">
+            <div class="breadcrumb">
+              <a href="dashboard.html">RetailMind</a>
+              <i class="fa-solid fa-chevron-right" style="font-size:0.625rem;"></i>
+              <span>Customers</span>
+            </div>
+            <div class="page-title">Customer Intelligence</div>
+          </div>
+        </div>
+
+        <div class="topbar-right">
+          <button class="btn-ai-quick" id="aiQuickBtn">
+            <i class="fa-solid fa-wand-magic-sparkles"></i>
+            <span>Ask AI</span>
+          </button>
+          <div class="user-avatar-circle" onclick="window.location.href='profile.html'"
+            style="cursor:pointer;width:38px;height:38px;">SM</div>
+        </div>
+      </header>
+
+      <main class="page-container">
+
+        <!-- PAGE HEADER -->
+        <div class="page-header">
+          <div>
+            <h1>Customer Analytics & RFM Segments</h1>
+            <p>
+              Review customer records, completed purchase history,
+              and data-based retention recommendations.
+            </p>
+          </div>
+
+          <button class="btn btn-primary" id="exportCustomerDataBtn">
+            <i class="fa-solid fa-download"></i>
+            Export Segment Data
+          </button>
+
+        </div>
+
+        <!-- KPI CARDS -->
+        <div class="kpi-grid" style="grid-template-columns:repeat(5,minmax(0,1fr));margin-bottom:1.5rem;">
+
+          <div class="kpi-card">
+            <span class="kpi-title">Total Customers</span>
+            <div class="kpi-value">Loading...</div>
+            <div class="kpi-footer text-muted" id="totalCustomersFooter">
+              Based on customer records
+            </div>
+          </div>
+
+          <div class="kpi-card">
+            <span class="kpi-title text-success">Repeat Customers</span>
+            <div class="kpi-value text-success">Loading...</div>
+            <div class="kpi-footer text-muted" id="repeatCustomersFooter">
+              Based on completed purchases
+            </div>
+          </div>
+
+          <div class="kpi-card">
+            <span class="kpi-title text-info">New This Month</span>
+            <div class="kpi-value text-info">Loading...</div>
+            <div class="kpi-footer text-muted" id="newCustomersFooter">
+              Customers added this month
+            </div>
+          </div>
+
+          <div class="kpi-card">
+            <span class="kpi-title text-primary">Avg Order Value (AOV)</span>
+            <div class="kpi-value text-primary">Loading...</div>
+            <div class="kpi-footer text-muted" id="aovFooter">
+              Average of completed sales
+            </div>
+          </div>
+
+          <div class="kpi-card">
+            <span class="kpi-title text-dark">Customer Lifetime Val</span>
+            <div class="kpi-value text-dark">Loading...</div>
+            <div class="kpi-footer text-muted" id="lifetimeValueFooter">
+              Average spend per purchasing customer
+            </div>
+          </div>
+
+        </div>
+
+        <!-- CUSTOMER GROWTH CHART -->
+        <div class="card" style="margin-bottom:1.75rem;">
+          <div class="card-header">
+            <div>
+              <h3 class="card-title">Customer Acquisition & Retention Trend</h3>
+              <p class="card-subtitle">
+                Monthly new customer records and returning customers
+                with linked completed purchases
+              </p>
+            </div>
+            <span class="badge badge-info" id="customerLoyaltyBadge">
+              Loyalty data loading...
+            </span>
+          </div>
+
+          <div class="card-body" style="height:280px;">
+            <canvas id="customerGrowthChart" aria-label="Monthly new and returning customer counts" role="img"></canvas>
+          </div>
+        </div>
+
+        <!-- CUSTOMER DIRECTORY -->
+        <div class="card">
+          <div class="card-header">
+            <div>
+              <h3 class="card-title">Customer Segments Directory</h3>
+              <p class="card-subtitle">
+                Customer purchase history and suggested next actions
+              </p>
+            </div>
+
+            <div class="chart-time-pills" id="customerSegmentFilters">
+              <button type="button" class="time-pill active" data-segment="all" aria-pressed="true">All</button>
+              <button type="button" class="time-pill" data-segment="vip" aria-pressed="false">VIP</button>
+              <button type="button" class="time-pill" data-segment="regular" aria-pressed="false">Regular</button>
+              <button type="button" class="time-pill" data-segment="at-risk" aria-pressed="false">At Risk</button>
+            </div>
+          </div>
+
+          <div class="table-responsive">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>Customer</th>
+                  <th>Total Orders</th>
+                  <th>Total Spent</th>
+                  <th>Avg Basket Size</th>
+                  <th>Last Purchase</th>
+                  <th>Customer Segment</th>
+                  <th>Recommended Action</th>
+                </tr>
+              </thead>
+              <tbody id="customersTableBody">
+                <tr>
+                  <td colspan="7" style="text-align:center;padding:2rem;">
+                    Loading customers...
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </main>
+    </div>
+  </div>
+
+  <!-- SCRIPTS: keep this order -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase.js"></script>
+  <script src="js/app.js"></script>
+  <script src="js/customers.js"></script>
+
+  <!-- CUSTOMER GROWTH CHART -->
+  <script>
+    let customerGrowthChart = null;
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const canvas = document.getElementById('customerGrowthChart');
+      if (!canvas || typeof Chart === 'undefined') return;
+
+      customerGrowthChart = new Chart(canvas, {
+        type: 'line',
+        data: {
+          labels: [],
+          datasets: [
+            {
+              label: 'Returning Customers',
+              data: [],
+              borderColor: '#5A1188',
+              backgroundColor: 'rgba(90, 17, 136, 0.1)',
+              fill: true,
+              tension: 0.4
+            },
+            {
+              label: 'New Customers',
+              data: [],
+              borderColor: '#00D4A0',
+              backgroundColor: 'rgba(0, 212, 160, 0.1)',
+              fill: true,
+              tension: 0.4
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              position: 'top',
+              align: 'end'
+            }
+          },
+          scales: {
+            x: {
+              grid: { display: false }
+            },
+            y: {
+              beginAtZero: true,
+              ticks: { precision: 0 },
+              grid: { color: '#F3F4F6' }
+            }
+          }
+        }
+      });
+
+      window.updateCustomerGrowthChart = function (
+        labels,
+        returningData,
+        newData
+      ) {
+        if (!customerGrowthChart) return;
+
+        customerGrowthChart.data.labels = labels;
+        customerGrowthChart.data.datasets[0].data = returningData;
+        customerGrowthChart.data.datasets[1].data = newData;
+        customerGrowthChart.update();
+      };
+    });
+  </script>
+</body>
+
+</html>

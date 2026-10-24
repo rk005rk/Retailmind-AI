@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RetailMind AI — Intelligent Inventory & Sales Prediction System</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Sora:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/responsive.css">
+  <style>
+    /* Landing Page Specific Styling */
+    .landing-nav {
+      height: 80px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 4rem;
+      background: rgba(255, 255, 255, 0.9);
+      backdrop-filter: blur(12px);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      border-bottom: 1px solid var(--border);
+    }
+    .landing-links {
+      display: flex;
+      gap: 2rem;
+      align-items: center;
+      list-style: none;
+    }
+    .landing-links a {
+      color: var(--dark);
+      font-weight: 600;
+      font-size: 0.9375rem;
+    }
+    .landing-links a:hover {
+      color: var(--primary);
+    }
+    .hero-section {
+      padding: 5rem 2rem 4rem 2rem;
+      text-align: center;
+      background: radial-gradient(circle at 50% 10%, #F5EEFA 0%, #F7F8FC 70%);
+      position: relative;
+      overflow: hidden;
+    }
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.4rem 1rem;
+      background: #FFFFFF;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-full);
+      box-shadow: var(--shadow-sm);
+      margin-bottom: 1.5rem;
+      font-size: 0.8125rem;
+      font-weight: 700;
+      color: var(--primary);
+    }
+    .hero-title {
+      font-size: 3.75rem;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      line-height: 1.15;
+      max-width: 900px;
+      margin: 0 auto 1.25rem auto;
+      color: var(--dark);
+    }
+    .hero-title span {
+      background: linear-gradient(135deg, var(--primary) 0%, #7B2CBF 50%, var(--accent-dark) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .hero-subtitle {
+      font-size: 1.1875rem;
+      color: var(--muted);
+      max-width: 680px;
+      margin: 0 auto 2.5rem auto;
+      line-height: 1.6;
+    }
+    .hero-cta-group {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 1rem;
+      margin-bottom: 3.5rem;
+    }
+    /* Realistic Dashboard Mockup in Hero */
+    .dashboard-preview-window {
+      max-width: 1100px;
+      margin: 0 auto;
+      background: #FFFFFF;
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      box-shadow: 0 25px 60px rgba(90, 17, 136, 0.15);
+      overflow: hidden;
+      text-align: left;
+    }
+    .window-header {
+      background: #FAF5FF;
+      border-bottom: 1px solid var(--border);
+      padding: 0.875rem 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .window-dots {
+      display: flex;
+      gap: 6px;
+    }
+    .window-dot {
+      width: 11px;
+      height: 11px;
+      border-radius: 50%;
+    }
+    .feature-card {
+      background: #FFFFFF;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-xl);
+      padding: 2rem;
+      transition: var(--transition);
+    }
+    .feature-card:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-lg);
+      border-color: var(--primary-light);
+    }
+    .feature-icon-box {
+      width: 52px;
+      height: 52px;
+      border-radius: var(--radius-lg);
+      background: var(--primary-subtle);
+      color: var(--primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      margin-bottom: 1.25rem;
+    }
+    .workflow-step {
+      display: flex;
+      gap: 1.5rem;
+      align-items: flex-start;
+    }
+    .step-num-badge {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+      color: #FFFFFF;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      flex-shrink: 0;
+      font-size: 1.125rem;
+      box-shadow: var(--shadow-purple);
+    }
+    .footer-section {
+      background: #111827;
+      color: #D1D5DB;
+      padding: 4rem 4rem 2rem 4rem;
+    }
+    @media (max-width: 992px) {
+      .landing-nav { padding: 0 1.5rem; }
+      .landing-links { display: none; }
+      .hero-title { font-size: 2.5rem; }
+      .footer-section { padding: 3rem 1.5rem 1.5rem 1.5rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Landing Navigation -->
+  <nav class="landing-nav">
+    <a href="index.html" class="brand-logo">
+      <div class="brand-icon">
+        <i class="fa-solid fa-brain"></i>
+      </div>
+      <span class="brand-text">RetailMind</span>
+      <span class="brand-badge">AI</span>
+    </a>
+
+    <ul class="landing-links">
+      <li><a href="#features">Features</a></li>
+      <li><a href="#how-it-works">How It Works</a></li>
+      <li><a href="demo-dashboard.html">Live Demo</a></li>
+      <li><a href="demo-pos.html">POS Terminal</a></li>
+      <li><a href="demo-predictions.html">Predictive AI</a></li>
+    </ul>
+
+    <div style="display: flex; gap: 0.75rem; align-items: center;">
+      <a href="login.html" class="btn btn-outline-primary btn-sm">Sign In</a>
+      <a href="login.html" class="btn btn-primary btn-sm">Start Free Trial</a>
+    </div>
+  </nav>
+
+  <!-- Hero Section -->
+  <section class="hero-section">
+    <div class="hero-badge">
+      <i class="fa-solid fa-sparkles text-accent"></i>
+      Next-Gen Retail Intelligence Platform
+    </div>
+
+    <h1 class="hero-title">
+      Run Your Retail Business <span>Smarter with AI</span>
+    </h1>
+
+    <p class="hero-subtitle">
+      RetailMind AI helps retail operators predict demand, optimize inventory, prevent stockouts, and boost net profit margins using explainable machine learning.
+    </p>
+
+    <div class="hero-cta-group">
+      <a href="login.html" class="btn btn-primary btn-lg">
+        <i class="fa-solid fa-rocket"></i> Get Started Free
+      </a>
+      <a href="demo-dashboard.html" class="btn btn-secondary btn-lg">
+        <i class="fa-solid fa-chart-pie"></i> Explore Dashboard
+      </a>
+    </div>
+
+    <!-- Realistic CSS Mockup Preview -->
+    <div class="dashboard-preview-window">
+      <div class="window-header">
+        <div class="window-dots">
+          <div class="window-dot" style="background: #EF4444;"></div>
+          <div class="window-dot" style="background: #F59E0B;"></div>
+          <div class="window-dot" style="background: #10B981;"></div>
+        </div>
+        <div style="font-size: 0.75rem; color: var(--muted); font-weight: 600;">
+          https://app.retailmind.ai/dashboard
+        </div>
+        <span class="badge badge-ai"><i class="fa-solid fa-circle text-accent" style="font-size: 8px;"></i> Interactive Demo</span>
+      </div>
+
+      <div style="padding: 1.5rem; background: var(--background);">
+        <!-- Mockup Topbar & KPIs -->
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
+          <div>
+            <h3 style="font-weight: 800; font-size: 1.25rem;">Good morning, Sana 👋</h3>
+            <p class="text-muted" style="font-size: 0.75rem;">Here's what's happening with your business today.</p>
+          </div>
+          <span class="badge badge-primary">Last 30 Days</span>
+        </div>
+
+        <div class="grid grid-cols-4" style="gap: 1rem; margin-bottom: 1.25rem;">
+          <div style="background: #fff; padding: 1rem; border-radius: 12px; border: 1px solid var(--border);">
+            <div style="font-size: 0.6875rem; color: var(--muted); font-weight: 600;">TOTAL REVENUE</div>
+            <div style="font-size: 1.35rem; font-weight: 800; color: var(--dark); font-family: var(--font-heading);">₹8,42,650</div>
+            <div style="font-size: 0.75rem; color: var(--success); font-weight: 700;">+12.8% vs last month</div>
+          </div>
+          <div style="background: #fff; padding: 1rem; border-radius: 12px; border: 1px solid var(--border);">
+            <div style="font-size: 0.6875rem; color: var(--muted); font-weight: 600;">NET PROFIT</div>
+            <div style="font-size: 1.35rem; font-weight: 800; color: var(--dark); font-family: var(--font-heading);">₹2,18,420</div>
+            <div style="font-size: 0.75rem; color: var(--success); font-weight: 700;">+8.4% (25.9% margin)</div>
+          </div>
+          <div style="background: #fff; padding: 1rem; border-radius: 12px; border: 1px solid var(--border);">
+            <div style="font-size: 0.6875rem; color: var(--muted); font-weight: 600;">LOW STOCK ALERT</div>
+            <div style="font-size: 1.35rem; font-weight: 800; color: var(--danger); font-family: var(--font-heading);">24 SKUs</div>
+            <div style="font-size: 0.75rem; color: var(--danger); font-weight: 700;">Replenishment needed</div>
+          </div>
+          <div style="background: #fff; padding: 1rem; border-radius: 12px; border: 1px solid var(--border);">
+            <div style="font-size: 0.6875rem; color: var(--muted); font-weight: 600;">HEALTH SCORE</div>
+            <div style="font-size: 1.35rem; font-weight: 800; color: var(--primary); font-family: var(--font-heading);">87 / 100</div>
+            <div style="font-size: 0.75rem; color: var(--accent-dark); font-weight: 700;">Excellent condition</div>
+          </div>
+        </div>
+
+        <!-- Mini AI banner -->
+        <div style="background: linear-gradient(135deg, #2E0854 0%, #5A1188 100%); padding: 1rem 1.5rem; border-radius: 12px; color: #fff; display: flex; justify-content: space-between; align-items: center;">
+          <div style="font-size: 0.875rem;">
+            <i class="fa-solid fa-sparkles text-accent" style="margin-right: 0.5rem;"></i>
+            AI Forecast: <strong>Beverage category demand +21% next week.</strong> Increase stock by 85 units before Friday.
+          </div>
+          <a href="demo-predictions.html" class="btn btn-accent btn-sm">Inspect Model</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Social Proof Logos -->
+  <section style="padding: 2.5rem 2rem; border-bottom: 1px solid var(--border); background: #FFFFFF; text-align: center;">
+    <div class="text-muted" style="font-size: 0.8125rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 1.5rem;">
+      Powering High-Volume Retailers, Supermarkets & Modern FMCG Stores
+    </div>
+    <div style="display: flex; justify-content: center; gap: 3.5rem; flex-wrap: wrap; opacity: 0.6; font-size: 1.25rem; font-weight: 800; color: var(--dark);">
+      <span>METRO MART</span>
+      <span>HERITAGE FOODS</span>
+      <span>GOLDEN PROVISIONS</span>
+      <span>RELIANT RETAIL</span>
+      <span>URBAN GROCERS</span>
+    </div>
+  </section>
+
+  <!-- Core Features Grid -->
+  <section id="features" style="padding: 5rem 4rem; max-width: 1200px; margin: 0 auto;">
+    <div style="text-align: center; margin-bottom: 3.5rem;">
+      <span class="badge badge-ai" style="margin-bottom: 0.75rem;">Enterprise Intelligence</span>
+      <h2 style="font-size: 2.5rem; font-weight: 800; margin-bottom: 0.75rem;">Everything you need to run an intelligent retail operation</h2>
+      <p class="text-muted" style="max-width: 600px; margin: 0 auto;">
+        From cashier terminals to autonomous purchase orders, RetailMind AI acts as your senior merchandising director.
+      </p>
+    </div>
+
+    <div class="grid grid-cols-3" style="gap: 1.75rem;">
+      <!-- Feature 1 -->
+      <div class="feature-card">
+        <div class="feature-icon-box">
+          <i class="fa-solid fa-brain"></i>
+        </div>
+        <h3 style="font-size: 1.25rem; font-weight: 700; margin-bottom: 0.5rem;">AI Demand Forecasting</h3>
+        <p class="text-muted" style="font-size: 0.875rem; line-height: 1.6;">
+          Predict SKU volume 7 to 90 days ahead with 92%+ confidence. Automatically factors in local weather, festivals, and weekend momentum.
+        </p>
+      </div>
+
+      <!-- Feature 2 -->
+      <div class="feature-card">
+        <div class="feature-icon-box" style="background: #E6FBF5; color: var(--accent-dark);">
+          <i class="fa-solid fa-cart-shopping"></i>
+        </div>
+        <h3 style="font-size: 1.25rem; font-weight: 700; margin-bottom: 0.5rem;">Lightning POS Terminal</h3>
+        <p class="text-muted" style="font-size: 0.875rem; line-height: 1.6;">
+          High-speed cashier register supporting barcode lookups, 18% GST tax computations, split tender (Cash/Card/UPI), and instant receipt printing.
+        </p>
+      </div>
+
+      <!-- Feature 3 -->
+      <div class="feature-card">
+        <div class="feature-icon-box" style="background: #EFF6FF; color: var(--info);">
+          <i class="fa-solid fa-truck-fast"></i>
+        </div>
+        <h3 style="font-size: 1.25rem; font-weight: 700; margin-bottom: 0.5rem;">Smart Reorder Autopilot</h3>
+        <p class="text-muted" style="font-size: 0.875rem; line-height: 1.6;">
+          Calculate safety stocks and auto-draft supplier purchase orders with lead times mapped directly to vendor SLAs.
+        </p>
+      </div>
+
+      <!-- Feature 4 -->
+      <div class="feature-card">
+        <div class="feature-icon-box" style="background: #FEF2F2; color: var(--danger);">
+          <i class="fa-solid fa-triangle-exclamation"></i>
+        </div>
+        <h3 style="font-size: 1.25rem; font-weight: 700; margin-bottom: 0.5rem;">Dead Stock Detection</h3>
+        <p class="text-muted" style="font-size: 0.875rem; line-height: 1.6;">
+          Identify slow-moving inventory and near-expiry goods. Receive algorithmic bundling recommendations to reclaim working capital.
+        </p>
+      </div>
+
+      <!-- Feature 5 -->
+      <div class="feature-card">
+        <div class="feature-icon-box" style="background: #FFFBEB; color: var(--warning);">
+          <i class="fa-solid fa-sliders"></i>
+        </div>
+        <h3 style="font-size: 1.25rem; font-weight: 700; margin-bottom: 0.5rem;">AI Sales "What-If" Simulator</h3>
+        <p class="text-muted" style="font-size: 0.875rem; line-height: 1.6;">
+          Drag interactive scenario sliders from 0% to 100% to simulate exact revenue, gross profit, and warehouse replenishment requirements.
+        </p>
+      </div>
+
+      <!-- Feature 6 -->
+      <div class="feature-card">
+        <div class="feature-icon-box" style="background: #F3E8FF; color: var(--primary);">
+          <i class="fa-solid fa-robot"></i>
+        </div>
+        <h3 style="font-size: 1.25rem; font-weight: 700; margin-bottom: 0.5rem;">Conversational AI Copilot</h3>
+        <p class="text-muted" style="font-size: 0.875rem; line-height: 1.6;">
+          Chat directly with your store database. Ask natural language questions about margins, restocking, or customer churn rates.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- How It Works Section -->
+  <section id="how-it-works" style="padding: 5rem 4rem; background: #FFFFFF; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);">
+    <div style="max-width: 1100px; margin: 0 auto;">
+      <div style="text-align: center; margin-bottom: 3.5rem;">
+        <span class="badge badge-primary" style="margin-bottom: 0.75rem;">Seamless Setup</span>
+        <h2 style="font-size: 2.5rem; font-weight: 800;">From Onboarding to Predictions in 4 Steps</h2>
+      </div>
+
+      <div class="grid grid-cols-2" style="gap: 3rem;">
+        <div class="workflow-step">
+          <div class="step-num-badge">1</div>
+          <div>
+            <h4 style="font-size: 1.25rem; font-weight: 700; margin-bottom: 0.35rem;">Connect Your Store</h4>
+            <p class="text-muted" style="font-size: 0.875rem; line-height: 1.6;">
+              Import products via CSV, drag & drop supplier invoices using AI OCR, or seed with our regional retail catalog templates.
+            </p>
+          </div>
+        </div>
+
+        <div class="workflow-step">
+          <div class="step-num-badge">2</div>
+          <div>
+            <h4 style="font-size: 1.25rem; font-weight: 700; margin-bottom: 0.35rem;">Analyze Sales History</h4>
+            <p class="text-muted" style="font-size: 0.875rem; line-height: 1.6;">
+              Ensemble machine learning models ingest basket sizes, transaction times, seasonality, and supplier fulfillment performance.
+            </p>
+          </div>
+        </div>
+
+        <div class="workflow-step">
+          <div class="step-num-badge">3</div>
+          <div>
+            <h4 style="font-size: 1.25rem; font-weight: 700; margin-bottom: 0.35rem;">Get AI Predictions</h4>
+            <p class="text-muted" style="font-size: 0.875rem; line-height: 1.6;">
+              Review 7-day forward demand projections, Explainable AI attribution bars, and dynamic price recommendations with confidence bounds.
+            </p>
+          </div>
+        </div>
+
+        <div class="workflow-step">
+          <div class="step-num-badge">4</div>
+          <div>
+            <h4 style="font-size: 1.25rem; font-weight: 700; margin-bottom: 0.35rem;">Make Smarter Decisions</h4>
+            <p class="text-muted" style="font-size: 0.875rem; line-height: 1.6;">
+              Approve smart reorders with 1-click, liquidate slow-moving goods, and eliminate costly stockouts for 20%+ net margin improvement.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Final Call to Action -->
+  <section style="padding: 6rem 2rem; text-align: center; background: radial-gradient(circle at 50% 50%, #2E0854 0%, #111827 100%); color: #FFFFFF;">
+    <h2 style="font-size: 2.75rem; font-weight: 800; margin-bottom: 1rem; color: #FFFFFF;">
+      Ready to transform your retail business with AI?
+    </h2>
+    <p style="color: #D8B4FE; font-size: 1.125rem; max-width: 600px; margin: 0 auto 2.5rem auto;">
+      Join hundreds of forward-thinking retailers optimizing inventory, reducing spoilage, and maximizing profitability.
+    </p>
+    <div style="display: flex; justify-content: center; gap: 1rem;">
+      <a href="login.html" class="btn btn-accent btn-lg">
+        <i class="fa-solid fa-rocket"></i> Start Free 14-Day Trial
+      </a>
+      <a href="demo-dashboard.html" class="btn btn-outline btn-lg" style="color: #fff; border-color: rgba(255,255,255,0.3);">
+        <i class="fa-solid fa-arrow-right"></i> Launch Live Dashboard
+      </a>
+    </div>
+  </section>
+
+  <!-- Global Footer -->
+  <footer class="footer-section">
+    <div style="max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 3rem; margin-bottom: 3rem;">
+      <div>
+        <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1rem;">
+          <div class="brand-icon" style="width: 32px; height: 32px; font-size: 1rem;">
+            <i class="fa-solid fa-brain"></i>
+          </div>
+          <span style="font-family: var(--font-heading); font-size: 1.25rem; font-weight: 800; color: #fff;">RetailMind</span>
+          <span class="brand-badge">AI</span>
+        </div>
+        <p style="font-size: 0.875rem; color: #9CA3AF; line-height: 1.6; max-width: 320px;">
+          Intelligent Inventory & Sales Prediction System utilizing Machine Learning, Predictive Analytics & Business Intelligence.
+        </p>
+      </div>
+
+      <div>
+        <h5 style="color: #fff; font-size: 0.875rem; margin-bottom: 1rem; font-weight: 700;">Navigation</h5>
+        <ul style="list-style: none; display: flex; flex-direction: column; gap: 0.5rem; font-size: 0.8125rem;">
+          <li><a href="dashboard.html" style="color: #9CA3AF;">Dashboard</a></li>
+          <li><a href="inventory.html" style="color: #9CA3AF;">Inventory</a></li>
+          <li><a href="sales.html" style="color: #9CA3AF;">Sales & POS</a></li>
+          <li><a href="orders.html" style="color: #9CA3AF;">Orders</a></li>
+          <li><a href="customers.html" style="color: #9CA3AF;">Customers</a></li>
+          <li><a href="suppliers.html" style="color: #9CA3AF;">Suppliers</a></li>
+        </ul>
+      </div>
+
+      <div>
+        <h5 style="color: #fff; font-size: 0.875rem; margin-bottom: 1rem; font-weight: 700;">AI Intelligence</h5>
+        <ul style="list-style: none; display: flex; flex-direction: column; gap: 0.5rem; font-size: 0.8125rem;">
+          <li><a href="ai-assistant.html" style="color: #9CA3AF;">AI Assistant</a></li>
+          <li><a href="predictions.html" style="color: #9CA3AF;">Demand Predictions</a></li>
+          <li><a href="analytics.html" style="color: #9CA3AF;">BI Analytics</a></li>
+          <li><a href="health.html" style="color: #9CA3AF;">Business Health</a></li>
+          <li><a href="reports.html" style="color: #9CA3AF;">Reports Hub</a></li>
+        </ul>
+      </div>
+
+      <div>
+        <h5 style="color: #fff; font-size: 0.875rem; margin-bottom: 1rem; font-weight: 700;">Account</h5>
+        <ul style="list-style: none; display: flex; flex-direction: column; gap: 0.5rem; font-size: 0.8125rem;">
+          <li><a href="login.html" style="color: #9CA3AF;">Sign In</a></li>
+          <li><a href="login.html" style="color: #9CA3AF;">Register Merchant</a></li>
+          <li><a href="setup.html" style="color: #9CA3AF;">Setup Wizard</a></li>
+          <li><a href="profile.html" style="color: #9CA3AF;">Store Settings</a></li>
+          <li><a href="notifications.html" style="color: #9CA3AF;">Notifications</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <div style="border-top: 1px solid rgba(255,255,255,0.1); padding-top: 1.5rem; display: flex; justify-content: space-between; font-size: 0.75rem; color: #6B7280; flex-wrap: wrap;">
+      <div>© 2026 RetailMind AI Technologies Inc. All rights reserved.</div>
+      <div style="display: flex; gap: 1.5rem;">
+        <a href="#" style="color: #6B7280;">Privacy Policy</a>
+        <a href="#" style="color: #6B7280;">Terms of Service</a>
+        <a href="#" style="color: #6B7280;">Security & Compliance</a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="js/app.js"></script>
+</body>
+</html>

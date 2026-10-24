@@ -1,0 +1,867 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#4F46E5">
+  <title>Setup Wizard — RetailMind AI</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Sora:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/auth.css">
+  <link rel="stylesheet" href="css/responsive.css">
+
+  <style>
+    .wizard-page { min-height: 100vh; background: var(--background, #f8fafc); }
+    .wizard-container { max-width: 1050px; margin: 2rem auto; padding: 0 1.25rem 3rem; }
+    .wizard-card { position: relative; padding: clamp(1rem, 3vw, 2rem); background: var(--surface, #fff); border-radius: 16px; border: 1px solid var(--border, #e5e7eb); }
+    .wizard-step-pane { display: none; }
+    .wizard-step-pane.active { display: block; animation: wizardFade .2s ease; }
+    .setup-section-title { margin-bottom: .4rem; font-size: 1.45rem; font-weight: 800; }
+    .setup-description { font-size: .9rem; margin-bottom: 1.5rem; color: var(--muted, #64748b); }
+    .setup-hint { color: var(--muted, #64748b); font-size: .8rem; margin-top: .35rem; }
+    .setup-field-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; }
+    .wizard-progress { height: 5px; background: var(--border, #e5e7eb); border-radius: 20px; overflow: hidden; margin-bottom: 1.5rem; }
+    .wizard-progress-fill { height: 100%; width: 16.67%; background: var(--primary, #4f46e5); transition: width .25s ease; }
+    .wizard-stepper { display: flex; justify-content: space-between; gap: .5rem; position: relative; margin-bottom: 1.5rem; }
+    .wizard-step-item { flex: 1; text-align: center; position: relative; z-index: 1; }
+    .step-circle { width: 34px; height: 34px; display: grid; place-items: center; margin: 0 auto .4rem; border-radius: 50%; background: #e5e7eb; color: #475569; font-weight: 700; }
+    .wizard-step-item.active .step-circle, .wizard-step-item.completed .step-circle { background: var(--primary, #4f46e5); color: white; }
+    .wizard-step-item.completed .step-circle { font-size: 0; }
+    .wizard-step-item.completed .step-circle::after { content: "✓"; font-size: 1rem; }
+    .step-label { font-size: .75rem; color: var(--muted, #64748b); }
+    .wizard-step-item.active .step-label { color: var(--primary, #4f46e5); font-weight: 700; }
+    .category-choice-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: .8rem; }
+    .choice-card { padding: 1rem; border: 1px solid var(--border, #e5e7eb); border-radius: 12px; cursor: pointer; background: white; transition: .2s ease; }
+    .choice-card i { display: block; font-size: 1.3rem; color: var(--primary, #4f46e5); margin-bottom: .65rem; }
+    .choice-card.selected { border-color: var(--primary, #4f46e5); box-shadow: 0 0 0 2px rgba(79,70,229,.12); background: #f8faff; }
+    .choice-card:focus-visible { outline: 3px solid var(--primary, #4f46e5); outline-offset: 3px; }
+    .setup-data-form { display: grid; gap: .65rem; max-width: 760px; }
+    .setup-data-form label { font-weight: 600; margin-top: .35rem; font-size: .875rem; }
+    .setup-data-form input, .setup-data-form select, .setup-data-form textarea,
+    .wizard-card .form-control, .wizard-card .form-select {
+      width: 100%; padding: .75rem; border: 1px solid #d7dce5; border-radius: 8px; font: inherit; box-sizing: border-box; background: white;
+    }
+    .setup-data-form input:focus, .setup-data-form select:focus,
+    .wizard-card .form-control:focus, .wizard-card .form-select:focus {
+      outline: 2px solid rgba(79,70,229,.25); border-color: var(--primary, #4f46e5);
+    }
+    .setup-data-form button { padding: .7rem 1rem; border: 0; border-radius: 8px; cursor: pointer; font: inherit; font-weight: 600; }
+    .setup-data-form button:disabled, button:disabled { opacity: .6; cursor: wait; }
+    .setup-saved-item { margin-top: .65rem; padding: .85rem; border: 1px solid var(--border, #e5e7eb); border-radius: 10px; background: white; overflow-wrap: anywhere; }
+    .setup-saved-item small { display: block; color: var(--muted, #64748b); margin-top: .3rem; }
+    .setup-list { margin-top: 1rem; }
+    .setup-message { margin-top: 1rem; padding: .8rem 1rem; border-radius: 10px; font-size: .875rem; overflow-wrap: anywhere; }
+    .setup-message:empty { display: none; }
+    .setup-message[data-type="error"] { background: #fef2f2; color: #b91c1c; }
+    .setup-message[data-type="success"] { background: #ecfdf5; color: #047857; }
+    .setup-message[data-type="info"] { background: #eef2ff; color: #3730a3; }
+    .setup-muted-box { background: #f8fafc; padding: 1rem; border-radius: 10px; border: 1px solid var(--border, #e5e7eb); margin-top: 1rem; }
+    .setup-review-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .75rem; margin: 1.5rem 0; }
+    .setup-review-item { padding: .9rem; border: 1px solid var(--border, #e5e7eb); border-radius: 10px; overflow-wrap: anywhere; }
+    .setup-review-label { font-size: .75rem; color: var(--muted, #64748b); margin-bottom: .25rem; }
+    .setup-review-value { font-weight: 600; }
+    .setup-actions { display: flex; justify-content: space-between; align-items: center; gap: 1rem; flex-wrap: wrap; margin-top: 2rem; border-top: 1px solid var(--border, #e5e7eb); padding-top: 1.25rem; }
+    .setup-actions-right { display: flex; gap: .75rem; margin-left: auto; }
+    .setup-actions button { min-height: 42px; }
+    .wizard-navbar { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 1rem 1.5rem; }
+    .setup-success-icon { width: 72px; height: 72px; border-radius: 50%; background: var(--primary, #4f46e5); color: white; display: grid; place-items: center; font-size: 2rem; margin: 0 auto 1.5rem; }
+    @keyframes wizardFade { from { opacity: .5; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+    @media (max-width: 720px) {
+      .setup-field-grid, .setup-review-list { grid-template-columns: 1fr; }
+      .category-choice-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .wizard-navbar { flex-wrap: wrap; padding: 1rem; }
+      .wizard-stepper { gap: .2rem; }
+      .step-circle { width: 28px; height: 28px; font-size: .8rem; }
+      .step-label { font-size: .63rem; }
+      .setup-actions-right { width: 100%; }
+      .setup-actions-right button { flex: 1; }
+      .wizard-container { margin-top: 1rem; padding-left: .75rem; padding-right: .75rem; }
+    }
+    @media (max-width: 400px) {
+      .category-choice-grid { grid-template-columns: 1fr 1fr; }
+      .choice-card { padding: .75rem; }
+    }
+  </style>
+</head>
+
+<body class="wizard-page">
+
+<header class="wizard-navbar">
+  <a href="dashboard.html" class="brand-logo" aria-label="RetailMind AI">
+    <span class="brand-icon"><i class="fa-solid fa-brain"></i></span>
+    <span class="brand-text">RetailMind</span>
+    <span class="brand-badge">AI</span>
+  </a>
+
+  <div style="font-size:.8125rem;color:var(--muted,#64748b)">
+    Store Onboarding · Step <strong id="currentStepNum">1</strong> of 6
+  </div>
+
+  <button type="button" id="btnSaveExit" class="btn btn-ghost btn-sm">
+    <i class="fa-solid fa-floppy-disk"></i> Save & Exit
+  </button>
+</header>
+
+<main class="wizard-container">
+  <div class="wizard-progress">
+    <div id="wizardProgress" class="wizard-progress-fill" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="17"></div>
+  </div>
+
+  <div class="wizard-stepper" aria-label="Setup steps">
+    <div class="wizard-step-item active" id="stepIndicator1"><div class="step-circle">1</div><div class="step-label">Profile</div></div>
+    <div class="wizard-step-item" id="stepIndicator2"><div class="step-circle">2</div><div class="step-label">Categories</div></div>
+    <div class="wizard-step-item" id="stepIndicator3"><div class="step-circle">3</div><div class="step-label">Suppliers</div></div>
+    <div class="wizard-step-item" id="stepIndicator4"><div class="step-circle">4</div><div class="step-label">Products</div></div>
+    <div class="wizard-step-item" id="stepIndicator5"><div class="step-circle">5</div><div class="step-label">AI Rules</div></div>
+    <div class="wizard-step-item" id="stepIndicator6"><div class="step-circle">6</div><div class="step-label">Complete</div></div>
+  </div>
+
+  <section class="wizard-card" aria-label="Business setup wizard">
+
+    <!-- STEP 1: BUSINESS PROFILE -->
+    <section class="wizard-step-pane active" id="paneStep1">
+      <h1 class="setup-section-title">Welcome to RetailMind AI!</h1>
+      <p class="setup-description">Configure your business profile. Existing details will be loaded when available.</p>
+
+      <div class="form-group">
+        <label class="form-label" for="businessName">Store / Enterprise Name *</label>
+        <input type="text" class="form-control" id="businessName" autocomplete="organization" placeholder="e.g. Apex Fresh Supermarket" required>
+      </div>
+
+      <div class="setup-field-grid">
+        <div class="form-group">
+          <label class="form-label" for="businessType">Retail Segment *</label>
+          <select class="form-select" id="businessType" required>
+            <option value="">Select business type</option>
+            <option value="Supermarket & Provisions">Supermarket & Provisions</option>
+            <option value="FMCG & Convenience">FMCG & Convenience</option>
+            <option value="Bakery & Confectionery">Bakery & Confectionery</option>
+            <option value="Pharmacy & Health Store">Pharmacy & Health Store</option>
+            <option value="Electronics">Electronics</option>
+            <option value="Fashion & Apparel">Fashion & Apparel</option>
+            <option value="General Retail">General Retail</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="businessGstin">GSTIN / Tax ID (optional)</label>
+          <input type="text" class="form-control" id="businessGstin" maxlength="15" placeholder="15-character GSTIN">
+          <p class="setup-hint">Leave blank if not applicable.</p>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="businessAddress">Primary Store Address</label>
+        <input type="text" class="form-control" id="businessAddress" placeholder="Street, city, state">
+      </div>
+
+      <div class="setup-field-grid">
+        <div class="form-group">
+          <label class="form-label" for="businessCurrency">Currency</label>
+          <select class="form-select" id="businessCurrency">
+            <option value="INR">INR — Indian Rupee (₹)</option>
+            <option value="USD">USD — US Dollar ($)</option>
+            <option value="GBP">GBP — Pound Sterling (£)</option>
+            <option value="EUR">EUR — Euro (€)</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="businessTaxRate">Default GST / Tax Rate (%)</label>
+          <input type="number" class="form-control" id="businessTaxRate" min="0" max="100" step="0.01" value="18">
+        </div>
+      </div>
+    </section>
+
+    <!-- STEP 2: CATEGORIES -->
+    <section class="wizard-step-pane" id="paneStep2">
+      <h2 class="setup-section-title">Select Your Core Retail Categories</h2>
+      <p class="setup-description">Choose the categories your business sells. These selections are saved as setup preferences.</p>
+
+      <div class="category-choice-grid">
+        <div class="choice-card selected" data-category="Dairy & Milk" role="button" tabindex="0" aria-pressed="true"><i class="fa-solid fa-cow"></i><strong>Dairy & Milk</strong><p class="setup-hint">High velocity</p></div>
+        <div class="choice-card selected" data-category="Bakery & Breads" role="button" tabindex="0" aria-pressed="true"><i class="fa-solid fa-bread-slice"></i><strong>Bakery & Breads</strong><p class="setup-hint">Daily turnover</p></div>
+        <div class="choice-card selected" data-category="Grains & Pulses" role="button" tabindex="0" aria-pressed="true"><i class="fa-solid fa-wheat-awn"></i><strong>Grains & Pulses</strong><p class="setup-hint">Bulk inventory</p></div>
+        <div class="choice-card selected" data-category="Cooking Oils" role="button" tabindex="0" aria-pressed="true"><i class="fa-solid fa-bottle-droplet"></i><strong>Cooking Oils</strong><p class="setup-hint">High ticket size</p></div>
+        <div class="choice-card selected" data-category="Tea & Beverages" role="button" tabindex="0" aria-pressed="true"><i class="fa-solid fa-mug-hot"></i><strong>Tea & Beverages</strong><p class="setup-hint">High margin</p></div>
+        <div class="choice-card selected" data-category="Personal Care" role="button" tabindex="0" aria-pressed="true"><i class="fa-solid fa-pump-soap"></i><strong>Personal Care</strong><p class="setup-hint">Stable demand</p></div>
+        <div class="choice-card" data-category="Household Essentials" role="button" tabindex="0" aria-pressed="false"><i class="fa-solid fa-house"></i><strong>Household Essentials</strong><p class="setup-hint">Daily needs</p></div>
+        <div class="choice-card" data-category="Other" role="button" tabindex="0" aria-pressed="false"><i class="fa-solid fa-layer-group"></i><strong>Other</strong><p class="setup-hint">Custom assortment</p></div>
+      </div>
+      <p class="setup-hint">These are preferences, not separate category-table records.</p>
+    </section>
+
+    <!-- STEP 3: SUPPLIERS -->
+    <section class="wizard-step-pane" id="paneStep3">
+      <h2 class="setup-section-title">Supplier Management</h2>
+      <p class="setup-description">Add your suppliers. Each supplier is saved immediately to your business in Supabase.</p>
+
+      <div class="setup-data-form">
+        <label for="supplierName">Supplier Name *</label>
+        <input id="supplierName" type="text" placeholder="e.g. Heritage Dairy Farms">
+
+        <label for="supplierContact">Contact Person</label>
+        <input id="supplierContact" type="text" placeholder="Contact person's name">
+
+        <div class="setup-field-grid">
+          <div><label for="supplierPhone">Phone</label><input id="supplierPhone" type="tel" placeholder="Phone number"></div>
+          <div><label for="supplierEmail">Email</label><input id="supplierEmail" type="email" placeholder="supplier@example.com"></div>
+        </div>
+
+        <div class="setup-field-grid">
+          <div><label for="supplierCategory">Category</label><input id="supplierCategory" type="text" placeholder="e.g. Dairy & Milk"></div>
+          <div><label for="supplierLeadTime">Lead Time (days)</label><input id="supplierLeadTime" type="number" min="0" step="1" value="3"></div>
+        </div>
+
+        <button type="button" class="btn btn-primary" id="btnAddSupplier"><i class="fa-solid fa-plus"></i> Add Supplier</button>
+        <p id="supplierMessage" class="setup-hint" role="status" aria-live="polite"></p>
+      </div>
+
+      <div class="setup-list">
+        <h3>Saved Suppliers</h3>
+        <div id="supplierList"><p class="setup-hint">Loading suppliers…</p></div>
+      </div>
+    </section>
+
+    <!-- STEP 4: PRODUCTS -->
+    <section class="wizard-step-pane" id="paneStep4">
+      <h2 class="setup-section-title">Initial Inventory</h2>
+      <p class="setup-description">Add products to your inventory. Products are saved immediately to Supabase.</p>
+
+      <div class="setup-data-form">
+        <label for="productName">Product Name *</label>
+        <input id="productName" type="text" placeholder="e.g. Full Cream Milk">
+
+        <div class="setup-field-grid">
+          <div><label for="productSku">SKU / Product Code</label><input id="productSku" type="text" placeholder="e.g. MILK-001"></div>
+          <div><label for="productCategory">Category</label><input id="productCategory" type="text" placeholder="e.g. Dairy & Milk"></div>
+        </div>
+
+        <label for="productSupplier">Supplier</label>
+        <select id="productSupplier"><option value="">No supplier selected</option></select>
+
+        <div class="setup-field-grid">
+          <div><label for="productPurchasePrice">Purchase Price *</label><input id="productPurchasePrice" type="number" min="0" step="0.01" placeholder="0.00" required></div>
+          <div><label for="productSellingPrice">Selling Price *</label><input id="productSellingPrice" type="number" min="0" step="0.01" placeholder="0.00" required></div>
+        </div>
+
+        <div class="setup-field-grid">
+          <div><label for="productStock">Opening Stock *</label><input id="productStock" type="number" min="0" step="1" value="0" required></div>
+          <div><label for="productReorderLevel">Reorder Level *</label><input id="productReorderLevel" type="number" min="0" step="1" value="5" required></div>
+        </div>
+
+        <button type="button" class="btn btn-primary" id="btnAddProduct"><i class="fa-solid fa-plus"></i> Add Product</button>
+        <p id="productMessage" class="setup-hint" role="status" aria-live="polite"></p>
+      </div>
+
+      <div class="setup-list">
+        <h3>Saved Products</h3>
+        <div id="productList"><p class="setup-hint">Loading products…</p></div>
+      </div>
+    </section>
+
+    <!-- STEP 5: AI RULES -->
+    <section class="wizard-step-pane" id="paneStep5">
+      <h2 class="setup-section-title">Configure AI Inventory Rules</h2>
+      <p class="setup-description">Choose default thresholds for inventory alerts and purchasing workflows.</p>
+
+      <div class="form-group">
+        <label class="form-label" for="safetyStockRule">Default Safety Stock Buffer</label>
+        <select id="safetyStockRule" class="form-select">
+          <option value="3">Aggressive — 3 days demand buffer</option>
+          <option value="5" selected>Balanced — 5 days demand buffer</option>
+          <option value="7">Conservative — 7 days demand buffer</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="deadStockRule">Dead Stock Alert Sensitivity</label>
+        <select id="deadStockRule" class="form-select">
+          <option value="30" selected>Flag products after 30 days without sales</option>
+          <option value="45">Flag products after 45 days without sales</option>
+          <option value="60">Flag products after 60 days without sales</option>
+        </select>
+      </div>
+
+      <div class="form-group" style="margin-top:1rem">
+        <label style="display:flex;align-items:center;gap:.6rem">
+          <input type="checkbox" id="autoPoCheck" checked style="width:18px;height:18px">
+          Enable smart reorder approval workflow
+        </label>
+        <p class="setup-hint">This saves a preference only. It does not place orders or contact suppliers automatically.</p>
+      </div>
+
+      <div class="setup-muted-box">
+        <strong><i class="fa-solid fa-shield-halved"></i> Before you finish</strong>
+        <p class="setup-hint">Review your business profile, supplier list, inventory, and preferences. Suppliers and products already added are saved separately.</p>
+      </div>
+    </section>
+
+    <!-- STEP 6: COMPLETE -->
+    <section class="wizard-step-pane" id="paneStep6" style="text-align:center;padding:1rem 0">
+      <div class="setup-success-icon"><i class="fa-solid fa-check"></i></div>
+      <h2 class="setup-section-title">Setup Saved Successfully!</h2>
+      <p class="setup-description">Your business profile and preferences have been saved. Review your setup summary below.</p>
+
+      <div class="setup-review-list" style="text-align:left">
+        <div class="setup-review-item"><div class="setup-review-label">Business</div><div class="setup-review-value" id="reviewBusinessName">—</div></div>
+        <div class="setup-review-item"><div class="setup-review-label">Retail Segment</div><div class="setup-review-value" id="reviewBusinessType">—</div></div>
+        <div class="setup-review-item"><div class="setup-review-label">Categories</div><div class="setup-review-value" id="reviewCategories">—</div></div>
+        <div class="setup-review-item"><div class="setup-review-label">Currency / Tax</div><div class="setup-review-value" id="reviewCurrency">—</div></div>
+        <div class="setup-review-item"><div class="setup-review-label">Safety Stock</div><div class="setup-review-value" id="reviewSafetyStock">—</div></div>
+        <div class="setup-review-item"><div class="setup-review-label">Dead Stock Alert</div><div class="setup-review-value" id="reviewDeadStock">—</div></div>
+        <div class="setup-review-item"><div class="setup-review-label">Suppliers Added</div><div class="setup-review-value" id="reviewSupplierCount">0</div></div>
+        <div class="setup-review-item"><div class="setup-review-label">Products Added</div><div class="setup-review-value" id="reviewProductCount">0</div></div>
+      </div>
+
+      <button type="button" class="btn btn-primary btn-lg" id="btnLaunchDashboard">
+        <i class="fa-solid fa-rocket"></i> Launch RetailMind AI Dashboard
+      </button>
+    </section>
+
+    <div id="setupMessage" class="setup-message" role="status" aria-live="polite"></div>
+
+    <div id="wizardControls" class="setup-actions">
+      <button type="button" class="btn btn-outline" id="btnWizardPrev" style="display:none">
+        <i class="fa-solid fa-arrow-left"></i> Previous
+      </button>
+      <div class="setup-actions-right">
+        <button type="button" class="btn btn-primary" id="btnWizardNext">
+          Next Step <i class="fa-solid fa-arrow-right"></i>
+        </button>
+      </div>
+    </div>
+  </section>
+</main>
+
+<!-- Supabase and application scripts -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/supabase.js"></script>
+<script src="js/app.js"></script>
+
+<script>
+(() => {
+  "use strict";
+
+  const TOTAL_STEPS = 6;
+  const $ = id => document.getElementById(id);
+  const db = () => window.supabaseClient || window.db;
+
+  let step = 1;
+  let user = null;
+  let businessId = null;
+  let business = null;
+  let saving = false;
+  let suppliers = [];
+  let products = [];
+
+  function showMessage(text, type = "info") {
+    const el = $("setupMessage");
+    el.textContent = text;
+    el.dataset.type = type;
+  }
+
+  function showFormMessage(id, text, isError = false) {
+    const el = $(id);
+    if (!el) return;
+    el.textContent = text;
+    el.style.color = isError ? "#b91c1c" : "#047857";
+  }
+
+  function escapeHTML(value) {
+    return String(value ?? "").replace(/[&<>"']/g, char => ({
+      "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
+    })[char]);
+  }
+
+  function selectedCategories() {
+    return [...document.querySelectorAll("#paneStep2 .choice-card.selected")]
+      .map(card => card.dataset.category)
+      .filter(Boolean);
+  }
+
+  function getPreferences() {
+    return {
+      categories: selectedCategories(),
+      safety_stock_rule: Number($("safetyStockRule").value),
+      dead_stock_rule: Number($("deadStockRule").value),
+      auto_purchase_order: $("autoPoCheck").checked,
+      wizard_version: 2
+    };
+  }
+
+  function updateReview() {
+    $("reviewBusinessName").textContent = $("businessName").value.trim() || "—";
+    $("reviewBusinessType").textContent = $("businessType").value || "—";
+    $("reviewCategories").textContent = selectedCategories().join(", ") || "None selected";
+    $("reviewCurrency").textContent = `${$("businessCurrency").value} / ${$("businessTaxRate").value || 0}%`;
+    $("reviewSafetyStock").textContent = `${$("safetyStockRule").value} days`;
+    $("reviewDeadStock").textContent = `${$("deadStockRule").value} days`;
+    $("reviewSupplierCount").textContent = suppliers.length;
+    $("reviewProductCount").textContent = products.length;
+  }
+
+  function renderStep(nextStep) {
+    step = Math.max(1, Math.min(TOTAL_STEPS, nextStep));
+
+    for (let i = 1; i <= TOTAL_STEPS; i++) {
+      $("paneStep" + i).classList.toggle("active", i === step);
+      $("stepIndicator" + i).classList.toggle("active", i === step);
+      $("stepIndicator" + i).classList.toggle("completed", i < step);
+    }
+
+    $("currentStepNum").textContent = step;
+    $("wizardProgress").style.width = `${(step / TOTAL_STEPS) * 100}%`;
+    $("wizardProgress").setAttribute("aria-valuenow", String(Math.round(step / TOTAL_STEPS * 100)));
+    $("btnWizardPrev").style.display = step > 1 && step < TOTAL_STEPS ? "inline-flex" : "none";
+    $("wizardControls").style.display = step === TOTAL_STEPS ? "none" : "flex";
+    $("btnWizardNext").innerHTML = step === 5
+      ? 'Save Setup <i class="fa-solid fa-floppy-disk"></i>'
+      : 'Next Step <i class="fa-solid fa-arrow-right"></i>';
+
+    if (step === TOTAL_STEPS) updateReview();
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  function validateStep() {
+    if (step === 1) {
+      const name = $("businessName").value.trim();
+      const type = $("businessType").value;
+      const gstin = $("businessGstin").value.trim().toUpperCase();
+      const tax = Number($("businessTaxRate").value);
+
+      if (!name) {
+        showMessage("Enter your business name.", "error");
+        $("businessName").focus();
+        return false;
+      }
+      if (!type) {
+        showMessage("Select your retail segment.", "error");
+        $("businessType").focus();
+        return false;
+      }
+      if (gstin && !/^[0-9A-Z]{15}$/.test(gstin)) {
+        showMessage("GSTIN must contain 15 letters and numbers.", "error");
+        $("businessGstin").focus();
+        return false;
+      }
+      if (!Number.isFinite(tax) || tax < 0 || tax > 100) {
+        showMessage("Enter a tax rate between 0 and 100.", "error");
+        $("businessTaxRate").focus();
+        return false;
+      }
+    }
+    return true;
+  }
+
+  async function loadBusiness() {
+    const client = db();
+    if (!client) throw new Error("Supabase client not found. Check js/supabase.js.");
+
+    const { data: sessionData, error: sessionError } = await client.auth.getSession();
+    if (sessionError) throw sessionError;
+
+    user = sessionData?.session?.user;
+    if (!user) {
+      showMessage("Please sign in before configuring your business.", "error");
+      $("btnWizardNext").disabled = true;
+      return;
+    }
+
+    const { data: membership, error } = await client
+      .from("business_members")
+      .select("business_id, role, businesses(id, name, business_type, currency, gst_rate, gstin, address, setup_preferences, onboarding_completed)")
+      .eq("user_id", user.id)
+      .limit(1)
+      .maybeSingle();
+
+    if (error) throw error;
+    if (!membership?.business_id || !membership.businesses) {
+      throw new Error("No business is linked to this account.");
+    }
+
+    businessId = membership.business_id;
+    business = membership.businesses;
+
+    window.currentBusinessId = businessId;
+    window.businessId = businessId;
+    window.currentBusiness = business;
+
+    $("businessName").value = business.name || "";
+    $("businessType").value = business.business_type || "";
+    $("businessGstin").value = business.gstin || "";
+    $("businessAddress").value = business.address || "";
+    $("businessCurrency").value = business.currency || "INR";
+    $("businessTaxRate").value = business.gst_rate ?? 18;
+
+    const prefs = business.setup_preferences || {};
+    if (Array.isArray(prefs.categories)) {
+      document.querySelectorAll("#paneStep2 .choice-card").forEach(card => {
+        const selected = prefs.categories.includes(card.dataset.category);
+        card.classList.toggle("selected", selected);
+        card.setAttribute("aria-pressed", String(selected));
+      });
+    }
+    if (prefs.safety_stock_rule != null) $("safetyStockRule").value = String(prefs.safety_stock_rule);
+    if (prefs.dead_stock_rule != null) $("deadStockRule").value = String(prefs.dead_stock_rule);
+    if (typeof prefs.auto_purchase_order === "boolean") $("autoPoCheck").checked = prefs.auto_purchase_order;
+
+    await loadSuppliers();
+    await loadProducts();
+
+    showMessage(
+      business.onboarding_completed
+        ? "Your saved business setup is loaded. You can review or update it."
+        : "Business connected. Complete the steps and save your setup.",
+      "success"
+    );
+  }
+
+  async function loadSuppliers() {
+    const client = db();
+    const { data, error } = await client
+      .from("suppliers")
+      .select("id, name, contact_person, phone, email, category, lead_time_days")
+      .eq("business_id", businessId)
+      .eq("is_archived", false)
+      .order("name");
+
+    if (error) throw error;
+    suppliers = data || [];
+    renderSuppliers();
+    renderSupplierOptions();
+  }
+
+  function renderSuppliers() {
+    $("supplierList").innerHTML = suppliers.length
+      ? suppliers.map(s => `
+          <div class="setup-saved-item">
+            <strong>${escapeHTML(s.name)}</strong>
+            <div>${escapeHTML(s.contact_person || "No contact person")}</div>
+            <small>${escapeHTML(s.phone || "No phone")} · ${escapeHTML(s.category || "Uncategorized")} · Lead time: ${s.lead_time_days ?? "—"} days</small>
+          </div>
+        `).join("")
+      : '<p class="setup-hint">No suppliers added yet.</p>';
+  }
+
+  function renderSupplierOptions() {
+    const select = $("productSupplier");
+    const previous = select.value;
+
+    select.innerHTML = '<option value="">No supplier selected</option>' +
+      suppliers.map(s => `<option value="${escapeHTML(s.id)}">${escapeHTML(s.name)}</option>`).join("");
+
+    if (suppliers.some(s => s.id === previous)) select.value = previous;
+  }
+
+  async function addSupplier() {
+    if (!businessId) {
+      showFormMessage("supplierMessage", "Business is not loaded. Please sign in again.", true);
+      return;
+    }
+
+    const name = $("supplierName").value.trim();
+    const contact = $("supplierContact").value.trim();
+    const phone = $("supplierPhone").value.trim();
+    const email = $("supplierEmail").value.trim();
+    const category = $("supplierCategory").value.trim();
+    const leadRaw = $("supplierLeadTime").value;
+    const lead = leadRaw === "" ? null : Number(leadRaw);
+
+    if (!name) {
+      showFormMessage("supplierMessage", "Supplier name is required.", true);
+      $("supplierName").focus();
+      return;
+    }
+    if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      showFormMessage("supplierMessage", "Enter a valid supplier email.", true);
+      $("supplierEmail").focus();
+      return;
+    }
+    if (lead !== null && (!Number.isInteger(lead) || lead < 0)) {
+      showFormMessage("supplierMessage", "Lead time must be a non-negative whole number.", true);
+      return;
+    }
+
+    const button = $("btnAddSupplier");
+    button.disabled = true;
+
+    try {
+      const { data, error } = await db()
+        .from("suppliers")
+        .insert({
+          business_id: businessId,
+          name,
+          contact_person: contact || null,
+          phone: phone || null,
+          email: email || null,
+          category: category || null,
+          lead_time_days: lead,
+          status: "active",
+          is_archived: false
+        })
+        .select("id, name, contact_person, phone, email, category, lead_time_days")
+        .single();
+
+      if (error) throw error;
+
+      suppliers.push(data);
+      suppliers.sort((a, b) => a.name.localeCompare(b.name));
+      renderSuppliers();
+      renderSupplierOptions();
+
+      $("supplierName").value = "";
+      $("supplierContact").value = "";
+      $("supplierPhone").value = "";
+      $("supplierEmail").value = "";
+      $("supplierCategory").value = "";
+      $("supplierLeadTime").value = "3";
+
+      showFormMessage("supplierMessage", "Supplier saved successfully.");
+      updateReview();
+    } catch (error) {
+      console.error("Add supplier error:", error);
+      showFormMessage("supplierMessage", error.message || "Could not save supplier.", true);
+    } finally {
+      button.disabled = false;
+    }
+  }
+
+  async function loadProducts() {
+    const { data, error } = await db()
+      .from("products")
+      .select("id, name, sku, category, selling_price, purchase_price, stock, reorder_level, supplier_id")
+      .eq("business_id", businessId)
+      .eq("is_archived", false)
+      .order("name");
+
+    if (error) throw error;
+    products = data || [];
+    renderProducts();
+  }
+
+  function renderProducts() {
+    $("productList").innerHTML = products.length
+      ? products.map(p => `
+          <div class="setup-saved-item">
+            <strong>${escapeHTML(p.name)}</strong>
+            <small>SKU: ${escapeHTML(p.sku || "Not set")} · Stock: ${p.stock} · Reorder at: ${p.reorder_level}</small>
+            <small>Purchase: ${Number(p.purchase_price).toFixed(2)} · Selling: ${Number(p.selling_price).toFixed(2)}</small>
+          </div>
+        `).join("")
+      : '<p class="setup-hint">No products added yet.</p>';
+  }
+
+  async function addProduct() {
+    if (!businessId) {
+      showFormMessage("productMessage", "Business is not loaded. Please sign in again.", true);
+      return;
+    }
+
+    const name = $("productName").value.trim();
+    const sku = $("productSku").value.trim();
+    const category = $("productCategory").value.trim();
+    const supplierId = $("productSupplier").value || null;
+    const purchaseRaw = $("productPurchasePrice").value;
+    const sellingRaw = $("productSellingPrice").value;
+    const stockRaw = $("productStock").value;
+    const reorderRaw = $("productReorderLevel").value;
+
+    const purchase = Number(purchaseRaw);
+    const selling = Number(sellingRaw);
+    const stock = Number(stockRaw);
+    const reorder = Number(reorderRaw);
+
+    if (!name || purchaseRaw === "" || sellingRaw === "" || stockRaw === "" || reorderRaw === "") {
+      showFormMessage("productMessage", "Complete all required product fields.", true);
+      return;
+    }
+    if (![purchase, selling].every(Number.isFinite) || purchase < 0 || selling < 0) {
+      showFormMessage("productMessage", "Prices must be valid non-negative numbers.", true);
+      return;
+    }
+    if (![stock, reorder].every(Number.isInteger) || stock < 0 || reorder < 0) {
+      showFormMessage("productMessage", "Stock and reorder level must be non-negative whole numbers.", true);
+      return;
+    }
+    if (sku && products.some(p => p.sku && p.sku.toLowerCase() === sku.toLowerCase())) {
+      showFormMessage("productMessage", "This SKU already exists in the loaded product list.", true);
+      return;
+    }
+
+    const button = $("btnAddProduct");
+    button.disabled = true;
+
+    try {
+      const { data, error } = await db()
+        .from("products")
+        .insert({
+          business_id: businessId,
+          supplier_id: supplierId,
+          name,
+          sku: sku || null,
+          category: category || null,
+          purchase_price: purchase,
+          selling_price: selling,
+          stock,
+          reorder_level: reorder,
+          is_archived: false
+        })
+        .select("id, name, sku, category, selling_price, purchase_price, stock, reorder_level, supplier_id")
+        .single();
+
+      if (error) throw error;
+
+      products.push(data);
+      products.sort((a, b) => a.name.localeCompare(b.name));
+      renderProducts();
+
+      $("productName").value = "";
+      $("productSku").value = "";
+      $("productCategory").value = "";
+      $("productPurchasePrice").value = "";
+      $("productSellingPrice").value = "";
+      $("productStock").value = "0";
+      $("productReorderLevel").value = "5";
+
+      showFormMessage("productMessage", "Product saved successfully.");
+      updateReview();
+    } catch (error) {
+      console.error("Add product error:", error);
+      showFormMessage("productMessage", error.message || "Could not save product.", true);
+    } finally {
+      button.disabled = false;
+    }
+  }
+
+  async function saveSetup() {
+    if (saving) return false;
+    if (!user || !businessId) {
+      showMessage("Sign in and connect a business before saving.", "error");
+      return false;
+    }
+    if (!validateStep()) return false;
+
+    saving = true;
+    $("btnWizardNext").disabled = true;
+    $("btnSaveExit").disabled = true;
+    showMessage("Saving your business profile and preferences…", "info");
+
+    try {
+      const updates = {
+        name: $("businessName").value.trim(),
+        business_type: $("businessType").value,
+        gstin: $("businessGstin").value.trim().toUpperCase() || null,
+        address: $("businessAddress").value.trim() || null,
+        currency: $("businessCurrency").value,
+        gst_rate: Number($("businessTaxRate").value || 0),
+        setup_preferences: getPreferences(),
+        onboarding_completed: true
+      };
+
+      const { data, error } = await db()
+        .from("businesses")
+        .update(updates)
+        .eq("id", businessId)
+        .select("id, name, business_type, gstin, address, currency, gst_rate, setup_preferences, onboarding_completed")
+        .maybeSingle();
+
+      if (error) throw error;
+      if (!data) throw new Error("No business was updated. Check your business membership and Supabase Row Level Security policies.");
+
+      business = { ...business, ...data };
+      window.currentBusiness = business;
+
+      showMessage("Setup saved successfully to Supabase.", "success");
+      return true;
+    } catch (error) {
+      console.error("Save setup error:", error);
+      showMessage("Save failed: " + (error.message || "Unknown error"), "error");
+      return false;
+    } finally {
+      saving = false;
+      $("btnWizardNext").disabled = false;
+      $("btnSaveExit").disabled = false;
+      $("btnWizardNext").innerHTML = step === 5
+        ? 'Save Setup <i class="fa-solid fa-floppy-disk"></i>'
+        : 'Next Step <i class="fa-solid fa-arrow-right"></i>';
+    }
+  }
+
+  async function saveAndExit() {
+    if (!validateStep()) return;
+    const saved = await saveSetup();
+    if (saved) window.location.href = "dashboard.html";
+  }
+
+  function bindEvents() {
+    $("btnWizardNext").addEventListener("click", async () => {
+      if (saving || !validateStep()) return;
+      if (step < 5) {
+        showMessage("", "info");
+        renderStep(step + 1);
+        return;
+      }
+      if (step === 5) {
+        const saved = await saveSetup();
+        if (saved) renderStep(6);
+      }
+    });
+
+    $("btnWizardPrev").addEventListener("click", () => {
+      if (!saving) {
+        showMessage("", "info");
+        renderStep(step - 1);
+      }
+    });
+
+    $("btnSaveExit").addEventListener("click", saveAndExit);
+    $("btnLaunchDashboard").addEventListener("click", () => {
+      if (!business?.onboarding_completed) {
+        showMessage("Complete a successful setup save before opening the dashboard.", "error");
+        return;
+      }
+      window.location.href = "dashboard.html";
+    });
+
+    $("btnAddSupplier").addEventListener("click", addSupplier);
+    $("btnAddProduct").addEventListener("click", addProduct);
+
+    document.querySelectorAll("#paneStep2 .choice-card").forEach(card => {
+      function toggleCard() {
+        card.classList.toggle("selected");
+        card.setAttribute("aria-pressed", String(card.classList.contains("selected")));
+      }
+      card.addEventListener("click", toggleCard);
+      card.addEventListener("keydown", event => {
+        if (event.key === "Enter" || event.key === " ") {
+          event.preventDefault();
+          toggleCard();
+        }
+      });
+    });
+  }
+
+  async function initialize() {
+    bindEvents();
+    renderStep(1);
+
+    try {
+      await loadBusiness();
+    } catch (error) {
+      console.error("Setup initialization error:", error);
+      showMessage("Could not load setup: " + (error.message || "Check Supabase connection and permissions."), "error");
+    }
+  }
+
+  initialize();
+})();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,709 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Inventory Management — RetailMind AI</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Sora:wght@400;500;600;700;800&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/dashboard.css">
+  <link rel="stylesheet" href="css/responsive.css">
+</head>
+
+<body>
+
+  <div class="app-layout">
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <a href="dashboard.html" class="brand-logo">
+          <div class="brand-icon">
+            <i class="fa-solid fa-brain"></i>
+          </div>
+          <span class="brand-text">RetailMind</span>
+          <span class="brand-badge">AI</span>
+        </a>
+      </div>
+
+      <nav class="sidebar-nav">
+        <div>
+          <div class="nav-group-title">Main</div>
+          <ul class="nav-list">
+            <li>
+              <a href="dashboard.html" class="nav-link">
+                <div class="nav-link-content">
+                  <i class="fa-solid fa-chart-pie"></i>
+                  <span>Dashboard</span>
+                </div>
+              </a>
+            </li>
+            <li>
+              <a href="inventory.html" class="nav-link active">
+                <div class="nav-link-content">
+                  <i class="fa-solid fa-boxes-stacked"></i>
+                  <span>Inventory</span>
+                </div>
+
+                <span id="inventoryLowStockBadge" class="nav-badge badge-warning"
+                  style="font-size: 0.6875rem; display: none;">
+                </span>
+              </a>
+            </li>
+            <li>
+              <a href="sales.html" class="nav-link">
+                <div class="nav-link-content">
+                  <i class="fa-solid fa-cart-shopping"></i>
+                  <span>Sales & POS</span>
+                </div>
+              </a>
+            </li>
+            <li>
+              <a href="orders.html" class="nav-link">
+                <div class="nav-link-content">
+                  <i class="fa-solid fa-receipt"></i>
+                  <span>Orders</span>
+                </div>
+              </a>
+            </li>
+            <li>
+              <a href="customers.html" class="nav-link">
+                <div class="nav-link-content">
+                  <i class="fa-solid fa-users"></i>
+                  <span>Customers</span>
+                </div>
+              </a>
+            </li>
+            <li>
+              <a href="suppliers.html" class="nav-link">
+                <div class="nav-link-content">
+                  <i class="fa-solid fa-truck"></i>
+                  <span>Suppliers</span>
+                </div>
+              </a>
+            </li>
+          </ul>
+        </div>
+
+        <div>
+          <div class="nav-group-title">Intelligence</div>
+          <ul class="nav-list">
+            <li>
+              <a href="ai-assistant.html" class="nav-link">
+                <div class="nav-link-content">
+                  <i class="fa-solid fa-robot"></i>
+                  <span>AI Assistant</span>
+                </div>
+                <span class="nav-badge badge-ai" style="font-size: 0.6875rem;">PRO</span>
+              </a>
+            </li>
+            <li>
+              <a href="analytics.html" class="nav-link">
+                <div class="nav-link-content">
+                  <i class="fa-solid fa-chart-line"></i>
+                  <span>Analytics</span>
+                </div>
+              </a>
+            </li>
+            <li>
+              <a href="predictions.html" class="nav-link">
+                <div class="nav-link-content">
+                  <i class="fa-solid fa-brain"></i>
+                  <span>Predictions</span>
+                </div>
+              </a>
+            </li>
+            <li>
+              <a href="reports.html" class="nav-link">
+                <div class="nav-link-content">
+                  <i class="fa-solid fa-file-lines"></i>
+                  <span>Reports</span>
+                </div>
+              </a>
+            </li>
+          </ul>
+        </div>
+
+        <div>
+          <div class="nav-group-title">Management</div>
+          <ul class="nav-list">
+            <li>
+              <a href="notifications.html" class="nav-link">
+                <div class="nav-link-content">
+                  <i class="fa-solid fa-bell"></i>
+                  <span>Notifications</span>
+                </div>
+                <span class="sidebar-notification-count" hidden>0</span>
+              </a>
+            </li>
+            <li>
+              <a href="health.html" class="nav-link">
+                <div class="nav-link-content">
+                  <i class="fa-solid fa-heart-pulse"></i>
+                  <span>Business Health</span>
+                </div>
+                <span class="nav-badge badge-success" style="font-size: 0.6875rem;">87%</span>
+              </a>
+            </li>
+
+            <li>
+              <a href="members.html" class="nav-link">
+                <div class="nav-link-content">
+                  <i class="fa-solid fa-user-group"></i>
+                  <span>Business Members</span>
+                </div>
+              </a>
+            </li>
+
+            <li>
+              <a href="setup.html" class="nav-link">
+                <div class="nav-link-content">
+                  <i class="fa-solid fa-sliders"></i>
+                  <span>Setup Wizard</span>
+                </div>
+              </a>
+            </li>
+          </ul>
+        </div>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="user-mini-card" onclick="window.location.href='profile.html'">
+          <div class="user-avatar-circle">SM</div>
+          <div class="user-info">
+            <div class="user-name">Sana Mondal</div>
+            <div class="user-role">Administrator</div>
+          </div>
+          <i class="fa-solid fa-chevron-right text-muted" style="font-size: 0.75rem;"></i>
+        </div>
+      </div>
+    </aside>
+
+    <!-- MAIN WRAPPER -->
+    <div class="main-wrapper">
+      <header class="topbar">
+        <div class="topbar-left">
+          <button class="mobile-toggle" aria-label="Toggle navigation">
+            <i class="fa-solid fa-bars"></i>
+          </button>
+          <div class="breadcrumb-area">
+            <div class="breadcrumb">
+              <a href="dashboard.html">RetailMind</a>
+              <i class="fa-solid fa-chevron-right" style="font-size: 0.625rem;"></i>
+              <span>Inventory</span>
+            </div>
+            <div class="page-title">Inventory Management</div>
+          </div>
+        </div>
+
+        <div class="topbar-right">
+          <button class="btn-ai-quick" id="aiQuickBtn">
+            <i class="fa-solid fa-wand-magic-sparkles"></i>
+            <span>Ask AI</span>
+          </button>
+          <div class="user-avatar-circle" onclick="window.location.href='profile.html'"
+            style="cursor: pointer; width: 38px; height: 38px;">SM</div>
+        </div>
+      </header>
+
+      <main class="page-container">
+        <!-- Header Actions -->
+        <div class="page-header">
+          <div>
+            <h1>Inventory Catalog & Stock Control</h1>
+            <p>Track real-time stock levels, reorder thresholds, OCR invoice ingestion, and batch expiries.</p>
+          </div>
+          <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
+            <button class="btn btn-outline" onclick="document.getElementById('barcodeModal').classList.add('active')">
+              <i class="fa-solid fa-barcode"></i> Scan Barcode
+            </button>
+            <button class="btn btn-secondary" onclick="document.getElementById('ocrModal').classList.add('active')">
+              <i class="fa-solid fa-file-invoice"></i> OCR Invoice Import
+            </button>
+            <button class="btn btn-outline"
+              onclick="showToast('Exported inventory catalog (CSV)', 'info', 'fa-file-csv')">
+              <i class="fa-solid fa-file-export"></i> Export
+            </button>
+            <button class="btn btn-primary"
+              onclick="document.getElementById('addProductModal').classList.add('active')">
+              <i class="fa-solid fa-plus"></i> Add Product
+            </button>
+          </div>
+        </div>
+
+        <!-- Inventory Stats -->
+        <div class="kpi-grid" style="grid-template-columns: repeat(5, 1fr); margin-bottom: 1.5rem;">
+          <div class="kpi-card">
+            <span class="kpi-title">Total Products</span>
+            <div class="kpi-value">1,248</div>
+            <div class="kpi-footer text-muted">Across 8 categories</div>
+          </div>
+          <div class="kpi-card">
+            <span class="kpi-title text-success">In Stock</span>
+            <div class="kpi-value text-success">1,102</div>
+            <div class="kpi-footer text-success">88.3% Healthy</div>
+          </div>
+          <div class="kpi-card">
+            <span class="kpi-title text-warning">Low Stock</span>
+            <div class="kpi-value text-warning">96</div>
+            <div class="kpi-footer text-warning">Reorder recommended</div>
+          </div>
+          <div class="kpi-card">
+            <span class="kpi-title text-danger">Out of Stock</span>
+            <div class="kpi-value text-danger">21</div>
+            <div class="kpi-footer text-danger">Immediate attention</div>
+          </div>
+          <div class="kpi-card">
+            <span class="kpi-title text-primary">Inventory Value</span>
+            <div class="kpi-value text-primary">₹6,84,200</div>
+            <div class="kpi-footer text-muted">Cost basis: ₹5,12,000</div>
+          </div>
+        </div>
+
+        <!-- Search & Filters Card -->
+        <div class="card" style="margin-bottom: 1.5rem;">
+          <div class="card-body" style="padding: 1.25rem;">
+            <div class="grid grid-cols-4" style="gap: 1rem; align-items: center;">
+              <div class="input-icon-wrapper" style="grid-column: span 2;">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <input type="text" id="inventorySearch" class="form-control"
+                  placeholder="Search by product name, SKU, or supplier...">
+              </div>
+              <div>
+                <select id="categoryFilter" class="form-select">
+                  <option value="all">All Categories</option>
+                  <option value="Groceries">Groceries</option>
+                  <option value="Beverages">Beverages</option>
+                  <option value="Personal Care">Personal Care</option>
+                  <option value="Clothing">Clothing</option>
+                  <option value="Footwear">Footwear</option>
+                  <option value="Accessories">Accessories</option>
+                  <option value="Medicines">Medicines</option>
+                  <option value="Dairy">Dairy</option>
+                  <option value="Bakery">Bakery</option>
+                  <option value="Snacks">Snacks</option>
+                  <option value="Home & Kitchen">Home &amp; Kitchen</option>
+                  <option value="Other">Other</option>
+                </select>
+              </div>
+              <div>
+                <select id="statusFilter" class="form-select">
+                  <option value="all">All Stock Statuses</option>
+                  <option value="In Stock">In Stock</option>
+                  <option value="Low Stock">Low Stock</option>
+                  <option value="Critical">Critical</option>
+                  <option value="Out of Stock">Out of Stock</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Inventory Data Table -->
+        <div class="card">
+          <div class="table-responsive">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>Product</th>
+                  <th>SKU</th>
+                  <th>Category</th>
+                  <th>Stock / Safety</th>
+                  <th>Selling / Cost</th>
+                  <th>Primary Supplier</th>
+                  <th>Expiry Date</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="inventoryTableBody">
+                <!-- Dynamically populated from js/inventory.js -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- MODAL: ADD PRODUCT                         -->
+  <!-- ========================================== -->
+  <div class="modal-overlay" id="addProductModal">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 class="modal-title">Add New Product</h3>
+        <button class="btn btn-ghost btn-sm"
+          onclick="document.getElementById('addProductModal').classList.remove('active')">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+      <form id="addProductForm">
+        <div class="modal-body">
+          <div class="form-group">
+            <label class="form-label">Product Name *</label>
+            <input type="text" id="newProdName" class="form-control" required placeholder="e.g. Organic Almond Milk 1L">
+          </div>
+          <div class="grid grid-cols-2" style="gap: 1rem;">
+            <div class="form-group">
+              <label class="form-label">Category *</label>
+              <select id="newProdCategory" class="form-select" required>
+                <option value="">Select a category</option>
+                <option value="Groceries">Groceries</option>
+                <option value="Beverages">Beverages</option>
+                <option value="Personal Care">Personal Care</option>
+                <option value="Clothing">Clothing</option>
+                <option value="Footwear">Footwear</option>
+                <option value="Accessories">Accessories</option>
+                <option value="Medicines">Medicines</option>
+                <option value="Dairy">Dairy</option>
+                <option value="Bakery">Bakery</option>
+                <option value="Snacks">Snacks</option>
+                <option value="Home & Kitchen">Home &amp; Kitchen</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="newProdSupplier">Primary Supplier *</label>
+              <select id="newProdSupplier" class="form-select" required>
+                <option value="">Loading suppliers...</option>
+              </select>
+            </div>
+
+          </div>
+          <div class="grid grid-cols-2" style="gap: 1rem;">
+            <div class="form-group">
+              <label class="form-label">Selling Price (₹) *</label>
+              <input type="number" id="newProdPrice" class="form-control" required min="1" step="0.5" placeholder="85">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Cost Price (₹) *</label>
+              <input type="number" id="newProdCost" class="form-control" required min="1" step="0.5" placeholder="62">
+            </div>
+          </div>
+          <div class="grid grid-cols-3" style="gap: 1rem;">
+            <div class="form-group">
+              <label class="form-label">Initial Stock *</label>
+              <input type="number" id="newProdStock" class="form-control" required min="0" placeholder="50">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Reorder Level *</label>
+              <input type="number" id="newProdReorder" class="form-control" required min="1" placeholder="20">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Expiry Date</label>
+              <input type="date" id="newProdExpiry" class="form-control" value="2027-12-31">
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline"
+            onclick="document.getElementById('addProductModal').classList.remove('active')">Cancel</button>
+          <button type="submit" class="btn btn-primary">
+            <i class="fa-solid fa-plus"></i> Add to Catalog
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- EDIT PRODUCT MODAL -->
+  <div class="modal-overlay" id="editProductModal">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 class="modal-title">Edit Product</h3>
+        <button type="button" class="btn btn-ghost btn-sm" id="closeEditProductModal"
+          aria-label="Close edit product dialog">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <form id="editProductForm">
+        <div class="modal-body">
+          <input type="hidden" id="editProdId">
+
+          <div class="form-group">
+            <label class="form-label" for="editProdName">Product Name *</label>
+            <input type="text" id="editProdName" class="form-control" required maxlength="150">
+          </div>
+
+          <div class="grid grid-cols-2" style="gap: 1rem;">
+            <div class="form-group">
+              <label class="form-label" for="editProdCategory">Category *</label>
+              <select id="editProdCategory" class="form-select" required>
+                <option value="">Select a category</option>
+                <option value="Groceries">Groceries</option>
+                <option value="Beverages">Beverages</option>
+                <option value="Personal Care">Personal Care</option>
+                <option value="Clothing">Clothing</option>
+                <option value="Footwear">Footwear</option>
+                <option value="Accessories">Accessories</option>
+                <option value="Medicines">Medicines</option>
+                <option value="Dairy">Dairy</option>
+                <option value="Bakery">Bakery</option>
+                <option value="Snacks">Snacks</option>
+                <option value="Home & Kitchen">Home &amp; Kitchen</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="editProdSupplier">Supplier *</label>
+              <select id="editProdSupplier" class="form-select" required>
+                <option value="">Loading suppliers...</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-2" style="gap: 1rem;">
+            <div class="form-group">
+              <label class="form-label" for="editProdPrice">Selling Price (₹) *</label>
+              <input type="number" id="editProdPrice" class="form-control" min="0.01" step="0.01" required>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="editProdCost">Cost Price (₹) *</label>
+              <input type="number" id="editProdCost" class="form-control" min="0.01" step="0.01" required>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-2" style="gap: 1rem;">
+            <div class="form-group">
+              <label class="form-label" for="editProdStock">Stock Quantity *</label>
+              <input type="number" id="editProdStock" class="form-control" min="0" step="1" required>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="editProdReorder">Reorder Level *</label>
+              <input type="number" id="editProdReorder" class="form-control" min="1" step="1" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="editProdExpiry">
+                Expiry Date
+              </label>
+              <input type="date" id="editProdExpiry" class="form-input" />
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline" id="cancelEditProduct">
+            Cancel
+          </button>
+
+          <button type="submit" class="btn btn-primary" id="saveEditProduct">
+            <i class="fa-solid fa-floppy-disk"></i>
+            Save Changes
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+  <!-- View Product Details Modal -->
+  <div class="modal-overlay" id="viewProductModal">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 class="modal-title">Product Details</h3>
+        <button type="button" class="btn btn-ghost btn-sm" id="closeViewProductModal"
+          aria-label="Close product details">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <div class="product-detail-header">
+          <div class="product-detail-icon">
+            <i class="fa-solid fa-box-open"></i>
+          </div>
+          <div>
+            <h3 id="viewProdName">Product Name</h3>
+            <p id="viewProdSku" class="text-muted">SKU</p>
+          </div>
+        </div>
+
+        <div class="product-detail-grid">
+          <div class="product-detail-item">
+            <span>Category</span>
+            <strong id="viewProdCategory">—</strong>
+          </div>
+          <div class="product-detail-item">
+            <span>Stock Available</span>
+            <strong id="viewProdStock">—</strong>
+          </div>
+          <div class="product-detail-item">
+            <span>Reorder Level</span>
+            <strong id="viewProdReorder">—</strong>
+          </div>
+          <div class="product-detail-item">
+            <span>Stock Status</span>
+            <strong id="viewProdStatus">—</strong>
+          </div>
+          <div class="product-detail-item">
+            <span>Selling Price</span>
+            <strong id="viewProdPrice">—</strong>
+          </div>
+          <div class="product-detail-item">
+            <span>Purchase Cost</span>
+            <strong id="viewProdCost">—</strong>
+          </div>
+          <div class="product-detail-item">
+            <span>Primary Supplier</span>
+            <strong id="viewProdSupplier">—</strong>
+          </div>
+          <div class="product-detail-item">
+            <span>Expiry Date</span>
+            <strong id="viewProdExpiry">—</strong>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" id="closeViewProductFooter">Close</button>
+        <button type="button" class="btn btn-primary" id="viewProdEditBtn">
+          <i class="fa-solid fa-pen-to-square"></i> Edit Product
+        </button>
+      </div>
+    </div>
+  </div>
+  <!-- ========================================== -->
+  <!-- MODAL: OCR BILL / INVOICE SCANNER          -->
+  <!-- ========================================== -->
+  <div class="modal-overlay" id="ocrModal">
+    <div class="modal" style="max-width: 640px;">
+      <div class="modal-header">
+        <div style="display: flex; align-items: center; gap: 0.5rem;">
+          <span class="badge badge-ai"><i class="fa-solid fa-wand-magic-sparkles"></i> AI OCR</span>
+          <h3 class="modal-title">Upload Supplier Invoice</h3>
+        </div>
+        <button class="btn btn-ghost btn-sm" onclick="document.getElementById('ocrModal').classList.remove('active')">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div id="ocrDropzone"
+          style="border: 2px dashed var(--border); border-radius: var(--radius-lg); padding: 2.5rem; text-align: center; cursor: pointer; background: var(--surface-subtle); transition: var(--transition);">
+          <i class="fa-solid fa-cloud-arrow-up text-primary" style="font-size: 2.5rem; margin-bottom: 1rem;"></i>
+          <h4 style="font-weight: 700; margin-bottom: 0.375rem;">Drag & drop your invoice here</h4>
+          <p class="text-muted" style="font-size: 0.8125rem; margin-bottom: 1rem;">Supports PDF, JPG, PNG (Max 15MB)</p>
+          <button class="btn btn-outline-primary btn-sm" type="button">Select Invoice File</button>
+          <input type="file" id="ocrFileInput" style="display: none;" accept=".pdf,.jpg,.jpeg,.png">
+        </div>
+
+        <!-- Simulated Extraction Results -->
+        <div id="ocrResults" style="display: none; margin-top: 1.25rem;">
+          <div class="badge badge-success" style="margin-bottom: 0.75rem;">
+            <i class="fa-solid fa-circle-check"></i> Extracted from "Golden_Crust_Inv_992.pdf"
+          </div>
+          <table class="table" style="font-size: 0.8125rem;">
+            <thead>
+              <tr>
+                <th>Item</th>
+                <th>Qty</th>
+                <th>Unit Cost</th>
+                <th>GST %</th>
+                <th>Total</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Whole Wheat Bread 400g</strong></td>
+                <td>100 units</td>
+                <td>₹32.00</td>
+                <td>5%</td>
+                <td>₹3,360</td>
+              </tr>
+              <tr>
+                <td><strong>Butter Cookies 200g</strong></td>
+                <td>80 units</td>
+                <td>₹38.00</td>
+                <td>12%</td>
+                <td>₹3,404</td>
+              </tr>
+              <tr>
+                <td><strong>Garlic Toast 150g</strong></td>
+                <td>40 units</td>
+                <td>₹25.00</td>
+                <td>5%</td>
+                <td>₹1,050</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline"
+          onclick="document.getElementById('ocrModal').classList.remove('active')">Cancel</button>
+        <button class="btn btn-accent" id="btnApplyOcr" style="display: none;">
+          <i class="fa-solid fa-arrows-rotate"></i> Update Inventory
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- MODAL: BARCODE / QR SCANNER                -->
+  <!-- ========================================== -->
+  <div class="modal-overlay" id="barcodeModal">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 class="modal-title">Barcode & QR Scanner</h3>
+        <button class="btn btn-ghost btn-sm"
+          onclick="document.getElementById('barcodeModal').classList.remove('active')">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+      <div class="modal-body text-center">
+        <!-- Viewfinder Frame -->
+        <div
+          style="width: 100%; height: 220px; background: #111827; border-radius: var(--radius-lg); position: relative; display: flex; align-items: center; justify-content: center; overflow: hidden; margin-bottom: 1.25rem;">
+          <div style="width: 180px; height: 120px; border: 2px dashed #00D4A0; border-radius: 8px; position: relative;">
+            <div
+              style="position: absolute; top: 50%; left: 0; right: 0; height: 2px; background: rgba(0, 212, 160, 0.8); box-shadow: 0 0 8px #00D4A0;">
+            </div>
+          </div>
+          <div id="scannerStatus" style="position: absolute; bottom: 10px; color: #E5E7EB; font-size: 0.75rem;">
+            Ready to scan physical barcode...
+          </div>
+        </div>
+
+        <button class="btn btn-primary" id="btnStartScanner">
+          <i class="fa-solid fa-camera"></i> Start Camera Scanner
+        </button>
+
+        <!-- Scanned Product Card Preview -->
+        <div id="scannedProductCard" class="card"
+          style="display: none; margin-top: 1.25rem; text-align: left; padding: 1rem; border-left: 4px solid var(--accent);">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div>
+              <div class="font-bold text-dark">Fresh Milk 1L</div>
+              <div class="text-muted" style="font-size: 0.75rem;">SKU: PRD-01 • Barcode: 8901234567890</div>
+            </div>
+            <span class="badge badge-danger">12 in stock (Low)</span>
+          </div>
+          <div style="display: flex; gap: 0.5rem; margin-top: 0.75rem;">
+            <button class="btn btn-primary btn-sm" onclick="window.location.href='sales.html'">Add to POS Cart</button>
+            <button class="btn btn-outline btn-sm" onclick="viewProductDetail('PRD-01')">View Ledger</button>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline"
+          onclick="document.getElementById('barcodeModal').classList.remove('active')">Close</button>
+      </div>
+    </div>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase.js"></script>
+  <script src="js/app.js"></script>
+  <script src="js/inventory.js"></script>
+</body>
+
+</html>

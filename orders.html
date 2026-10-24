@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Orders Management — RetailMind AI</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Sora:wght@400;500;600;700;800&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/dashboard.css">
+  <link rel="stylesheet" href="css/responsive.css">
+</head>
+
+<body>
+
+  <div class="app-layout">
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <a href="dashboard.html" class="brand-logo">
+          <div class="brand-icon">
+            <i class="fa-solid fa-brain"></i>
+          </div>
+          <span class="brand-text">RetailMind</span>
+          <span class="brand-badge">AI</span>
+        </a>
+      </div>
+
+      <nav class="sidebar-nav">
+        <div>
+          <div class="nav-group-title">Main</div>
+          <ul class="nav-list">
+            <li>
+              <a href="dashboard.html" class="nav-link">
+                <div class="nav-link-content">
+                  <i class="fa-solid fa-chart-pie"></i>
+                  <span>Dashboard</span>
+                </div>
+              </a>
+            </li>
+            <li>
+              <a href="inventory.html" class="nav-link">
+                <div class="nav-link-content">
+                  <i class="fa-solid fa-boxes-stacked"></i>
+                  <span>Inventory</span>
+                </div>
+
+                <span id="inventoryLowStockBadge" class="nav-badge badge-warning"
+                  style="font-size: 0.6875rem; display: none;">
+                </span>
+              </a>
+            </li>
+            <li>
+              <a href="sales.html" class="nav-link">
+                <div class="nav-link-content">
+                  <i class="fa-solid fa-cart-shopping"></i>
+                  <span>Sales & POS</span>
+                </div>
+              </a>
+            </li>
+            <li>
+              <a href="orders.html" class="nav-link active">
+                <div class="nav-link-content">
+                  <i class="fa-solid fa-receipt"></i>
+                  <span>Orders</span>
+                </div>
+              </a>
+            </li>
+            <li>
+              <a href="customers.html" class="nav-link">
+                <div class="nav-link-content">
+                  <i class="fa-solid fa-users"></i>
+                  <span>Customers</span>
+                </div>
+              </a>
+            </li>
+            <li>
+              <a href="suppliers.html" class="nav-link">
+                <div class="nav-link-content">
+                  <i class="fa-solid fa-truck"></i>
+                  <span>Suppliers</span>
+                </div>
+              </a>
+            </li>
+          </ul>
+        </div>
+
+        <div>
+          <div class="nav-group-title">Intelligence</div>
+          <ul class="nav-list">
+            <li>
+              <a href="ai-assistant.html" class="nav-link">
+                <div class="nav-link-content">
+                  <i class="fa-solid fa-robot"></i>
+                  <span>AI Assistant</span>
+                </div>
+                <span class="nav-badge badge-ai" style="font-size: 0.6875rem;">PRO</span>
+              </a>
+            </li>
+            <li>
+              <a href="analytics.html" class="nav-link">
+                <div class="nav-link-content">
+                  <i class="fa-solid fa-chart-line"></i>
+                  <span>Analytics</span>
+                </div>
+              </a>
+            </li>
+            <li>
+              <a href="predictions.html" class="nav-link">
+                <div class="nav-link-content">
+                  <i class="fa-solid fa-brain"></i>
+                  <span>Predictions</span>
+                </div>
+              </a>
+            </li>
+            <li>
+              <a href="reports.html" class="nav-link">
+                <div class="nav-link-content">
+                  <i class="fa-solid fa-file-lines"></i>
+                  <span>Reports</span>
+                </div>
+              </a>
+            </li>
+          </ul>
+        </div>
+
+        <div>
+          <div class="nav-group-title">Management</div>
+          <ul class="nav-list">
+            <li>
+              <a href="notifications.html" class="nav-link">
+                <div class="nav-link-content">
+                  <i class="fa-solid fa-bell"></i>
+                  <span>Notifications</span>
+                </div>
+                <span class="sidebar-notification-count" hidden>0</span>
+              </a>
+            </li>
+            <li>
+              <a href="health.html" class="nav-link">
+                <div class="nav-link-content">
+                  <i class="fa-solid fa-heart-pulse"></i>
+                  <span>Business Health</span>
+                </div>
+                <span class="nav-badge badge-success" style="font-size: 0.6875rem;">87%</span>
+              </a>
+            </li>
+
+            <li>
+              <a href="members.html" class="nav-link">
+                <div class="nav-link-content">
+                  <i class="fa-solid fa-user-group"></i>
+                  <span>Business Members</span>
+                </div>
+              </a>
+            </li>
+
+            <li>
+              <a href="setup.html" class="nav-link">
+                <div class="nav-link-content">
+                  <i class="fa-solid fa-sliders"></i>
+                  <span>Setup Wizard</span>
+                </div>
+              </a>
+            </li>
+          </ul>
+        </div>
+      </nav>
+
+
+      <div class="sidebar-footer">
+        <div class="user-mini-card" onclick="window.location.href='profile.html'">
+          <div class="user-avatar-circle" id="ordersSidebarAvatar">?</div>
+          <div class="user-info">
+            <div class="user-name" id="ordersSidebarName">Loading profile...</div>
+            <div class="user-role" id="ordersSidebarRole">Loading...</div>
+          </div>
+          <i class="fa-solid fa-chevron-right text-muted" style="font-size: 0.75rem;"></i>
+        </div>
+      </div>
+
+    </aside>
+
+    <!-- MAIN WRAPPER -->
+    <div class="main-wrapper">
+      <header class="topbar">
+        <div class="topbar-left">
+          <button class="mobile-toggle" aria-label="Toggle navigation">
+            <i class="fa-solid fa-bars"></i>
+          </button>
+          <div class="breadcrumb-area">
+            <div class="breadcrumb">
+              <a href="dashboard.html">RetailMind</a>
+              <i class="fa-solid fa-chevron-right" style="font-size: 0.625rem;"></i>
+              <span>Orders</span>
+            </div>
+            <div class="page-title">Orders Management</div>
+          </div>
+        </div>
+
+        <div class="topbar-right">
+          <button class="btn-ai-quick" id="aiQuickBtn">
+            <i class="fa-solid fa-wand-magic-sparkles"></i>
+            <span>Ask AI</span>
+          </button>
+
+          <div class="user-avatar-circle" id="ordersTopbarAvatar" onclick="window.location.href='profile.html'"
+            style="cursor: pointer; width: 38px; height: 38px;">?</div>
+
+      </header>
+
+      <main class="page-container">
+        <!-- Page Header -->
+        <div class="page-header">
+          <div>
+            <h1>Orders & Transaction Flow</h1>
+            <p>Monitor multi-channel order fulfillment, invoices, payment status, and dispatch tracking.</p>
+          </div>
+          <button class="btn btn-primary" onclick="window.location.href='sales.html'">
+            <i class="fa-solid fa-plus"></i> New Sale
+          </button>
+        </div>
+
+        <!-- Order Statistics Cards -->
+        <div class="kpi-grid" style="grid-template-columns: repeat(5, 1fr); margin-bottom: 1.5rem;">
+
+          <div class="kpi-card">
+            <span class="kpi-title">Total Orders</span>
+            <div class="kpi-value" id="ordersTotalCount">0</div>
+            <div class="kpi-footer text-muted">All orders</div>
+          </div>
+
+          <div class="kpi-card">
+            <span class="kpi-title text-success">Completed</span>
+            <div class="kpi-value text-success" id="ordersCompletedCount">0</div>
+            <div class="kpi-footer text-success" id="ordersCompletedRate">0% completed</div>
+          </div>
+
+          <div class="kpi-card">
+            <span class="kpi-title text-info">Processing</span>
+            <div class="kpi-value text-info" id="ordersProcessingCount">0</div>
+            <div class="kpi-footer text-info">In fulfillment</div>
+          </div>
+
+          <div class="kpi-card">
+            <span class="kpi-title text-warning">Pending</span>
+            <div class="kpi-value text-warning" id="ordersPendingCount">0</div>
+            <div class="kpi-footer text-warning">Awaiting payment</div>
+          </div>
+
+          <div class="kpi-card">
+            <span class="kpi-title text-danger">Cancelled</span>
+            <div class="kpi-value text-danger" id="ordersCancelledCount">0</div>
+            <div class="kpi-footer text-danger" id="ordersCancelledRate">0% cancelled</div>
+          </div>
+
+        </div>
+
+
+        <!-- Search & Filter Tabs -->
+        <div class="card" style="margin-bottom: 1.5rem;">
+          <div class="card-body" style="padding: 1rem 1.25rem;">
+            <div
+              style="display: flex; justify-content: space-between; align-items: center; gap: 1rem; flex-wrap: wrap;">
+              <!-- Status Pills -->
+              <div class="chart-time-pills">
+                <button class="time-pill order-status-pill active" data-status="All">All Orders</button>
+                <button class="time-pill order-status-pill" data-status="Completed">Completed</button>
+                <button class="time-pill order-status-pill" data-status="Processing">Processing</button>
+                <button class="time-pill order-status-pill" data-status="Pending">Pending</button>
+                <button class="time-pill order-status-pill" data-status="Cancelled">Cancelled</button>
+              </div>
+
+              <!-- Search Bar -->
+              <div class="input-icon-wrapper" style="width: 320px;">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <input type="text" id="orderSearchInput" class="form-control"
+                  placeholder="Search by Order ID, customer, item...">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Orders Table -->
+        <div class="card">
+          <div class="table-responsive">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>Order ID</th>
+                  <th>Customer</th>
+                  <th>Date</th>
+                  <th>Time</th>
+                  <th>Purchased Items</th>
+                  <th>Total Amount</th>
+                  <th>Payment</th>
+                  <th>Status</th>
+                  <th class="text-right">Action</th>
+                </tr>
+              </thead>
+              <tbody id="ordersTableBody">
+                <!-- Filled dynamically by js/orders.js -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <!-- SLIDE-IN ORDER DETAIL DRAWER -->
+  <div class="drawer-overlay" id="drawerOverlay" onclick="closeOrderDetailDrawer()"></div>
+  <div class="drawer" id="orderDetailDrawer">
+    <div id="drawerOrderContent" style="display: flex; flex-direction: column; height: 100%;">
+      <!-- Rendered dynamically by js/orders.js -->
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase.js"></script>
+  <script src="js/app.js"></script>
+  <script src="js/orders.js"></script>
+
+</body>
+
+</html>

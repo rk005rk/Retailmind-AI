@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Suppliers Directory & Reliability — RetailMind AI</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Sora:wght@400;500;600;700;800&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/dashboard.css">
+  <link rel="stylesheet" href="css/responsive.css">
+</head>
+
+<body>
+  <div class="app-layout">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <a href="dashboard.html" class="brand-logo">
+          <div class="brand-icon">
+            <i class="fa-solid fa-brain"></i>
+          </div>
+          <span class="brand-text">RetailMind</span>
+          <span class="brand-badge">AI</span>
+        </a>
+      </div>
+
+      <nav class="sidebar-nav">
+        <div>
+          <div class="nav-group-title">Main</div>
+          <ul class="nav-list">
+            <li>
+              <a href="dashboard.html" class="nav-link">
+                <div class="nav-link-content">
+                  <i class="fa-solid fa-chart-pie"></i>
+                  <span>Dashboard</span>
+                </div>
+              </a>
+            </li>
+            <li>
+              <a href="inventory.html" class="nav-link">
+                <div class="nav-link-content">
+                  <i class="fa-solid fa-boxes-stacked"></i>
+                  <span>Inventory</span>
+                </div>
+                <span id="inventoryLowStockBadge" class="nav-badge badge-warning"
+                  style="font-size:0.6875rem;display:none;"></span>
+              </a>
+            </li>
+            <li>
+              <a href="sales.html" class="nav-link">
+                <div class="nav-link-content">
+                  <i class="fa-solid fa-cart-shopping"></i>
+                  <span>Sales & POS</span>
+                </div>
+              </a>
+            </li>
+            <li>
+              <a href="orders.html" class="nav-link">
+                <div class="nav-link-content">
+                  <i class="fa-solid fa-receipt"></i>
+                  <span>Orders</span>
+                </div>
+              </a>
+            </li>
+            <li>
+              <a href="customers.html" class="nav-link">
+                <div class="nav-link-content">
+                  <i class="fa-solid fa-users"></i>
+                  <span>Customers</span>
+                </div>
+              </a>
+            </li>
+            <li>
+              <a href="suppliers.html" class="nav-link active">
+                <div class="nav-link-content">
+                  <i class="fa-solid fa-truck"></i>
+                  <span>Suppliers</span>
+                </div>
+              </a>
+            </li>
+          </ul>
+        </div>
+
+        <div>
+          <div class="nav-group-title">Intelligence</div>
+          <ul class="nav-list">
+            <li>
+              <a href="ai-assistant.html" class="nav-link">
+                <div class="nav-link-content">
+                  <i class="fa-solid fa-robot"></i>
+                  <span>AI Assistant</span>
+                </div>
+                <span class="nav-badge badge-ai" style="font-size:0.6875rem;">PRO</span>
+              </a>
+            </li>
+            <li>
+              <a href="analytics.html" class="nav-link">
+                <div class="nav-link-content">
+                  <i class="fa-solid fa-chart-line"></i>
+                  <span>Analytics</span>
+                </div>
+              </a>
+            </li>
+            <li>
+              <a href="predictions.html" class="nav-link">
+                <div class="nav-link-content">
+                  <i class="fa-solid fa-brain"></i>
+                  <span>Predictions</span>
+                </div>
+              </a>
+            </li>
+            <li>
+              <a href="reports.html" class="nav-link">
+                <div class="nav-link-content">
+                  <i class="fa-solid fa-file-lines"></i>
+                  <span>Reports</span>
+                </div>
+              </a>
+            </li>
+          </ul>
+        </div>
+
+        <div>
+          <div class="nav-group-title">Management</div>
+          <ul class="nav-list">
+            <li>
+              <a href="notifications.html" class="nav-link">
+                <div class="nav-link-content">
+                  <i class="fa-solid fa-bell"></i>
+                  <span>Notifications</span>
+                </div>
+                <span class="sidebar-notification-count" hidden>0</span>
+              </a>
+            </li>
+            <li>
+              <a href="health.html" class="nav-link">
+                <div class="nav-link-content">
+                  <i class="fa-solid fa-heart-pulse"></i>
+                  <span>Business Health</span>
+                </div>
+                <span class="nav-badge badge-success" style="font-size:0.6875rem;">87%</span>
+              </a>
+            </li>
+            <li>
+              <a href="members.html" class="nav-link">
+                <div class="nav-link-content">
+                  <i class="fa-solid fa-user-group"></i>
+                  <span>Business Members</span>
+                </div>
+              </a>
+            </li>
+            <li>
+              <a href="setup.html" class="nav-link">
+                <div class="nav-link-content">
+                  <i class="fa-solid fa-sliders"></i>
+                  <span>Setup Wizard</span>
+                </div>
+              </a>
+            </li>
+          </ul>
+        </div>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="user-mini-card" onclick="window.location.href='profile.html'">
+          <div class="user-avatar-circle">SM</div>
+          <div class="user-info">
+            <div class="user-name">Sana Mondal</div>
+            <div class="user-role">Administrator</div>
+          </div>
+          <i class="fa-solid fa-chevron-right text-muted" style="font-size:0.75rem;"></i>
+        </div>
+      </div>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <div class="main-wrapper">
+      <header class="topbar">
+        <div class="topbar-left">
+          <button class="mobile-toggle" aria-label="Toggle navigation">
+            <i class="fa-solid fa-bars"></i>
+          </button>
+
+          <div class="breadcrumb-area">
+            <div class="breadcrumb">
+              <a href="dashboard.html">RetailMind</a>
+              <i class="fa-solid fa-chevron-right" style="font-size:0.625rem;"></i>
+              <span>Suppliers</span>
+            </div>
+            <div class="page-title">Suppliers & Procurement</div>
+          </div>
+        </div>
+
+        <div class="topbar-right">
+          <button class="btn-ai-quick" id="aiQuickBtn">
+            <i class="fa-solid fa-wand-magic-sparkles"></i>
+            <span>Ask AI</span>
+          </button>
+
+          <div class="user-avatar-circle" onclick="window.location.href='profile.html'"
+            style="cursor:pointer;width:38px;height:38px;">SM</div>
+        </div>
+      </header>
+
+      <main class="page-container">
+
+        <!-- PAGE HEADER -->
+        <div class="page-header">
+          <div>
+            <h1>Supplier Directory & Fulfillment SLAs</h1>
+            <p>
+              Monitor vendor delivery reliability, lead times,
+              purchase volumes, and quality ratings.
+            </p>
+          </div>
+
+          <button class="btn btn-primary" type="button"
+            onclick="document.getElementById('addSupplierModal').classList.add('active')">
+            <i class="fa-solid fa-plus"></i> Add Supplier
+          </button>
+        </div>
+
+        <!-- KPI CARDS -->
+        <div class="kpi-grid" style="grid-template-columns:repeat(4,1fr);margin-bottom:1.5rem;">
+
+          <div class="kpi-card">
+            <span class="kpi-title">Total Suppliers</span>
+            <div class="kpi-value">Loading...</div>
+            <div class="kpi-footer text-muted">Registered suppliers</div>
+          </div>
+
+          <div class="kpi-card">
+            <span class="kpi-title text-success">Active Vendors</span>
+            <div class="kpi-value text-success">Loading...</div>
+            <div class="kpi-footer text-success">Active suppliers</div>
+          </div>
+
+          <div class="kpi-card">
+            <span class="kpi-title text-primary">Top Tier (Rating &gt; 4.5★)</span>
+            <div class="kpi-value text-primary">Loading...</div>
+            <div class="kpi-footer text-muted">Rating above 4.5</div>
+          </div>
+
+          <div class="kpi-card" style="border-left:3px solid var(--warning);">
+            <span class="kpi-title text-warning">Delayed Shipments</span>
+            <div class="kpi-value text-warning">—</div>
+            <div class="kpi-footer text-danger" id="delayedShipmentsFooter">
+              <i class="fa-solid fa-clock"></i>
+              Calculated from purchase-order delivery dates
+            </div>
+          </div>
+        </div>
+
+        <!-- SUPPLIER TABLE -->
+        <div class="card">
+          <div class="table-responsive">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>Supplier Organization</th>
+                  <th>Primary Line</th>
+                  <th>Orders Completed</th>
+                  <th>On-Time Delivery</th>
+                  <th>Vendor Rating</th>
+                  <th>Total Purchase (YTD)</th>
+                  <th>Status</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+
+              <tbody id="suppliersTableBody">
+                <tr>
+                  <td colspan="8" style="text-align:center;padding:2rem;">
+                    Loading suppliers...
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </main>
+    </div>
+  </div>
+
+  <!-- ADD SUPPLIER MODAL -->
+  <div class="modal-overlay" id="addSupplierModal">
+    <div class="modal">
+
+      <div class="modal-header">
+        <h3 class="modal-title">Onboard New Supplier</h3>
+        <button type="button" class="btn btn-ghost btn-sm" aria-label="Close modal"
+          onclick="document.getElementById('addSupplierModal').classList.remove('active')">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <form id="addSupplierForm">
+        <div class="modal-body">
+
+          <!-- SUPPLIER NAME -->
+          <div class="form-group">
+            <label class="form-label" for="supplierName">
+              Company / Vendor Name *
+            </label>
+            <input id="supplierName" type="text" class="form-control" name="name" required
+              placeholder="e.g. Metro Spices Wholesale Ltd">
+          </div>
+
+          <!-- CONTACT AND PHONE -->
+          <div class="grid grid-cols-2" style="gap:1rem;">
+            <div class="form-group">
+              <label class="form-label" for="supplierContact">
+                Contact Representative *
+              </label>
+              <input id="supplierContact" type="text" class="form-control" name="contact_person" required
+                placeholder="Rajesh Patel">
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="supplierPhone">
+                Phone Number *
+              </label>
+              <input id="supplierPhone" type="tel" class="form-control" name="phone" required
+                placeholder="+91 98765 43210">
+            </div>
+          </div>
+
+          <!-- CATEGORY AND LEAD TIME -->
+          <div class="grid grid-cols-2" style="gap:1rem;">
+            <div class="form-group">
+              <label class="form-label" for="supplierCategory">
+                Category *
+              </label>
+
+              <select id="supplierCategory" name="category" class="form-control" required>
+                <option value="" disabled selected>Select a category</option>
+                <option value="Groceries">Groceries</option>
+                <option value="Beverages">Beverages</option>
+                <option value="Personal Care">Personal Care</option>
+                <option value="Clothing">Clothing</option>
+                <option value="Footwear">Footwear</option>
+                <option value="Accessories">Accessories</option>
+                <option value="Medicines">Medicines</option>
+                <option value="Dairy">Dairy</option>
+                <option value="Bakery">Bakery</option>
+                <option value="Snacks">Snacks</option>
+                <option value="Home &amp; Kitchen">Home &amp; Kitchen</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="supplierLeadTime">
+                Standard Lead Time (Days) *
+              </label>
+              <input id="supplierLeadTime" type="number" class="form-control" name="lead_time_days" min="1" value="2"
+                required>
+            </div>
+          </div>
+
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline"
+            onclick="document.getElementById('addSupplierModal').classList.remove('active')">
+            Cancel
+          </button>
+
+          <button type="submit" class="btn btn-primary">
+            Save Supplier
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- SUPPLIER DETAILS MODAL -->
+  <div class="modal-overlay" id="supplierDetailsModal">
+    <div class="modal">
+
+      <div class="modal-header">
+        <h3 class="modal-title">Supplier Details</h3>
+        <button type="button" class="btn btn-ghost btn-sm"
+          onclick="document.getElementById('supplierDetailsModal').classList.remove('active')"
+          aria-label="Close supplier details">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <div class="modal-body" id="supplierDetailsContent">
+        Loading supplier details...
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline"
+          onclick="document.getElementById('supplierDetailsModal').classList.remove('active')">
+          Close
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- CUSTOM ARCHIVE CONFIRMATION -->
+  <div class="archive-modal-overlay" id="archiveConfirmModal" role="dialog" aria-modal="true"
+    aria-labelledby="archiveModalTitle" aria-describedby="archiveModalMessage">
+
+    <div class="archive-modal">
+      <div class="archive-modal-icon">
+        <i class="fa-solid fa-box-archive"></i>
+      </div>
+
+      <h3 id="archiveModalTitle">Archive supplier?</h3>
+
+      <p class="archive-modal-message" id="archiveModalMessage">
+        Are you sure you want to archive this supplier?
+      </p>
+
+      <div class="archive-modal-warning">
+        <i class="fa-solid fa-circle-check"></i>
+        <span>
+          Your purchase orders and history will be preserved.
+          You can keep the records for future reference.
+        </span>
+      </div>
+
+      <div class="archive-modal-actions">
+        <button type="button" class="archive-cancel-btn" id="cancelArchiveBtn">
+          Cancel
+        </button>
+
+        <button type="button" class="archive-confirm-btn" id="confirmArchiveBtn">
+          <i class="fa-solid fa-box-archive"></i>
+          <span>Archive Supplier</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCRIPTS -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase.js"></script>
+  <script src="js/app.js"></script>
+  <script src="js/suppliers.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Predictive AI — RetailMind AI Demo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Sora:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/responsive.css">
+<style>
+:root { --demo-purple:#5A1188; --demo-mint:#42E8C2; }
+.demo-wrap { max-width:1200px; margin:0 auto; padding:2rem; }
+.demo-top { display:flex; justify-content:space-between; align-items:center; gap:1rem; flex-wrap:wrap; margin-bottom:1.5rem; }
+.demo-brand { display:flex; align-items:center; gap:.6rem; font-family:var(--font-heading); font-weight:800; font-size:1.15rem; }
+.demo-banner { border:1px solid #e9d5ff; background:#faf5ff; color:#581c87; border-radius:12px; padding:.8rem 1rem; font-size:.88rem; margin-bottom:1.25rem; }
+.demo-card { background:#fff; border:1px solid var(--border,#e5e7eb); border-radius:16px; padding:1.2rem; box-shadow:0 8px 24px rgba(17,24,39,.04); }
+.demo-grid { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:1rem; }
+.demo-value { font-family:var(--font-heading); font-size:1.65rem; font-weight:800; margin:.45rem 0; }
+.demo-muted { color:#6b7280; font-size:.85rem; }
+.demo-pill { display:inline-block; border-radius:999px; background:#f3e8ff; color:#6b21a8; padding:.25rem .6rem; font-size:.75rem; font-weight:700; }
+.demo-btn { cursor:pointer; border:0; border-radius:9px; padding:.65rem .9rem; font-weight:700; background:#5A1188; color:#fff; }
+.demo-btn.secondary { background:#f3e8ff; color:#5A1188; }
+.demo-btn:disabled { opacity:.5; cursor:not-allowed; }
+.demo-table { width:100%; border-collapse:collapse; font-size:.9rem; }
+.demo-table th,.demo-table td { padding:.8rem .65rem; border-bottom:1px solid #eee; text-align:left; }
+.demo-table th { color:#6b7280; font-size:.75rem; text-transform:uppercase; letter-spacing:.04em; }
+.demo-row { display:flex; justify-content:space-between; gap:1rem; align-items:center; padding:.8rem 0; border-bottom:1px solid #eee; }
+.demo-input,.demo-select { width:100%; padding:.65rem; border:1px solid #d1d5db; border-radius:8px; background:#fff; }
+.demo-footer { text-align:center; color:#6b7280; font-size:.8rem; padding:2rem; }
+.demo-nav { display:flex; flex-wrap:wrap; gap:.7rem; }
+.demo-nav a { text-decoration:none; border:1px solid #e5e7eb; padding:.55rem .75rem; border-radius:8px; color:#374151; font-weight:600; font-size:.85rem; }
+.demo-nav a:hover { border-color:#c084fc; color:#5A1188; }
+@media(max-width:800px) { .demo-grid {grid-template-columns:repeat(2,minmax(0,1fr));} .demo-wrap {padding:1rem;} }
+@media(max-width:480px) { .demo-grid {grid-template-columns:1fr 1fr;} .demo-value {font-size:1.25rem;} .demo-table {font-size:.8rem;} }
+</style>
+</head>
+<body>
+<div class="demo-wrap">
+  <div class="demo-top">
+    <a href="index.html" style="text-decoration:none;color:inherit" class="demo-brand"><span class="brand-icon"><i class="fa-solid fa-brain"></i></span> RetailMind <span class="brand-badge">AI</span></a>
+    <nav class="demo-nav">
+      <a href="index.html"><i class="fa-solid fa-house"></i> Landing page</a>
+      <a href="demo-dashboard.html"><i class="fa-solid fa-chart-line"></i> Dashboard</a>
+      <a href="demo-pos.html"><i class="fa-solid fa-cash-register"></i> POS Demo</a>
+      <a href="demo-predictions.html"><i class="fa-solid fa-wand-magic-sparkles"></i> AI Predictions</a>
+      <a href="login.html"><i class="fa-solid fa-right-to-bracket"></i> Sign in</a>
+    </nav>
+  </div>
+  <div class="demo-banner"><i class="fa-solid fa-circle-info"></i> <strong>Interactive demo mode:</strong> all products, sales, totals, and predictions on this page are mock data. Nothing is saved to Supabase or your real business.</div>
+
+  <h1 style="font-family:var(--font-heading);margin-bottom:.35rem">Predictive AI studio</h1>
+  <p class="demo-muted" style="margin-bottom:1.4rem">Explore simulated demand forecasts and replenishment suggestions. This page does not run a trained model.</p>
+  <section class="demo-card" style="margin-bottom:1rem">
+    <div class="demo-grid" style="grid-template-columns:1.4fr 1fr 1fr;align-items:end">
+      <div><label class="demo-muted" for="category">Product category</label><select id="category" class="demo-select" style="margin-top:.35rem"><option value="beverages">Beverages</option><option value="dairy">Dairy</option><option value="staples">Staples</option><option value="snacks">Snacks</option></select></div>
+      <div><label class="demo-muted" for="horizon">Forecast horizon</label><select id="horizon" class="demo-select" style="margin-top:.35rem"><option value="7">Next 7 days</option><option value="14">Next 14 days</option><option value="30">Next 30 days</option><option value="90">Next 90 days</option></select></div>
+      <button id="runForecast" class="demo-btn"><i class="fa-solid fa-wand-magic-sparkles"></i> Generate forecast</button>
+    </div>
+  </section>
+  <div class="demo-grid">
+    <div class="demo-card"><div class="demo-muted">PREDICTED UNIT DEMAND</div><div class="demo-value" id="units">1,240</div><span class="demo-muted" id="period">Next 7 days</span></div>
+    <div class="demo-card"><div class="demo-muted">DEMAND CHANGE</div><div class="demo-value" id="change" style="color:#059669">+21%</div><span class="demo-muted">Compared with prior period</span></div>
+    <div class="demo-card"><div class="demo-muted">MODEL CONFIDENCE</div><div class="demo-value" id="confidence">87%</div><span class="demo-muted">Illustrative demo score</span></div>
+    <div class="demo-card"><div class="demo-muted">SUGGESTED REORDER</div><div class="demo-value" id="reorder">85 units</div><span class="demo-muted">Example recommendation</span></div>
+  </div>
+  <div class="demo-grid" style="grid-template-columns:1.2fr 1fr;margin-top:1rem">
+    <section class="demo-card">
+      <h2 style="font-size:1.1rem;margin-bottom:1rem">Forecast trend</h2>
+      <div id="forecastBars" style="height:210px;display:flex;align-items:end;gap:10px;border-bottom:1px solid #eee;padding:1rem .3rem .2rem"></div>
+      <p class="demo-muted" style="margin-top:.8rem">Illustrative weekly demand distribution generated from mock data.</p>
+    </section>
+    <section class="demo-card">
+      <h2 style="font-size:1.1rem;margin-bottom:.8rem">Why this forecast?</h2>
+      <div class="demo-row"><span><i class="fa-solid fa-calendar-days" style="color:#7c3aed"></i> Weekend uplift</span><strong>+8%</strong></div>
+      <div class="demo-row"><span><i class="fa-solid fa-cloud-sun" style="color:#d97706"></i> Seasonal demand</span><strong>+6%</strong></div>
+      <div class="demo-row"><span><i class="fa-solid fa-chart-line" style="color:#059669"></i> Recent sales trend</span><strong>+7%</strong></div>
+      <div class="demo-banner" style="margin-top:1rem;margin-bottom:0"><strong>Recommendation:</strong> Review supplier lead time and available storage before placing a replenishment order.</div>
+    </section>
+  </div>
+  <section class="demo-card" style="margin-top:1rem">
+    <h2 style="font-size:1.1rem;margin-bottom:.8rem">Suggested actions</h2>
+    <div class="demo-row"><div><strong>1. Review replenishment</strong><div class="demo-muted">Compare the suggested quantity with current stock and supplier lead time.</div></div><span class="demo-pill">Review</span></div>
+    <div class="demo-row"><div><strong>2. Check unusual demand</strong><div class="demo-muted">Look for promotions, holidays, and one-off bulk purchases.</div></div><span class="demo-pill">Analyze</span></div>
+    <div class="demo-row"><div><strong>3. Validate before ordering</strong><div class="demo-muted">Demo outputs are not operational purchasing advice.</div></div><span class="demo-pill">Confirm</span></div>
+  </section>
+  <div class="demo-footer">RetailMind AI Predictive Studio · Mock forecasts only</div>
+</div>
+<script>
+(() => {
+  const configs={
+    beverages:{base:1240,change:21,reorder:85,confidence:87},
+    dairy:{base:890,change:12,reorder:52,confidence:84},
+    staples:{base:1680,change:9,reorder:110,confidence:89},
+    snacks:{base:1420,change:16,reorder:74,confidence:86}
+  };
+  const money=n=>n.toLocaleString('en-IN');
+  function run(){
+    const c=configs[document.getElementById('category').value];
+    const days=Number(document.getElementById('horizon').value);
+    const factor=days/7;
+    const units=Math.round(c.base*factor);
+    document.getElementById('units').textContent=money(units);
+    document.getElementById('change').textContent='+'+c.change+'%';
+    document.getElementById('confidence').textContent=Math.max(68,c.confidence-(days-7)*.12).toFixed(0)+'%';
+    document.getElementById('reorder').textContent=money(Math.round(c.reorder*factor))+' units';
+    document.getElementById('period').textContent='Next '+days+' days';
+    const bars=document.getElementById('forecastBars');bars.innerHTML='';
+    const count=days<=7?7:days<=14?7:10;
+    for(let i=0;i<count;i++){
+      const h=45+((i*31+c.base/13)%110);
+      const wrap=document.createElement('div');wrap.style.cssText='flex:1;text-align:center;min-width:0;height:100%;display:flex;flex-direction:column;justify-content:end;gap:.35rem';
+      const bar=document.createElement('div');bar.style.cssText='height:'+h+'px;background:linear-gradient(180deg,#a855f7,#5A1188);border-radius:6px 6px 0 0';
+      const label=document.createElement('small');label.style.color='#6b7280';label.style.fontSize='.7rem';label.textContent=days<=7?['M','T','W','T','F','S','S'][i]:'P'+(i+1);
+      wrap.append(bar,label);bars.appendChild(wrap);
+    }
+  }
+  document.getElementById('runForecast').addEventListener('click',run);
+  document.getElementById('category').addEventListener('change',run);
+  document.getElementById('horizon').addEventListener('change',run);
+  run();
+})();
+</script>
+</body></html>

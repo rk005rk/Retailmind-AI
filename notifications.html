@@ -1,0 +1,919 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Notification Center — RetailMind AI</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Sora:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/dashboard.css">
+  <link rel="stylesheet" href="css/responsive.css">
+
+  <style>
+    .notification-toolbar {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+      margin-bottom: 1.25rem;
+    }
+
+    .notification-search {
+      flex: 1;
+      min-width: 200px;
+      max-width: 360px;
+    }
+
+    .notification-search input {
+      width: 100%;
+    }
+
+    .notification-summary {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .notification-summary-card {
+      display: flex;
+      align-items: center;
+      gap: 0.9rem;
+      padding: 1.1rem;
+    }
+
+    .notification-summary-icon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 42px;
+      height: 42px;
+      flex-shrink: 0;
+      border-radius: 12px;
+      font-size: 1.1rem;
+    }
+
+    .notification-summary-value {
+      font-family: Sora, sans-serif;
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: var(--text-dark, #1f2937);
+    }
+
+    .notification-summary-label {
+      color: var(--muted, #6b7280);
+      font-size: 0.8rem;
+    }
+
+    .notification-tabs {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-bottom: 1.25rem;
+    }
+
+    .notification-tabs .time-pill {
+      cursor: pointer;
+    }
+
+    .notification-count {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 19px;
+      height: 19px;
+      padding: 0 5px;
+      margin-left: 5px;
+      border-radius: 999px;
+      background: rgba(107, 114, 128, 0.12);
+      font-size: 0.7rem;
+      font-weight: 700;
+    }
+
+    .notification-list {
+      min-height: 180px;
+    }
+
+    .notification-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 1rem;
+      padding: 1.25rem 1.5rem;
+      border-bottom: 1px solid var(--border-color, #e5e7eb);
+      transition: background 0.2s ease;
+    }
+
+    .notification-item:last-child {
+      border-bottom: none;
+    }
+
+    .notification-item:hover {
+      background: rgba(107, 114, 128, 0.035);
+    }
+
+    .notification-item.unread {
+      background: rgba(99, 102, 241, 0.045);
+    }
+
+    .notification-main {
+      display: flex;
+      align-items: flex-start;
+      gap: 1rem;
+      min-width: 0;
+      flex: 1;
+    }
+
+    .notification-icon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 42px;
+      height: 42px;
+      flex-shrink: 0;
+      border-radius: 12px;
+      font-size: 1.1rem;
+    }
+
+    .notification-content {
+      min-width: 0;
+      flex: 1;
+    }
+
+    .notification-heading {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-bottom: 0.35rem;
+    }
+
+    .notification-title {
+      font-size: 0.9375rem;
+      font-weight: 700;
+      color: var(--text-dark, #1f2937);
+      overflow-wrap: anywhere;
+    }
+
+    .notification-description {
+      font-size: 0.8125rem;
+      color: var(--muted, #6b7280);
+      line-height: 1.7;
+      overflow-wrap: anywhere;
+      margin-bottom: 0.55rem;
+    }
+
+    .notification-meta {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      font-size: 0.75rem;
+      color: var(--muted, #6b7280);
+    }
+
+    .notification-actions {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+      flex-shrink: 0;
+    }
+
+    .notification-actions .btn {
+      white-space: nowrap;
+    }
+
+    .notification-empty {
+      padding: 3rem 1.5rem;
+      text-align: center;
+      color: var(--muted, #6b7280);
+    }
+
+    .notification-empty i {
+      display: block;
+      font-size: 2rem;
+      margin-bottom: 1rem;
+      opacity: 0.55;
+    }
+
+    .notification-empty h3 {
+      color: var(--text-dark, #1f2937);
+      font-size: 1rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .notification-error {
+      padding: 1rem;
+      border-radius: 8px;
+      background: #fef2f2;
+      color: #991b1b;
+      margin-bottom: 1rem;
+      overflow-wrap: anywhere;
+    }
+
+    .notification-loading {
+      padding: 2.5rem;
+      text-align: center;
+      color: var(--muted, #6b7280);
+    }
+
+    .notification-loading i {
+      margin-right: 0.5rem;
+    }
+
+    .notification-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      padding: 1rem 1.5rem;
+      border-top: 1px solid var(--border-color, #e5e7eb);
+      font-size: 0.8rem;
+      color: var(--muted, #6b7280);
+    }
+
+    .notification-dot {
+      display: inline-block;
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #6366f1;
+      flex-shrink: 0;
+    }
+
+    .notification-item:not(.unread) .notification-dot {
+      visibility: hidden;
+    }
+
+    .notification-toolbar .form-select {
+      min-width: 140px;
+    }
+
+    @media (max-width: 900px) {
+      .notification-item {
+        flex-direction: column;
+      }
+
+      .notification-actions {
+        padding-left: 58px;
+        justify-content: flex-start;
+      }
+    }
+
+    @media (max-width: 650px) {
+      .notification-summary {
+        grid-template-columns: 1fr;
+      }
+
+      .notification-search {
+        max-width: none;
+        width: 100%;
+      }
+
+      .notification-toolbar .form-select {
+        flex: 1;
+      }
+
+      .notification-item {
+        padding: 1rem;
+      }
+
+      .notification-main {
+        gap: 0.75rem;
+      }
+
+      .notification-actions {
+        padding-left: 0;
+      }
+    }
+    
+/* ===== RetailMind AI Notifications UI Polish ===== */
+
+.notification-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin: 24px 0 16px;
+}
+
+.notification-toolbar #notificationSearch {
+  flex: 1 1 210px;
+  min-width: 160px;
+  width: auto;
+  height: 44px;
+  padding: 0 14px;
+  border: 1px solid #dfe3eb;
+  border-radius: 12px;
+  background: #fff;
+  color: #172033;
+  font-size: 14px;
+  outline: none;
+  box-sizing: border-box;
+}
+
+.notification-toolbar select {
+  flex: 0 1 155px;
+  min-width: 125px;
+  height: 44px;
+  padding: 0 12px;
+  border: 1px solid #dfe3eb;
+  border-radius: 12px;
+  background: #fff;
+  color: #334155;
+  font-size: 14px;
+  cursor: pointer;
+  box-sizing: border-box;
+}
+
+.notification-toolbar #btnRefreshNotifications {
+  flex: 0 0 auto;
+  height: 44px;
+  padding: 0 18px;
+  border: 1px solid #dfe3eb;
+  border-radius: 12px;
+  background: #fff;
+  color: #26364f;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background .2s, border-color .2s, transform .2s;
+}
+
+.notification-toolbar #btnRefreshNotifications:hover {
+  background: #f3edff;
+  border-color: #a78bfa;
+  color: #6d28d9;
+}
+
+.notification-toolbar #btnRefreshNotifications:active {
+  transform: scale(.97);
+}
+
+/* Category tabs */
+.notification-category-tabs {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  padding: 5px;
+  margin: 0 0 20px;
+  border: 1px solid #e1e5ed;
+  border-radius: 14px;
+  background: #fff;
+  scrollbar-width: thin;
+}
+
+.notification-category-tabs [data-category] {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  flex: 0 0 auto;
+  min-height: 38px;
+  padding: 0 14px;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  background: transparent;
+  color: #64748b;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: .2s ease;
+}
+
+.notification-category-tabs [data-category]:hover {
+  background: #f5f3ff;
+  color: #6d28d9;
+}
+
+.notification-category-tabs [data-category].active {
+  background: #f3edff;
+  border-color: #e9ddff;
+  color: #6d28d9;
+}
+
+.notification-category-tabs [data-category] span {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 22px;
+  height: 22px;
+  padding: 0 5px;
+  border-radius: 999px;
+  background: #edf0f5;
+  color: #475569;
+  font-size: 11px;
+}
+
+/* Notification cards */
+.notification-item {
+  align-items: flex-start;
+  gap: 14px;
+  padding: 22px 24px !important;
+  background: #fff;
+  transition: background .2s ease;
+}
+
+.notification-item:hover {
+  background: #faf9ff;
+}
+
+.notification-item.unread {
+  background: #faf8ff;
+  border-left: 3px solid #8b5cf6;
+}
+
+.notification-item strong {
+  color: #24344d;
+  line-height: 1.5;
+}
+
+.notification-item p {
+  line-height: 1.65;
+  overflow-wrap: anywhere;
+}
+
+/* Modern Mark Read button */
+.notification-item button[data-action="read"] {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
+  min-height: 36px;
+  padding: 0 13px;
+  border: 1px solid #ddd6fe;
+  border-radius: 9px;
+  background: #fff;
+  color: #6d28d9;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background .2s, border-color .2s, color .2s;
+}
+
+.notification-item button[data-action="read"]:hover {
+  background: #6d28d9;
+  border-color: #6d28d9;
+  color: #fff;
+}
+
+.notification-item button[data-action="read"]:focus-visible,
+.notification-toolbar button:focus-visible,
+.notification-category-tabs button:focus-visible {
+  outline: 3px solid #c4b5fd;
+  outline-offset: 2px;
+}
+
+/* Responsive layout */
+@media (max-width: 900px) {
+  .notification-toolbar #notificationSearch {
+    flex: 1 1 100%;
+  }
+
+  .notification-toolbar select {
+    flex: 1 1 140px;
+  }
+}
+
+@media (max-width: 600px) {
+  .notification-toolbar {
+    gap: 8px;
+  }
+
+  .notification-toolbar select {
+    flex: 1 1 calc(50% - 8px);
+    min-width: 0;
+  }
+
+  .notification-toolbar #btnRefreshNotifications {
+    flex: 1 1 100%;
+  }
+
+  .notification-item {
+    padding: 16px !important;
+    flex-wrap: wrap;
+  }
+
+  .notification-item > div:nth-child(2) {
+    flex: 1 1 calc(100% - 45px);
+  }
+
+  .notification-item > div:last-child {
+    width: 100%;
+    justify-content: flex-end;
+  }
+}
+
+  </style>
+</head>
+
+<body>
+  <div class="app-layout">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <a href="dashboard.html" class="brand-logo">
+          <div class="brand-icon">
+            <i class="fa-solid fa-brain"></i>
+          </div>
+          <span class="brand-text">RetailMind</span>
+          <span class="brand-badge">AI</span>
+        </a>
+      </div>
+
+      <nav class="sidebar-nav">
+        <div>
+          <div class="nav-group-title">Main</div>
+          <ul class="nav-list">
+            <li>
+              <a href="dashboard.html" class="nav-link">
+                <div class="nav-link-content">
+                  <i class="fa-solid fa-chart-pie"></i>
+                  <span>Dashboard</span>
+                </div>
+              </a>
+            </li>
+
+            <li>
+              <a href="inventory.html" class="nav-link">
+                <div class="nav-link-content">
+                  <i class="fa-solid fa-boxes-stacked"></i>
+                  <span>Inventory</span>
+                </div>
+                <span id="inventoryLowStockBadge"
+                  class="nav-badge badge-warning"
+                  style="font-size:0.6875rem;display:none;"></span>
+              </a>
+            </li>
+
+            <li>
+              <a href="sales.html" class="nav-link">
+                <div class="nav-link-content">
+                  <i class="fa-solid fa-cart-shopping"></i>
+                  <span>Sales & POS</span>
+                </div>
+              </a>
+            </li>
+
+            <li>
+              <a href="orders.html" class="nav-link">
+                <div class="nav-link-content">
+                  <i class="fa-solid fa-receipt"></i>
+                  <span>Orders</span>
+                </div>
+              </a>
+            </li>
+
+            <li>
+              <a href="customers.html" class="nav-link">
+                <div class="nav-link-content">
+                  <i class="fa-solid fa-users"></i>
+                  <span>Customers</span>
+                </div>
+              </a>
+            </li>
+
+            <li>
+              <a href="suppliers.html" class="nav-link">
+                <div class="nav-link-content">
+                  <i class="fa-solid fa-truck"></i>
+                  <span>Suppliers</span>
+                </div>
+              </a>
+            </li>
+          </ul>
+        </div>
+
+        <div>
+          <div class="nav-group-title">Intelligence</div>
+          <ul class="nav-list">
+            <li>
+              <a href="ai-assistant.html" class="nav-link">
+                <div class="nav-link-content">
+                  <i class="fa-solid fa-robot"></i>
+                  <span>AI Assistant</span>
+                </div>
+                <span class="nav-badge badge-ai"
+                  style="font-size:0.6875rem;">PRO</span>
+              </a>
+            </li>
+
+            <li>
+              <a href="analytics.html" class="nav-link">
+                <div class="nav-link-content">
+                  <i class="fa-solid fa-chart-line"></i>
+                  <span>Analytics</span>
+                </div>
+              </a>
+            </li>
+
+            <li>
+              <a href="predictions.html" class="nav-link">
+                <div class="nav-link-content">
+                  <i class="fa-solid fa-brain"></i>
+                  <span>Predictions</span>
+                </div>
+              </a>
+            </li>
+
+            <li>
+              <a href="reports.html" class="nav-link">
+                <div class="nav-link-content">
+                  <i class="fa-solid fa-file-lines"></i>
+                  <span>Reports</span>
+                </div>
+              </a>
+            </li>
+          </ul>
+        </div>
+
+        <div>
+          <div class="nav-group-title">Management</div>
+          <ul class="nav-list">
+            <li>
+              <a href="notifications.html" class="nav-link active">
+                <div class="nav-link-content">
+                  <i class="fa-solid fa-bell"></i>
+                  <span>Notifications</span>
+                </div>
+                <span id="sidebarNotificationBadge"
+                  class="nav-badge badge-danger"
+                  style="font-size:0.6875rem;display:none;">0</span>
+              </a>
+            </li>
+
+            <li>
+              <a href="health.html" class="nav-link">
+                <div class="nav-link-content">
+                  <i class="fa-solid fa-heart-pulse"></i>
+                  <span>Business Health</span>
+                </div>
+                <span class="nav-badge badge-success"
+                  style="font-size:0.6875rem;">87%</span>
+              </a>
+            </li>
+
+            <li>
+              <a href="members.html" class="nav-link">
+                <div class="nav-link-content">
+                  <i class="fa-solid fa-user-group"></i>
+                  <span>Business Members</span>
+                </div>
+              </a>
+            </li>
+
+            <li>
+              <a href="setup.html" class="nav-link">
+                <div class="nav-link-content">
+                  <i class="fa-solid fa-sliders"></i>
+                  <span>Setup Wizard</span>
+                </div>
+              </a>
+            </li>
+          </ul>
+        </div>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="user-mini-card"
+          onclick="window.location.href='profile.html'">
+          <div class="user-avatar-circle">SM</div>
+          <div class="user-info">
+            <div class="user-name">Sana Mondal</div>
+            <div class="user-role">Administrator</div>
+          </div>
+          <i class="fa-solid fa-chevron-right text-muted"
+            style="font-size:0.75rem;"></i>
+        </div>
+      </div>
+    </aside>
+
+    <!-- MAIN WRAPPER -->
+    <div class="main-wrapper">
+      <header class="topbar">
+        <div class="topbar-left">
+          <button class="mobile-toggle" aria-label="Toggle navigation">
+            <i class="fa-solid fa-bars"></i>
+          </button>
+
+          <div class="breadcrumb-area">
+            <div class="breadcrumb">
+              <a href="dashboard.html">RetailMind</a>
+              <i class="fa-solid fa-chevron-right"
+                style="font-size:0.625rem;"></i>
+              <span>Management</span>
+            </div>
+            <div class="page-title">Notification Center</div>
+          </div>
+        </div>
+
+        <div class="topbar-right">
+          <button class="btn-ai-quick" id="aiQuickBtn" type="button">
+            <i class="fa-solid fa-wand-magic-sparkles"></i>
+            <span>Ask AI</span>
+          </button>
+
+          <div class="user-avatar-circle"
+            onclick="window.location.href='profile.html'"
+            style="cursor:pointer;width:38px;height:38px;">SM</div>
+        </div>
+      </header>
+
+      <main class="page-container">
+
+        <!-- PAGE HEADER -->
+        <div class="page-header">
+          <div>
+            <h1>Alerts & System Notifications</h1>
+            <p>
+              Monitor business alerts, inventory warnings, sales activity,
+              and system updates.
+            </p>
+          </div>
+
+          <button class="btn btn-outline"
+            id="btnMarkAllRead"
+            type="button">
+            <i class="fa-solid fa-check-double"></i>
+            Mark All as Read
+          </button>
+        </div>
+
+        <!-- STATUS / ERROR -->
+        <div id="notificationStatus"
+          role="status"
+          aria-live="polite"
+          hidden></div>
+
+        <!-- SUMMARY -->
+        <div class="notification-summary">
+          <div class="card notification-summary-card">
+            <div class="notification-summary-icon"
+              style="background:#EEF2FF;color:#4F46E5;">
+              <i class="fa-solid fa-bell"></i>
+            </div>
+            <div>
+              <div id="totalNotificationCount"
+                class="notification-summary-value">—</div>
+              <div class="notification-summary-label">
+                Total Notifications
+              </div>
+            </div>
+          </div>
+
+          <div class="card notification-summary-card">
+            <div class="notification-summary-icon"
+              style="background:#FEF2F2;color:#DC2626;">
+              <i class="fa-solid fa-envelope"></i>
+            </div>
+            <div>
+              <div id="unreadNotificationCount"
+                class="notification-summary-value">—</div>
+              <div class="notification-summary-label">
+                Unread Notifications
+              </div>
+            </div>
+          </div>
+
+          <div class="card notification-summary-card">
+            <div class="notification-summary-icon"
+              style="background:#FFFBEB;color:#D97706;">
+              <i class="fa-solid fa-triangle-exclamation"></i>
+            </div>
+            <div>
+              <div id="criticalNotificationCount"
+                class="notification-summary-value">—</div>
+              <div class="notification-summary-label">
+                Critical Alerts
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- SEARCH AND FILTERS -->
+        <div class="notification-toolbar">
+          <div class="notification-search">
+            <input id="notificationSearch"
+              class="form-input"
+              type="search"
+              placeholder="Search notifications..."
+              aria-label="Search notifications">
+          </div>
+
+          <select id="notificationReadFilter"
+            class="form-select"
+            aria-label="Filter by read status">
+            <option value="all">All statuses</option>
+            <option value="unread">Unread only</option>
+            <option value="read">Read only</option>
+          </select>
+
+          <select id="notificationSort"
+            class="form-select"
+            aria-label="Sort notifications">
+            <option value="newest">Newest first</option>
+            <option value="oldest">Oldest first</option>
+            <option value="priority">Highest priority</option>
+          </select>
+
+          <button id="btnRefreshNotifications"
+            class="btn btn-outline"
+            type="button">
+            <i class="fa-solid fa-rotate"></i>
+            Refresh
+          </button>
+        </div>
+
+        <!-- CATEGORY FILTER TABS -->
+        <div class="notification-tabs chart-time-pills"
+          role="group"
+          aria-label="Notification category filters">
+
+          <button class="time-pill active"
+            type="button"
+            data-category="all"
+            aria-pressed="true">
+            All <span id="countAll" class="notification-count">0</span>
+          </button>
+
+          <button class="time-pill"
+            type="button"
+            data-category="inventory"
+            aria-pressed="false">
+            Inventory <span id="countInventory" class="notification-count">0</span>
+          </button>
+
+          <button class="time-pill"
+            type="button"
+            data-category="sales"
+            aria-pressed="false">
+            Sales <span id="countSales" class="notification-count">0</span>
+          </button>
+
+          <button class="time-pill"
+            type="button"
+            data-category="ai"
+            aria-pressed="false">
+            AI Insights <span id="countAI" class="notification-count">0</span>
+          </button>
+
+          <button class="time-pill"
+            type="button"
+            data-category="system"
+            aria-pressed="false">
+            System <span id="countSystem" class="notification-count">0</span>
+          </button>
+        </div>
+
+        <!-- NOTIFICATION LIST -->
+        <section class="card" aria-label="Notifications">
+          <div id="fullNotifsList"
+            class="notification-list"
+            aria-live="polite"
+            aria-busy="true">
+
+            <div class="notification-loading">
+              <i class="fa-solid fa-spinner fa-spin"></i>
+              Loading notifications...
+            </div>
+          </div>
+
+          <div class="notification-footer">
+            <span id="notificationResultCount">
+              Loading notification list...
+            </span>
+
+            <button id="btnClearReadNotifications"
+              class="btn btn-outline btn-sm"
+              type="button">
+              <i class="fa-solid fa-trash-can"></i>
+              Delete Read Notifications
+            </button>
+          </div>
+        </section>
+
+      </main>
+    </div>
+  </div>
+
+  <!-- APPLICATION SCRIPTS -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase.js"></script>
+  <script src="js/app.js"></script>
+  <script src="js/notifications.js"></script>
+</body>
+</html>

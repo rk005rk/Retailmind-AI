@@ -1,0 +1,764 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Business Members | RetailMind AI</title>
+
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/dashboard.css">
+    <link rel="stylesheet" href="css/responsive.css">
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            background: #f6f7fb;
+            color: #111827;
+            font-family: Inter, Arial, sans-serif;
+        }
+
+        .members-page {
+            width: 100%;
+            min-height: 100vh;
+            padding: 28px 44px;
+        }
+
+        .members-heading {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 20px;
+            margin-bottom: 34px;
+        }
+
+        .members-heading h1 {
+            margin: 0 0 12px;
+            font-size: clamp(28px, 3vw, 42px);
+            font-weight: 800;
+            letter-spacing: -1px;
+        }
+
+        .members-heading p,
+        .members-card-header p {
+            margin: 0;
+            color: #64748b;
+            font-size: 16px;
+            line-height: 1.5;
+        }
+
+        .members-button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 9px;
+            padding: 15px 22px;
+            border: none;
+            border-radius: 12px;
+            background: #681bb0;
+            color: #fff;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background .2s, transform .2s;
+        }
+
+        .members-button:hover {
+            background: #50138b;
+            transform: translateY(-1px);
+        }
+
+        .members-button:focus-visible,
+        .invite-close:focus-visible,
+        .invite-cancel:focus-visible {
+            outline: 3px solid #c4b5fd;
+            outline-offset: 3px;
+        }
+
+        .members-stats {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 18px;
+            margin-bottom: 28px;
+        }
+
+        .members-stat {
+            display: flex;
+            align-items: center;
+            gap: 19px;
+            min-height: 112px;
+            padding: 24px;
+            border: 1px solid #e1e5ed;
+            border-radius: 20px;
+            background: #fff;
+            box-shadow: 0 4px 14px rgba(15, 23, 42, .025);
+        }
+
+        .members-stat-icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            width: 56px;
+            height: 56px;
+            border-radius: 16px;
+            background: #f3e8ff;
+            color: #7e22ce;
+            font-size: 22px;
+        }
+
+        .members-stat-label {
+            margin-bottom: 8px;
+            color: #64748b;
+            font-size: 15px;
+        }
+
+        .members-stat-value {
+            font-size: 29px;
+            line-height: 1;
+            font-weight: 800;
+        }
+
+        .members-card {
+            overflow: hidden;
+            border: 1px solid #e1e5ed;
+            border-radius: 20px;
+            background: #fff;
+            box-shadow: 0 4px 14px rgba(15, 23, 42, .025);
+        }
+
+        .members-card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+            padding: 24px 28px;
+            border-bottom: 1px solid #e1e5ed;
+        }
+
+        .members-card-header h2 {
+            margin: 0 0 8px;
+            font-size: 22px;
+            font-weight: 800;
+        }
+
+        .members-search {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            width: min(100%, 400px);
+            padding: 15px;
+            border: 1px solid #d9e0eb;
+            border-radius: 12px;
+            background: #fff;
+            color: #94a3b8;
+        }
+
+        .members-search input {
+            width: 100%;
+            min-width: 0;
+            border: none;
+            outline: none;
+            background: transparent;
+            color: #111827;
+            font: inherit;
+            font-size: 16px;
+        }
+
+        .members-search:focus-within {
+            border-color: #8b5cf6;
+            box-shadow: 0 0 0 3px rgba(139, 92, 246, .12);
+        }
+
+        .members-status {
+            padding: 18px 28px 12px;
+            color: #64748b;
+            font-size: 15px;
+        }
+
+        .members-table-wrapper {
+            width: 100%;
+            overflow-x: auto;
+        }
+
+        .members-table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+        }
+
+        .members-table thead {
+            background: #f8fafc;
+        }
+
+        .members-table th {
+            padding: 20px 28px;
+            color: #64748b;
+            font-size: 13px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: .3px;
+            white-space: nowrap;
+        }
+
+        .members-table td {
+            padding: 19px 28px;
+            border-top: 1px solid #e9edf4;
+            font-size: 16px;
+        }
+
+        .member-name-cell {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            min-width: 190px;
+        }
+
+        .member-avatar {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            width: 46px;
+            height: 46px;
+            border-radius: 50%;
+            background: #f3e8ff;
+            color: #7e22ce;
+            font-weight: 800;
+        }
+
+        .member-name {
+            color: #111827;
+            font-weight: 700;
+        }
+
+        .member-email {
+            color: #64748b;
+            overflow-wrap: anywhere;
+        }
+
+        .member-role {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 14px;
+            border-radius: 24px;
+            background: #f3e8ff;
+            color: #7e22ce;
+            font-size: 14px;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+
+        .members-empty {
+            padding: 40px !important;
+            color: #64748b;
+            text-align: center;
+        }
+
+        .members-back {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 26px;
+            color: #681bb0;
+            font-size: 16px;
+            font-weight: 700;
+            text-decoration: none;
+        }
+
+        .members-back:hover {
+            color: #50138b;
+        }
+
+        /* Invite modal */
+        .invite-modal {
+            position: fixed;
+            inset: 0;
+            z-index: 99999;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            background: rgba(15, 23, 42, .58);
+            backdrop-filter: blur(4px);
+        }
+
+        .invite-modal.show {
+            display: flex;
+        }
+
+        .invite-modal-content {
+            width: 100%;
+            max-width: 480px;
+            max-height: 90vh;
+            overflow-y: auto;
+            padding: 28px;
+            border: 1px solid #e5e7eb;
+            border-radius: 20px;
+            background: #fff;
+            box-shadow: 0 24px 70px rgba(15, 23, 42, .25);
+            animation: inviteModalIn .18s ease-out;
+        }
+
+        @keyframes inviteModalIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px) scale(.98);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .invite-modal-header {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 16px;
+            margin-bottom: 26px;
+        }
+
+        .invite-modal-header h2 {
+            margin: 0 0 8px;
+            font-size: 25px;
+            font-weight: 800;
+        }
+
+        .invite-modal-header p {
+            margin: 0;
+            color: #64748b;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .invite-close {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            width: 38px;
+            height: 38px;
+            border: none;
+            border-radius: 10px;
+            background: #f1f5f9;
+            color: #475569;
+            cursor: pointer;
+            font-size: 17px;
+        }
+
+        .invite-close:hover {
+            background: #e2e8f0;
+        }
+
+        .invite-form-group {
+            margin-bottom: 20px;
+        }
+
+        .invite-form-group label {
+            display: block;
+            margin-bottom: 9px;
+            color: #334155;
+            font-size: 14px;
+            font-weight: 700;
+        }
+
+        .invite-form-group input,
+        .invite-form-group select {
+            display: block;
+            width: 100%;
+            min-height: 48px;
+            padding: 12px 14px;
+            border: 1px solid #dbe1ea;
+            border-radius: 11px;
+            outline: none;
+            background: #fff;
+            color: #172033;
+            font: inherit;
+            font-size: 15px;
+        }
+
+        .invite-form-group input:focus,
+        .invite-form-group select:focus {
+            border-color: #8b5cf6;
+            box-shadow: 0 0 0 3px rgba(139, 92, 246, .12);
+        }
+
+        .invite-help {
+            margin: 0;
+            color: #64748b;
+            font-size: 13px;
+            line-height: 1.6;
+        }
+
+        .invite-message {
+            display: none;
+            margin-top: 18px;
+            padding: 12px 14px;
+            border-radius: 10px;
+            background: #fff7ed;
+            color: #9a3412;
+            font-size: 13px;
+            line-height: 1.5;
+        }
+
+        .invite-message.show {
+            display: block;
+        }
+
+        .invite-modal-actions {
+            display: flex;
+            justify-content: flex-end;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-top: 25px;
+        }
+
+        .invite-cancel {
+            padding: 13px 18px;
+            border: 1px solid #dbe1ea;
+            border-radius: 11px;
+            background: #fff;
+            color: #334155;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .invite-cancel:hover {
+            background: #f8fafc;
+        }
+
+        @media (max-width: 900px) {
+            .members-page {
+                padding: 24px;
+            }
+
+            .members-stats {
+                grid-template-columns: 1fr;
+            }
+
+            .members-card-header {
+                align-items: flex-start;
+                flex-direction: column;
+            }
+
+            .members-search {
+                width: 100%;
+            }
+        }
+
+        @media (max-width: 560px) {
+            .members-page {
+                padding: 18px 12px;
+            }
+
+            .members-heading {
+                flex-direction: column;
+            }
+
+            .members-heading .members-button {
+                width: 100%;
+            }
+
+            .members-card-header {
+                padding: 20px 16px;
+            }
+
+            .members-table th,
+            .members-table td {
+                padding: 16px;
+            }
+
+            .members-status {
+                padding-left: 16px;
+                padding-right: 16px;
+            }
+
+            .invite-modal-content {
+                padding: 22px;
+            }
+
+            .invite-modal-actions {
+                flex-direction: column-reverse;
+            }
+
+            .invite-modal-actions button {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <main class="members-page">
+
+        <!-- Page heading -->
+        <header class="members-heading">
+            <div>
+                <h1>Business Members</h1>
+                <p>Manage the people and roles connected to your business.</p>
+            </div>
+
+            <button
+                type="button"
+                class="members-button"
+                id="inviteMemberBtn"
+                aria-haspopup="dialog"
+                aria-controls="inviteMemberModal"
+            >
+                <i class="fa-solid fa-user-plus"></i>
+                Invite Member
+            </button>
+        </header>
+
+        <!-- Summary cards -->
+        <section class="members-stats" aria-label="Member statistics">
+
+            <article class="members-stat">
+                <div class="members-stat-icon">
+                    <i class="fa-solid fa-users"></i>
+                </div>
+                <div>
+                    <div class="members-stat-label">Total Members</div>
+                    <div class="members-stat-value" id="totalMembers">0</div>
+                </div>
+            </article>
+
+            <article class="members-stat">
+                <div class="members-stat-icon">
+                    <i class="fa-solid fa-crown"></i>
+                </div>
+                <div>
+                    <div class="members-stat-label">Owners</div>
+                    <div class="members-stat-value" id="ownerCount">0</div>
+                </div>
+            </article>
+
+            <article class="members-stat">
+                <div class="members-stat-icon">
+                    <i class="fa-solid fa-user-shield"></i>
+                </div>
+                <div>
+                    <div class="members-stat-label">Other Roles</div>
+                    <div class="members-stat-value" id="otherRolesCount">0</div>
+                </div>
+            </article>
+
+        </section>
+
+        <!-- Members table -->
+        <section class="members-card">
+            <div class="members-card-header">
+                <div>
+                    <h2>Team Members</h2>
+                    <p>People who have access to your business.</p>
+                </div>
+
+                <label class="members-search">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    <input
+                        type="search"
+                        id="memberSearch"
+                        placeholder="Search name or email..."
+                        aria-label="Search business members"
+                    >
+                </label>
+            </div>
+
+            <div
+                class="members-status"
+                id="membersStatus"
+                role="status"
+                aria-live="polite"
+            >
+                Loading members...
+            </div>
+
+            <div class="members-table-wrapper">
+                <table class="members-table">
+                    <thead>
+                        <tr>
+                            <th scope="col">Member</th>
+                            <th scope="col">Email Address</th>
+                            <th scope="col">Role</th>
+                        </tr>
+                    </thead>
+                    <tbody id="membersTableBody">
+                        <tr>
+                            <td colspan="3" class="members-empty">
+                                Loading members...
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <a href="dashboard.html" class="members-back">
+            <i class="fa-solid fa-arrow-left"></i>
+            Back to Dashboard
+        </a>
+
+        <!-- Invite Member modal -->
+        <div
+            class="invite-modal"
+            id="inviteMemberModal"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="inviteModalTitle"
+            aria-hidden="true"
+        >
+            <div class="invite-modal-content">
+                <div class="invite-modal-header">
+                    <div>
+                        <h2 id="inviteModalTitle">Invite a Member</h2>
+                        <p>Add a teammate to your RetailMind business.</p>
+                    </div>
+
+                    <button
+                        type="button"
+                        class="invite-close"
+                        id="closeInviteModal"
+                        aria-label="Close invitation dialog"
+                    >
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                </div>
+
+                <form id="inviteMemberForm">
+                    <div class="invite-form-group">
+                        <label for="inviteEmail">Email Address</label>
+                        <input
+                            type="email"
+                            id="inviteEmail"
+                            name="email"
+                            placeholder="teammate@example.com"
+                            autocomplete="email"
+                            required
+                        >
+                    </div>
+
+                    <div class="invite-form-group">
+                        <label for="inviteRole">Assign Role</label>
+                        <select id="inviteRole" name="role" required>
+                            <option value="manager">Manager</option>
+                            <option value="staff">Staff</option>
+                            <option value="admin">Administrator</option>
+                        </select>
+                    </div>
+
+                    <p class="invite-help">
+                        Secure invitation processing is not connected yet.
+                        Submitting this form will not send an invitation or
+                        grant anyone access to your business.
+                    </p>
+
+                    <div
+                        class="invite-message"
+                        id="inviteMessage"
+                        role="status"
+                        aria-live="polite"
+                    ></div>
+
+                    <div class="invite-modal-actions">
+                        <button
+                            type="button"
+                            class="invite-cancel"
+                            id="cancelInviteModal"
+                        >
+                            Cancel
+                        </button>
+
+                        <button type="submit" class="members-button" id="sendInviteBtn">
+                            <i class="fa-solid fa-paper-plane"></i>
+                            Send Invitation
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Scripts: keep this order -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/supabase.js"></script>
+    <script src="js/members.js"></script>
+
+    <!-- Modal controls -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const inviteButton = document.getElementById("inviteMemberBtn");
+            const modal = document.getElementById("inviteMemberModal");
+            const closeButton = document.getElementById("closeInviteModal");
+            const cancelButton = document.getElementById("cancelInviteModal");
+            const form = document.getElementById("inviteMemberForm");
+            const emailInput = document.getElementById("inviteEmail");
+            const message = document.getElementById("inviteMessage");
+
+            if (!inviteButton || !modal || !form) {
+                console.error(
+                    "Invite modal elements are missing. Check members.html."
+                );
+                return;
+            }
+
+            function openModal() {
+                modal.classList.add("show");
+                modal.setAttribute("aria-hidden", "false");
+                message.classList.remove("show");
+                message.textContent = "";
+                document.body.style.overflow = "hidden";
+                window.setTimeout(() => emailInput.focus(), 50);
+            }
+
+            function closeModal() {
+                modal.classList.remove("show");
+                modal.setAttribute("aria-hidden", "true");
+                document.body.style.overflow = "";
+                form.reset();
+                message.classList.remove("show");
+                message.textContent = "";
+                inviteButton.focus();
+            }
+
+            inviteButton.addEventListener("click", openModal);
+            closeButton.addEventListener("click", closeModal);
+            cancelButton.addEventListener("click", closeModal);
+
+            modal.addEventListener("click", function (event) {
+                if (event.target === modal) {
+                    closeModal();
+                }
+            });
+
+            document.addEventListener("keydown", function (event) {
+                if (
+                    event.key === "Escape" &&
+                    modal.classList.contains("show")
+                ) {
+                    closeModal();
+                }
+            });
+
+            form.addEventListener("submit", function (event) {
+                event.preventDefault();
+
+                message.textContent =
+                    "Invitation sending is not connected yet. No invitation was sent and no access was granted.";
+                message.classList.add("show");
+            });
+        });
+    </script>
+    <script src="js/inventory.js"></script>
+
+</body>
+</html>

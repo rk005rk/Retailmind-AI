@@ -1,0 +1,419 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>POS Terminal — RetailMind AI Demo</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Sora:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/responsive.css">
+
+  <style>
+    :root {
+      --demo-purple: #5A1188;
+      --demo-mint: #42E8C2;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      background: #f6f7fb;
+      color: #1f2937;
+      font-family: Inter, sans-serif;
+    }
+
+    .demo-wrap {
+      max-width: 1200px;
+      margin: auto;
+      padding: 2rem;
+    }
+
+    .demo-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1rem;
+      flex-wrap: wrap;
+      margin-bottom: 1.5rem;
+    }
+
+    .demo-brand {
+      display: flex;
+      align-items: center;
+      gap: .6rem;
+      font-family: Sora, sans-serif;
+      font-weight: 800;
+      font-size: 1.15rem;
+      text-decoration: none;
+      color: inherit;
+    }
+
+    .brand-icon {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 38px;
+      height: 38px;
+      border-radius: 10px;
+      background: var(--demo-purple);
+      color: white;
+    }
+
+    .brand-badge {
+      background: var(--demo-mint);
+      color: #123c34;
+      padding: .2rem .4rem;
+      border-radius: 5px;
+      font-size: .7rem;
+    }
+
+    .demo-nav {
+      display: flex;
+      flex-wrap: wrap;
+      gap: .7rem;
+    }
+
+    .demo-nav a {
+      text-decoration: none;
+      border: 1px solid #e5e7eb;
+      padding: .55rem .75rem;
+      border-radius: 8px;
+      color: #374151;
+      font-weight: 600;
+      font-size: .85rem;
+      background: white;
+    }
+
+    .demo-nav a:hover {
+      border-color: #c084fc;
+      color: var(--demo-purple);
+    }
+
+    .demo-banner {
+      border: 1px solid #e9d5ff;
+      background: #faf5ff;
+      color: #581c87;
+      border-radius: 12px;
+      padding: .8rem 1rem;
+      font-size: .88rem;
+      margin-bottom: 1.25rem;
+    }
+
+    .demo-card {
+      background: white;
+      border: 1px solid #e5e7eb;
+      border-radius: 16px;
+      padding: 1.2rem;
+      box-shadow: 0 8px 24px rgba(17,24,39,.04);
+      min-width: 0;
+    }
+
+    .demo-grid {
+      display: grid;
+      grid-template-columns: minmax(0,1.25fr) minmax(0,.9fr);
+      gap: 1rem;
+      align-items: start;
+    }
+
+    .demo-muted {
+      color: #6b7280;
+      font-size: .85rem;
+      line-height: 1.5;
+    }
+
+    .demo-pill {
+      display: inline-block;
+      border-radius: 999px;
+      background: #f3e8ff;
+      color: #6b21a8;
+      padding: .25rem .6rem;
+      font-size: .75rem;
+      font-weight: 700;
+    }
+
+    .demo-btn {
+      cursor: pointer;
+      border: 0;
+      border-radius: 9px;
+      padding: .7rem .9rem;
+      font-weight: 700;
+      font-size: .88rem;
+      background: var(--demo-purple);
+      color: white;
+    }
+
+    .demo-btn:hover { opacity: .88; }
+
+    .demo-btn.secondary {
+      background: #f3e8ff;
+      color: var(--demo-purple);
+    }
+
+    .demo-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 1rem;
+      align-items: center;
+      padding: .8rem 0;
+      border-bottom: 1px solid #eee;
+    }
+
+    .demo-input,
+    .demo-select {
+      width: 100%;
+      padding: .7rem;
+      border: 1px solid #d1d5db;
+      border-radius: 8px;
+      background: white;
+      font: inherit;
+    }
+
+    .receipt-paper {
+      width: 100%;
+      max-width: 460px;
+      margin: auto;
+      padding: 1.25rem;
+      border: 1px dashed #c4b5fd;
+      border-radius: 8px;
+      background: white;
+      color: #111827;
+      font-family: "Courier New", monospace;
+    }
+
+    .receipt-center { text-align: center; }
+
+    .receipt-rule {
+      border-top: 1px dashed #9ca3af;
+      margin: .75rem 0;
+    }
+
+    .receipt-line {
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+      margin: .4rem 0;
+      font-size: .82rem;
+    }
+
+    .receipt-line > :last-child {
+      text-align: right;
+      overflow-wrap: anywhere;
+    }
+
+    .receipt-items {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: .76rem;
+    }
+
+    .receipt-items th,
+    .receipt-items td {
+      padding: .4rem .12rem;
+      border-bottom: 1px dashed #e5e7eb;
+      text-align: left;
+      vertical-align: top;
+      overflow-wrap: anywhere;
+    }
+
+    .receipt-items .num {
+      text-align: right;
+      white-space: nowrap;
+    }
+
+    .receipt-small {
+      font-size: .72rem;
+      line-height: 1.5;
+      color: #6b7280;
+    }
+
+    .receipt-actions {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1rem;
+      flex-wrap: wrap;
+      margin-bottom: 1rem;
+    }
+
+    .demo-footer {
+      text-align: center;
+      color: #6b7280;
+      font-size: .8rem;
+      padding: 2rem;
+    }
+
+    @media(max-width:800px) {
+      .demo-wrap { padding: 1rem; }
+      .demo-grid { grid-template-columns: 1fr; }
+      .demo-top { align-items: flex-start; }
+    }
+
+    @media(max-width:480px) {
+      .demo-wrap { padding: .7rem; }
+      .demo-card { padding: .9rem; }
+      .demo-nav a { font-size: .78rem; }
+      .receipt-paper { padding: .75rem; }
+    }
+
+    @media print {
+      body * { visibility: hidden !important; }
+
+      #receipt,
+      #receipt * { visibility: visible !important; }
+
+      #receipt {
+        display: block !important;
+        position: absolute !important;
+        left: 0 !important;
+        top: 0 !important;
+        width: 72mm !important;
+        max-width: 72mm !important;
+        margin: 0 !important;
+        padding: 3mm !important;
+        border: 0 !important;
+        border-radius: 0 !important;
+        box-shadow: none !important;
+        background: white !important;
+        color: black !important;
+      }
+
+      #receipt .receipt-actions { display: none !important; }
+
+      #receipt .receipt-paper {
+        width: 100% !important;
+        max-width: 100% !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        border: 0 !important;
+      }
+
+      #receipt .receipt-paper * { color: black !important; }
+
+      #receipt .receipt-rule { border-top: 1px dashed black !important; }
+
+      #receipt .receipt-line {
+        display: flex !important;
+        justify-content: space-between !important;
+        gap: 4px !important;
+        font-size: 10px !important;
+      }
+
+      #receipt .receipt-items { font-size: 9px !important; }
+
+      #receipt .receipt-items th,
+      #receipt .receipt-items td {
+        padding: 3px 0 !important;
+        border: 0 !important;
+        font-size: 9px !important;
+      }
+
+      @page { size: 80mm auto; margin: 0; }
+    }
+  </style>
+</head>
+
+<body>
+<div class="demo-wrap">
+
+  <header class="demo-top">
+    <a href="index.html" class="demo-brand">
+      <span class="brand-icon"><i class="fa-solid fa-brain"></i></span>
+      RetailMind <span class="brand-badge">AI</span>
+    </a>
+
+    <nav class="demo-nav">
+      <a href="index.html"><i class="fa-solid fa-house"></i> Landing page</a>
+      <a href="demo-dashboard.html"><i class="fa-solid fa-chart-line"></i> Dashboard</a>
+      <a href="demo-pos.html"><i class="fa-solid fa-cash-register"></i> POS Demo</a>
+      <a href="demo-predictions.html"><i class="fa-solid fa-wand-magic-sparkles"></i> AI Predictions</a>
+      <a href="login.html"><i class="fa-solid fa-right-to-bracket"></i> Sign in</a>
+    </nav>
+  </header>
+
+  <div class="demo-banner">
+    <i class="fa-solid fa-circle-info"></i>
+    <strong>Interactive demo mode:</strong>
+    all products, sales and totals are mock data. Nothing is saved to Supabase or your real business.
+  </div>
+
+  <h1 style="font-family:Sora,sans-serif;margin-bottom:.35rem">POS Terminal</h1>
+  <p class="demo-muted" style="margin-bottom:1.4rem">
+    Add products to the cart, calculate GST, and generate a realistic demo bill.
+  </p>
+
+  <div class="demo-grid">
+
+    <section class="demo-card">
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:1rem;flex-wrap:wrap">
+        <h2 style="font-size:1.1rem">Product Catalogue</h2>
+        <span class="demo-pill">Mock Inventory</span>
+      </div>
+      <div id="productList"></div>
+    </section>
+
+    <section class="demo-card">
+      <h2 style="font-size:1.1rem">Current Bill</h2>
+
+      <label for="customer" class="demo-muted">Customer Name</label>
+      <input id="customer" class="demo-input"
+             value="Walk-in customer"
+             placeholder="Enter customer name"
+             style="margin:.35rem 0 1rem">
+
+      <div id="cart">
+        <p class="demo-muted">Your cart is empty. Add a product to begin.</p>
+      </div>
+
+      <div class="demo-row"><span>Subtotal</span><strong id="subtotal">₹0.00</strong></div>
+      <div class="demo-row"><span>GST (18%)</span><strong id="tax">₹0.00</strong></div>
+      <div class="demo-row"><strong>Total Due</strong><strong id="total" style="font-size:1.25rem">₹0.00</strong></div>
+
+      <label for="payment" class="demo-muted" style="display:block;margin-top:1rem">Payment Method</label>
+      <select id="payment" class="demo-select" style="margin:.35rem 0 1rem">
+        <option value="UPI">UPI</option>
+        <option value="Cash">Cash</option>
+        <option value="Card">Card</option>
+      </select>
+
+      <button type="button" class="demo-btn" id="checkout" style="width:100%">
+        <i class="fa-solid fa-check"></i> Complete Demo Sale
+      </button>
+
+      <button type="button" class="demo-btn secondary" id="clear" style="width:100%;margin-top:.5rem">
+        <i class="fa-solid fa-trash"></i> Clear Cart
+      </button>
+
+      <p class="demo-muted" style="margin-top:.8rem">
+        This checkout is simulated. No payment is processed and no real stock is changed.
+      </p>
+    </section>
+  </div>
+
+  <section class="demo-card" id="receipt" style="display:none;margin-top:1rem">
+    <div class="receipt-actions">
+      <h2 style="font-size:1.1rem">Generated Demo Bill</h2>
+      <div style="display:flex;gap:.5rem;flex-wrap:wrap">
+        <button type="button" class="demo-btn secondary" id="downloadBill">
+          <i class="fa-solid fa-download"></i> Download Bill
+        </button>
+        <button type="button" class="demo-btn" id="printBill">
+          <i class="fa-solid fa-print"></i> Print Bill
+        </button>
+      </div>
+    </div>
+    <div id="receiptContent"></div>
+  </section>
+
+  <footer class="demo-footer">RetailMind AI POS · Mock transactions only</footer>
+</div>
+
+<!-- All functionality is loaded from a separate JavaScript file. -->
+<script src="js/demo-pos.js" defer></script>
+</body>
+</html>
