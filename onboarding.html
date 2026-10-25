@@ -1,0 +1,261 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Business Setup | RetailMind AI</title>
+  <style>
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      padding: 32px 16px;
+      background: #f5f6fa;
+      color: #202438;
+      font-family: Inter, Arial, sans-serif;
+    }
+
+    main {
+      max-width: 680px;
+      margin: 0 auto;
+      padding: 30px;
+      background: #fff;
+      border-radius: 18px;
+      box-shadow: 0 12px 40px #17203312;
+    }
+
+    h1 { margin-top: 0; }
+    .intro { color: #687084; line-height: 1.6; }
+
+    form {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 18px;
+      margin-top: 28px;
+    }
+
+    .field { display: flex; flex-direction: column; gap: 7px; }
+    .full { grid-column: 1 / -1; }
+
+    label { font-size: 13px; font-weight: 700; }
+
+    input, select {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #d8dce6;
+      border-radius: 9px;
+      font: inherit;
+      background: #fff;
+    }
+
+    button {
+      grid-column: 1 / -1;
+      border: 0;
+      border-radius: 10px;
+      padding: 14px;
+      background: #5a1188;
+      color: white;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    button:disabled { opacity: .65; cursor: wait; }
+
+    #message {
+      margin-top: 18px;
+      line-height: 1.5;
+      overflow-wrap: anywhere;
+    }
+
+    .error { color: #b42318; }
+    .success { color: #167447; }
+
+    @media (max-width: 520px) {
+      form { grid-template-columns: 1fr; }
+      .full, button { grid-column: auto; }
+      main { padding: 22px; }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>Set up your business</h1>
+    <p class="intro">
+      Configure your store and inventory settings to get started
+      with RetailMind AI.
+    </p>
+
+    <form id="onboardingForm">
+      <div class="field full">
+        <label for="businessName">Business name *</label>
+        <input id="businessName" required maxlength="120"
+               placeholder="Your store name">
+      </div>
+
+      <div class="field">
+        <label for="businessType">Store category *</label>
+        <select id="businessType" required>
+          <option value="Supermarket / Hypermarket">Supermarket</option>
+          <option value="Electronics & Tech Store">Electronics & Tech</option>
+          <option value="Apparel & Fashion Boutique">Apparel & Fashion</option>
+          <option value="Pharmacy & Health">Pharmacy & Health</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label for="currency">Currency</label>
+        <select id="currency">
+          <option value="INR (₹)">INR (₹)</option>
+          <option value="USD ($)">USD ($)</option>
+          <option value="EUR (€)">EUR (€)</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label for="warehouseName">Warehouse name</label>
+        <input id="warehouseName" maxlength="120"
+               placeholder="Main warehouse">
+      </div>
+
+      <div class="field">
+        <label for="warehouseCity">Warehouse city</label>
+        <input id="warehouseCity" maxlength="100"
+               placeholder="Kolkata">
+      </div>
+
+      <div class="field">
+        <label for="lowStock">Low-stock alert threshold</label>
+        <input id="lowStock" type="number" min="0" max="100000"
+               value="15" required>
+      </div>
+
+      <div class="field">
+        <label for="gstRate">Standard GST rate (%)</label>
+        <input id="gstRate" type="number" min="0" max="100"
+               step="0.01" value="18" required>
+      </div>
+
+      <div class="field full">
+        <label for="language">Dashboard language</label>
+        <select id="language">
+          <option value="English">English</option>
+          <option value="Hindi">Hindi</option>
+          <option value="Bengali">Bengali</option>
+          <option value="Tamil">Tamil</option>
+        </select>
+      </div>
+
+      <button id="submitButton" type="submit">
+        Create Business & Continue
+      </button>
+    </form>
+
+    <p id="message" role="status" aria-live="polite"></p>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase.js"></script>
+
+  <script>
+    const form = document.getElementById('onboardingForm');
+    const button = document.getElementById('submitButton');
+    const message = document.getElementById('message');
+
+    async function initialize() {
+      const { data, error } =
+        await window.supabaseClient.auth.getSession();
+
+      if (error) throw error;
+
+      if (!data.session) {
+        window.location.replace('login.html');
+        return;
+      }
+
+      const { data: memberships, error: membershipError } =
+        await window.supabaseClient
+          .from('business_members')
+          .select('business_id')
+          .eq('user_id', data.session.user.id);
+
+      if (membershipError) throw membershipError;
+
+      if (memberships.length > 0) {
+        window.location.replace('dashboard.html');
+      }
+    }
+
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault();
+
+      button.disabled = true;
+      button.textContent = 'Creating your business...';
+      message.className = '';
+      message.textContent = '';
+
+      try {
+        const { data: sessionData, error: sessionError } =
+          await window.supabaseClient.auth.getSession();
+
+        if (sessionError) throw sessionError;
+
+        if (!sessionData.session) {
+          window.location.replace('login.html');
+          return;
+        }
+
+        const { data: businessId, error } =
+          await window.supabaseClient.rpc(
+            'create_business_for_current_user',
+            {
+              p_business_name:
+                document.getElementById('businessName').value.trim(),
+              p_business_type:
+                document.getElementById('businessType').value,
+              p_warehouse_name:
+                document.getElementById('warehouseName').value.trim(),
+              p_warehouse_city:
+                document.getElementById('warehouseCity').value.trim(),
+              p_low_stock_alert_level:
+                Number(document.getElementById('lowStock').value),
+              p_currency:
+                document.getElementById('currency').value,
+              p_gst_rate:
+                Number(document.getElementById('gstRate').value),
+              p_language:
+                document.getElementById('language').value
+            }
+          );
+
+        if (error) throw error;
+
+        if (!businessId) {
+          throw new Error('Business creation returned no ID.');
+        }
+
+        message.className = 'success';
+        message.textContent = 'Business created. Opening your dashboard...';
+
+        window.location.replace('dashboard.html');
+
+      } catch (error) {
+        console.error('Business onboarding failed:', error);
+        message.className = 'error';
+        message.textContent =
+          error.message || 'Could not create your business. Please try again.';
+        button.disabled = false;
+        button.textContent = 'Create Business & Continue';
+      }
+    });
+
+    initialize().catch((error) => {
+      console.error('Onboarding initialization failed:', error);
+      message.className = 'error';
+      message.textContent =
+        'Could not verify your account. Refresh the page or sign in again.';
+    });
+  </script>
+</body>
+</html>

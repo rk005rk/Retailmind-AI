@@ -332,6 +332,7 @@ async function loadCurrentUser() {
       customerSalesMap[sale.customer_id]++;
     });
 
+
     const totalCustomersWithSales =
       Object.keys(customerSalesMap).length;
 
@@ -339,22 +340,34 @@ async function loadCurrentUser() {
       Object.values(customerSalesMap)
         .filter(count => count > 1)
         .length;
+
+    const customerRetentionScore =
+      totalCustomersWithSales > 0
+        ? Math.round(
+          (repeatCustomers / totalCustomersWithSales) * 100
+        )
+        : null;
+
     const healthCustomer =
       document.getElementById('healthCustomer');
 
-    if (healthCustomer) {
-      if (totalCustomersWithSales === 0) {
-        healthCustomer.textContent = 'N/A';
-      } else {
-        const customerRetentionScore =
-          Math.round(
-            (repeatCustomers / totalCustomersWithSales) * 100
-          );
+    const healthCustomerBar =
+      document.getElementById('healthCustomerBar');
 
-        healthCustomer.textContent =
-          `${customerRetentionScore}%`;
-      }
+    if (healthCustomer) {
+      healthCustomer.textContent =
+        customerRetentionScore === null
+          ? 'N/A'
+          : `${customerRetentionScore}%`;
     }
+
+    if (healthCustomerBar) {
+      healthCustomerBar.style.width =
+        `${customerRetentionScore ?? 0}%`;
+    }
+
+    console.log('Customer retention score:', customerRetentionScore);
+
     console.log(
       'RetailMind customer sales:',
       customerSalesMap
@@ -616,31 +629,31 @@ async function loadCurrentUser() {
       healthStockBar.style.width =
         `${stockAccuracyScore}%`;
     }
+
     const supplierRatings = products
       .map(product => Number(product.suppliers?.rating))
-      .filter(rating => rating > 0);
+      .filter(rating => Number.isFinite(rating) && rating > 0);
 
     const supplierPerformanceScore =
       supplierRatings.length > 0
         ? Math.round(
-          (supplierRatings.reduce(
-            (sum, rating) => sum + rating,
-            0
-          ) / supplierRatings.length) * 20
+          (supplierRatings.reduce((sum, rating) => sum + rating, 0) /
+            supplierRatings.length) * 20
         )
-        : 0;
+        : null;
 
     console.log(
       'RetailMind supplier performance score:',
       supplierPerformanceScore
     );
 
-    const healthSupplier =
-      document.getElementById('healthSupplier');
+    const healthSupplier = document.getElementById('healthSupplier');
 
     if (healthSupplier) {
       healthSupplier.textContent =
-        `${supplierPerformanceScore}%`;
+        supplierPerformanceScore === null
+          ? 'N/A'
+          : `${supplierPerformanceScore}%`;
     }
 
     const healthSupplierBar =
@@ -648,8 +661,9 @@ async function loadCurrentUser() {
 
     if (healthSupplierBar) {
       healthSupplierBar.style.width =
-        `${supplierPerformanceScore}%`;
+        `${supplierPerformanceScore ?? 0}%`;
     }
+
     const profitMargin =
       totalSales > 0
         ? (totalProfit / totalSales) * 100
@@ -684,19 +698,23 @@ async function loadCurrentUser() {
         salesData.length * 20
       );
 
-    const businessHealth = Math.round(
-      (
-        profitabilityScore +
-        inventoryHealthScore +
-        stockAccuracyScore +
-        supplierPerformanceScore
-      ) / 4
-    );
 
-    console.log(
-      'RetailMind business health:',
-      businessHealth
-    );
+    const healthPillars = [
+      profitabilityScore,
+      inventoryHealthScore,
+      stockAccuracyScore,
+      supplierPerformanceScore
+    ].filter(score => score !== null && Number.isFinite(score));
+
+    const businessHealth = healthPillars.length > 0
+      ? Math.round(
+        healthPillars.reduce((sum, score) => sum + score, 0) /
+        healthPillars.length
+      )
+      : 0;
+
+    console.log('RetailMind business health:', businessHealth);
+
     // Sync the calculated score to every Business Health sidebar badge
     document.querySelectorAll(
       "[data-business-health-score], .sidebar-business-health-score"

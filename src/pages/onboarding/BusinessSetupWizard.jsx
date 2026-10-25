@@ -18,7 +18,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 
 export default function BusinessSetupWizard() {
   const { user, completeOnboarding } = useAuth();
-  const { addToast } = ;polikjuhytgffrde();
+  const { addToast } = polikjuhytgffrde();
   const navigate = useNavigate();
 
   const [currentStep, setCurrentStep] = useState(1);

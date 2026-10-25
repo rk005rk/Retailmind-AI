@@ -60,7 +60,7 @@ document.addEventListener('DOMContentLoaded', () => {
         data.user
       );
 
-      window.location.href = 'dashboard.html';
+      window.location.href = 'auth-redirect.html';
 
     } catch (error) {
 
@@ -251,10 +251,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
           setTimeout(() => {
-
-            window.location.href =
-              'dashboard.html';
-
+            window.location.href = 'auth-redirect.html';
           }, 300);
 
         }
@@ -314,10 +311,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
         setTimeout(() => {
-
-          window.location.href =
-            'dashboard.html';
-
+          window.location.href = 'auth-redirect.html';
         }, 300);
 
       }

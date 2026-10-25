@@ -448,23 +448,26 @@ function setupAddProductModal() {
 
       if (insertError) throw insertError;
 
+
       const newProduct = {
-        id: data.id,
-        name: data.name,
-        sku: data.sku || data.id,
-        category: data.category,
-        price: Number(data.selling_price),
-        cost: Number(data.purchase_price),
-        stock: data.stock,
-        reorder: data.reorder_level,
-        supplier: data.suppliers?.name || '—',
-        supplierId: data.supplier_id,
-        expiry: data.expiry_date || '',
+        id: insertedProduct.id,
+        name: insertedProduct.name,
+        sku: insertedProduct.sku || insertedProduct.id,
+        category: insertedProduct.category,
+        price: Number(insertedProduct.selling_price),
+        cost: Number(insertedProduct.purchase_price),
+        stock: Number(insertedProduct.stock),
+        reorder: Number(insertedProduct.reorder_level),
+        supplier: insertedProduct.suppliers?.name || supplier.name || '—',
+        supplierId: insertedProduct.supplier_id,
+        expiry: insertedProduct.expiry_date || '',
         status:
-          data.stock === 0 ? 'Out of Stock' :
-            data.stock <= data.reorder_level ? 'Low Stock' :
-              'In Stock'
+          Number(insertedProduct.stock) === 0 ? 'Out of Stock' :
+            Number(insertedProduct.stock) <= Number(insertedProduct.reorder_level)
+              ? 'Low Stock'
+              : 'In Stock'
       };
+
 
       inventoryProducts.unshift(newProduct);
 

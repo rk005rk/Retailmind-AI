@@ -3,8 +3,7 @@
    RETAILMIND AI — SUPPLIERS MODULE
    Supabase: Suppliers, Purchase Orders, KPIs, View, Edit, Archive
    ========================================================= */
-
-const SUPPLIERS_BUSINESS_ID = 'a2d99a73-1f99-4c51-b35c-20fcd0cf221f';
+let SUPPLIERS_BUSINESS_ID = null;
 
 const SUPPLIER_CATEGORIES = [
     'Groceries',
@@ -25,17 +24,55 @@ let suppliersCache = [];
 let purchaseOrdersCache = [];
 let pendingArchiveSupplierId = null;
 
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
     initializeSupplierForm();
     initializeSupplierModals();
     initializeArchiveModal();
-    loadSuppliers();
-});
 
+    try {
+        await initializeSupplierBusiness();
+        await loadSuppliers();
+    } catch (error) {
+        console.error('Supplier initialization failed:', error);
+        showSupplierMessage(
+            error.message || 'Could not initialize suppliers.',
+            'error'
+        );
+    }
+});
 /* =========================================================
    AUTHENTICATION AND BUSINESS ACCESS
    ========================================================= */
+async function initializeSupplierBusiness() {
+    const { data: { user }, error: authError } =
+        await supabaseClient.auth.getUser();
 
+    if (authError) throw authError;
+
+    if (!user) {
+        window.location.href = 'login.html';
+        return;
+    }
+
+    const { data: memberships, error } = await supabaseClient
+        .from('business_members')
+        .select('business_id')
+        .eq('user_id', user.id);
+
+    if (error) throw error;
+
+    if (!memberships || memberships.length === 0) {
+        throw new Error('No business is linked to your account.');
+    }
+
+    if (memberships.length > 1) {
+        throw new Error(
+            'Your account belongs to multiple businesses. Please select a business first.'
+        );
+    }
+
+    SUPPLIERS_BUSINESS_ID = memberships[0].business_id;
+}
 async function verifySupplierAccess() {
     const {
         data: { user },
@@ -285,15 +322,15 @@ function renderSuppliersWithPurchases(suppliers, orders) {
                     <strong>${escapeSupplierHTML(supplier.name)}</strong>
                     <div class="text-muted" style="font-size:0.8rem;">
                         ${escapeSupplierHTML(
-                            supplier.contact_person || 'No contact person'
-                        )}
+            supplier.contact_person || 'No contact person'
+        )}
                     </div>
                 </td>
 
                 <td>
                     ${escapeSupplierHTML(
-                        supplier.category || 'Uncategorized'
-                    )}
+            supplier.category || 'Uncategorized'
+        )}
                 </td>
 
                 <td>${completedOrders}</td>
@@ -304,9 +341,9 @@ function renderSuppliersWithPurchases(suppliers, orders) {
                 <td>
                     <span class="status-badge ${statusClass}">
                         ${escapeSupplierHTML(
-                            status.charAt(0).toUpperCase() +
-                            status.slice(1)
-                        )}
+            status.charAt(0).toUpperCase() +
+            status.slice(1)
+        )}
                     </span>
                 </td>
 
@@ -561,8 +598,8 @@ function initializeSupplierModals() {
                                     Select a category
                                 </option>
                                 ${SUPPLIER_CATEGORIES.map(category =>
-                                    `<option value="${escapeSupplierHTML(category)}">${escapeSupplierHTML(category)}</option>`
-                                ).join('')}
+        `<option value="${escapeSupplierHTML(category)}">${escapeSupplierHTML(category)}</option>`
+    ).join('')}
                             </select>
                         </div>
 
@@ -989,26 +1026,26 @@ async function viewSupplierDetails(supplierId) {
                                 <tr>
                                     <td>
                                         ${escapeSupplierHTML(
-                                            formatSupplierDate(order.order_date)
-                                        )}
+                formatSupplierDate(order.order_date)
+            )}
                                     </td>
                                     <td>
                                         ${escapeSupplierHTML(order.status || 'Unknown')}
                                     </td>
                                     <td>
                                         ${escapeSupplierHTML(
-                                            formatSupplierDate(order.expected_delivery_date)
-                                        )}
+                formatSupplierDate(order.expected_delivery_date)
+            )}
                                     </td>
                                     <td>
                                         ${escapeSupplierHTML(
-                                            formatSupplierDate(order.actual_delivery_date)
-                                        )}
+                formatSupplierDate(order.actual_delivery_date)
+            )}
                                     </td>
                                     <td>
                                         ${formatSupplierCurrency(
-                                            Number(order.total_amount || 0)
-                                        )}
+                Number(order.total_amount || 0)
+            )}
                                     </td>
                                 </tr>
                             `).join('')}
@@ -1027,53 +1064,53 @@ async function viewSupplierDetails(supplierId) {
             </p>
 
             ${row(
-                'Contact Person',
-                escapeSupplierHTML(supplier.contact_person || '—')
-            )}
+            'Contact Person',
+            escapeSupplierHTML(supplier.contact_person || '—')
+        )}
 
             ${row(
-                'Phone',
-                escapeSupplierHTML(supplier.phone || '—')
-            )}
+            'Phone',
+            escapeSupplierHTML(supplier.phone || '—')
+        )}
 
             ${row(
-                'Email',
-                escapeSupplierHTML(supplier.email || '—')
-            )}
+            'Email',
+            escapeSupplierHTML(supplier.email || '—')
+        )}
 
             ${row(
-                'Status',
-                escapeSupplierHTML(supplier.status || 'Active')
-            )}
+            'Status',
+            escapeSupplierHTML(supplier.status || 'Active')
+        )}
 
             ${row('Rating', rating)}
 
             ${row(
-                'Lead Time',
-                supplier.lead_time_days == null
-                    ? '—'
-                    : `${Number(supplier.lead_time_days)} days`
-            )}
+            'Lead Time',
+            supplier.lead_time_days == null
+                ? '—'
+                : `${Number(supplier.lead_time_days)} days`
+        )}
 
             ${row('Total Purchase Orders', supplierOrders.length)}
             ${row('Completed Orders', completedOrders)}
 
             ${row(
-                'On-Time Delivery',
-                deliveryMetrics.onTimeRate === null
-                    ? '—'
-                    : `${deliveryMetrics.onTimeRate.toFixed(1)}%`
-            )}
+            'On-Time Delivery',
+            deliveryMetrics.onTimeRate === null
+                ? '—'
+                : `${deliveryMetrics.onTimeRate.toFixed(1)}%`
+        )}
 
             ${row(
-                'Delayed Shipments',
-                deliveryMetrics.delayedCount
-            )}
+            'Delayed Shipments',
+            deliveryMetrics.delayedCount
+        )}
 
             ${row(
-                'Purchase Value This Year',
-                formatSupplierCurrency(yearToDatePurchase)
-            )}
+            'Purchase Value This Year',
+            formatSupplierCurrency(yearToDatePurchase)
+        )}
 
             <h4 style="margin:1.25rem 0 0.5rem;">
                 Recent Purchase Orders
