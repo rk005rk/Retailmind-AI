@@ -446,7 +446,7 @@ document.addEventListener('DOMContentLoaded', () => {
   updateInventoryLowStockBadge();
 });
 
- //======================== Notifications ========================//
+//======================== Notifications ========================//
 async function updateSidebarNotificationCounts() {
   const badges = document.querySelectorAll(
     ".sidebar-notification-count"
@@ -552,173 +552,173 @@ document.addEventListener("DOMContentLoaded", () => {
 // ==========================================
 
 window.syncBusinessHealthSidebar = async function () {
-    const db = window.supabaseClient || window.db;
+  const db = window.supabaseClient || window.db;
 
-    if (!db) {
-        console.warn("Supabase client not found.");
-        return;
+  if (!db) {
+    console.warn("Supabase client not found.");
+    return;
+  }
+
+  try {
+    const { data: sessionData, error: sessionError } =
+      await db.auth.getSession();
+
+    if (sessionError) throw sessionError;
+
+    const user = sessionData?.session?.user;
+
+    if (!user) {
+      updateSidebarHealth(null);
+      return;
     }
 
-    try {
-        const { data: sessionData, error: sessionError } =
-            await db.auth.getSession();
+    // Reuse the active business if already resolved.
+    let businessId =
+      window.currentBusinessId ||
+      window.businessId ||
+      window.currentBusiness?.id;
 
-        if (sessionError) throw sessionError;
+    // Otherwise, fetch the user's business membership.
+    if (!businessId) {
+      const { data: membership, error } = await db
+        .from("business_members")
+        .select("business_id")
+        .eq("user_id", user.id)
+        .limit(1)
+        .maybeSingle();
 
-        const user = sessionData?.session?.user;
+      if (error) throw error;
 
-        if (!user) {
-            updateSidebarHealth(null);
-            return;
-        }
+      businessId = membership?.business_id;
+    }
 
-        // Reuse the active business if already resolved.
-        let businessId =
-            window.currentBusinessId ||
-            window.businessId ||
-            window.currentBusiness?.id;
+    if (!businessId) {
+      updateSidebarHealth(null);
+      return;
+    }
 
-        // Otherwise, fetch the user's business membership.
-        if (!businessId) {
-            const { data: membership, error } = await db
-                .from("business_members")
-                .select("business_id")
-                .eq("user_id", user.id)
-                .limit(1)
-                .maybeSingle();
+    // Load products, completed sales, and sale items.
+    const [productsResult, salesResult, itemsResult] =
+      await Promise.all([
+        db.from("products")
+          .select("id, stock, reorder_level")
+          .eq("business_id", businessId),
 
-            if (error) throw error;
+        db.from("sales")
+          .select("id, total_amount, status")
+          .eq("business_id", businessId)
+          .eq("status", "completed"),
 
-            businessId = membership?.business_id;
-        }
-
-        if (!businessId) {
-            updateSidebarHealth(null);
-            return;
-        }
-
-        // Load products, completed sales, and sale items.
-        const [productsResult, salesResult, itemsResult] =
-            await Promise.all([
-                db.from("products")
-                    .select("id, stock, reorder_level")
-                    .eq("business_id", businessId),
-
-                db.from("sales")
-                    .select("id, total_amount, status")
-                    .eq("business_id", businessId)
-                    .eq("status", "completed"),
-
-                db.from("sale_items")
-                    .select(`
+        db.from("sale_items")
+          .select(`
                         quantity,
                         total_price,
                         products(purchase_price),
                         sales!inner(business_id, status)
                     `)
-                    .eq("sales.business_id", businessId)
-                    .eq("sales.status", "completed")
-            ]);
+          .eq("sales.business_id", businessId)
+          .eq("sales.status", "completed")
+      ]);
 
-        if (productsResult.error) throw productsResult.error;
-        if (salesResult.error) throw salesResult.error;
-        if (itemsResult.error) throw itemsResult.error;
+    if (productsResult.error) throw productsResult.error;
+    if (salesResult.error) throw salesResult.error;
+    if (itemsResult.error) throw itemsResult.error;
 
-        const products = productsResult.data || [];
-        const sales = salesResult.data || [];
-        const items = itemsResult.data || [];
+    const products = productsResult.data || [];
+    const sales = salesResult.data || [];
+    const items = itemsResult.data || [];
 
-        // 1. Profitability score
-        const revenue = sales.reduce(
-            (sum, sale) => sum + Number(sale.total_amount || 0),
-            0
-        );
+    // 1. Profitability score
+    const revenue = sales.reduce(
+      (sum, sale) => sum + Number(sale.total_amount || 0),
+      0
+    );
 
-        const grossProfit = items.reduce((sum, item) => {
-            const quantity = Number(item.quantity || 0);
-            const sellingTotal = Number(item.total_price || 0);
-            const purchasePrice = Number(
-                item.products?.purchase_price || 0
-            );
+    const grossProfit = items.reduce((sum, item) => {
+      const quantity = Number(item.quantity || 0);
+      const sellingTotal = Number(item.total_price || 0);
+      const purchasePrice = Number(
+        item.products?.purchase_price || 0
+      );
 
-            return sum + sellingTotal - quantity * purchasePrice;
-        }, 0);
+      return sum + sellingTotal - quantity * purchasePrice;
+    }, 0);
 
-        const profitabilityScore = revenue > 0
-            ? clampHealthScore((grossProfit / revenue) * 100)
-            : null;
+    const profitabilityScore = revenue > 0
+      ? clampHealthScore((grossProfit / revenue) * 100)
+      : null;
 
-        // 2. Inventory health score
-        const lowStockCount = products.filter(product =>
-            Number(product.stock || 0) > 0 &&
-            Number(product.stock || 0) <= Number(product.reorder_level || 0)
-        ).length;
+    // 2. Inventory health score
+    const lowStockCount = products.filter(product =>
+      Number(product.stock || 0) > 0 &&
+      Number(product.stock || 0) <= Number(product.reorder_level || 0)
+    ).length;
 
-        const inventoryScore = products.length
-            ? clampHealthScore(
-                100 - (lowStockCount / products.length) * 100
-            )
-            : null;
+    const inventoryScore = products.length
+      ? clampHealthScore(
+        100 - (lowStockCount / products.length) * 100
+      )
+      : null;
 
-        // 3. Stock accuracy score
-        const stockAccuracyScore = products.length
-            ? clampHealthScore(
-                products.filter(product =>
-                    Number(product.stock || 0) >
-                    Number(product.reorder_level || 0)
-                ).length / products.length * 100
-            )
-            : null;
+    // 3. Stock accuracy score
+    const stockAccuracyScore = products.length
+      ? clampHealthScore(
+        products.filter(product =>
+          Number(product.stock || 0) >
+          Number(product.reorder_level || 0)
+        ).length / products.length * 100
+      )
+      : null;
 
-        // 4. Supplier performance score
-        // Supplier ratings are not queried here, so this score is omitted.
-        // Add the supplier rating query if you want it included.
+    // 4. Supplier performance score
+    // Supplier ratings are not queried here, so this score is omitted.
+    // Add the supplier rating query if you want it included.
 
-        const availableScores = [
-            profitabilityScore,
-            inventoryScore,
-            stockAccuracyScore
-        ].filter(score => score !== null);
+    const availableScores = [
+      profitabilityScore,
+      inventoryScore,
+      stockAccuracyScore
+    ].filter(score => score !== null);
 
-        const businessHealth = availableScores.length
-            ? Math.round(
-                availableScores.reduce((sum, score) => sum + score, 0) /
-                availableScores.length
-            )
-            : null;
+    const businessHealth = availableScores.length
+      ? Math.round(
+        availableScores.reduce((sum, score) => sum + score, 0) /
+        availableScores.length
+      )
+      : null;
 
-        updateSidebarHealth(businessHealth);
+    updateSidebarHealth(businessHealth);
 
-        // Share the score with other page scripts.
-        window.currentBusinessHealth = businessHealth;
+    // Share the score with other page scripts.
+    window.currentBusinessHealth = businessHealth;
 
-    } catch (error) {
-        console.error("Business Health sidebar sync failed:", error);
-    }
+  } catch (error) {
+    console.error("Business Health sidebar sync failed:", error);
+  }
 };
 
 function clampHealthScore(value) {
-    return Math.max(0, Math.min(100, Math.round(value)));
+  return Math.max(0, Math.min(100, Math.round(value)));
 }
 
 function updateSidebarHealth(score) {
-    document.querySelectorAll(
-        "[data-business-health-score], .sidebar-business-health-score"
-    ).forEach(element => {
-        element.textContent = score === null ? "--%" : `${score}%`;
-    });
+  document.querySelectorAll(
+    "[data-business-health-score], .sidebar-business-health-score"
+  ).forEach(element => {
+    element.textContent = score === null ? "--%" : `${score}%`;
+  });
 
-    document.querySelectorAll("[data-business-health-status]").forEach(element => {
-        if (score === null) {
-            element.textContent = "No data";
-        } else if (score >= 80) {
-            element.textContent = "Healthy";
-        } else if (score >= 60) {
-            element.textContent = "Needs attention";
-        } else {
-            element.textContent = "At risk";
-        }
-    });
+  document.querySelectorAll("[data-business-health-status]").forEach(element => {
+    if (score === null) {
+      element.textContent = "No data";
+    } else if (score >= 80) {
+      element.textContent = "Healthy";
+    } else if (score >= 60) {
+      element.textContent = "Needs attention";
+    } else {
+      element.textContent = "At risk";
+    }
+  });
 }
 
 
@@ -728,246 +728,257 @@ function updateSidebarHealth(score) {
 ============================================ */
 
 (() => {
-    if (window.__rmHealthSyncInstalled) return;
-    window.__rmHealthSyncInstalled = true;
+  if (window.__rmHealthSyncInstalled) return;
+  window.__rmHealthSyncInstalled = true;
 
-    let syncInProgress = false;
+  let syncInProgress = false;
 
-    function getClient() {
-        return window.supabaseClient || window.db;
-    }
+  function getClient() {
+    return window.supabaseClient || window.db;
+  }
 
-    function getHealthBadges() {
-        const badges = new Set(
-            document.querySelectorAll(
-                "[data-business-health-score], " +
-                ".sidebar-business-health-score"
-            )
-        );
+  function getHealthBadges() {
+    const badges = new Set(
+      document.querySelectorAll(
+        "[data-business-health-score], " +
+        ".sidebar-business-health-score"
+      )
+    );
 
-        // Fallback for sidebars that still have older HTML markup.
-        document.querySelectorAll("a").forEach(link => {
-            const label = (link.innerText || "").trim();
+    // Fallback for sidebars that still have older HTML markup.
+    document.querySelectorAll("a").forEach(link => {
+      const label = (link.innerText || "").trim();
 
-            if (
-                /business health/i.test(label) ||
-                /health\.html/i.test(link.getAttribute("href") || "")
-            ) {
-                const candidates = link.querySelectorAll("span, strong, b");
+      if (
+        /business health/i.test(label) ||
+        /health\.html/i.test(link.getAttribute("href") || "")
+      ) {
+        const candidates = link.querySelectorAll("span, strong, b");
 
-                if (candidates.length) {
-                    badges.add(candidates[candidates.length - 1]);
-                }
-            }
-        });
+        if (candidates.length) {
+          badges.add(candidates[candidates.length - 1]);
+        }
+      }
+    });
 
-        return [...badges];
-    }
+    return [...badges];
+  }
 
-    function renderHealth(score) {
-        getHealthBadges().forEach(badge => {
-            badge.textContent =
-                score === null || score === undefined
-                    ? "--%"
-                    : `${score}%`;
-        });
+  function renderHealth(score) {
+    getHealthBadges().forEach(badge => {
+      badge.textContent =
+        score === null || score === undefined
+          ? "--%"
+          : `${score}%`;
+    });
 
-        window.currentBusinessHealth = score;
-    }
+    window.currentBusinessHealth = score;
+  }
 
-    function clamp(value) {
-        return Math.max(0, Math.min(100, Math.round(value)));
-    }
+  function clamp(value) {
+    return Math.max(0, Math.min(100, Math.round(value)));
+  }
 
-    async function syncBusinessHealth() {
-        const db = getClient();
+  async function syncBusinessHealth() {
+    const db = getClient();
 
-        if (!db || syncInProgress) return;
+    if (!db || syncInProgress) return;
 
-        syncInProgress = true;
+    syncInProgress = true;
 
-        try {
-            const { data: sessionResult, error: sessionError } =
-                await db.auth.getSession();
+    try {
+      const { data: sessionResult, error: sessionError } =
+        await db.auth.getSession();
 
-            if (sessionError) throw sessionError;
+      if (sessionError) throw sessionError;
 
-            const user = sessionResult?.session?.user;
+      const user = sessionResult?.session?.user;
 
-            if (!user) {
-                renderHealth(null);
-                return;
-            }
+      if (!user) {
+        renderHealth(null);
+        return;
+      }
 
-            // Use the active business, or find the user's membership.
-            let businessId =
-                window.currentBusinessId ||
-                window.businessId ||
-                window.currentBusiness?.id;
+      // Use the active business, or find the user's membership.
+      let businessId =
+        window.currentBusinessId ||
+        window.businessId ||
+        window.currentBusiness?.id;
 
-            if (!businessId) {
-                const { data: membership, error } = await db
-                    .from("business_members")
-                    .select("business_id")
-                    .eq("user_id", user.id)
-                    .limit(1)
-                    .maybeSingle();
+      if (!businessId) {
+        const { data: membership, error } = await db
+          .from("business_members")
+          .select("business_id")
+          .eq("user_id", user.id)
+          .limit(1)
+          .maybeSingle();
 
-                if (error) throw error;
+        if (error) throw error;
 
-                businessId = membership?.business_id;
-            }
+        businessId = membership?.business_id;
+      }
 
-            if (!businessId) {
-                renderHealth(null);
-                return;
-            }
+      if (!businessId) {
+        renderHealth(null);
+        return;
+      }
 
-            // Fetch the same underlying data used for the health calculation.
-            const [productsResult, salesResult, itemsResult] =
-                await Promise.all([
-                    db.from("products")
-                        .select(
-                            "id, stock, reorder_level, suppliers(rating)"
-                        )
-                        .eq("business_id", businessId),
+      // Fetch the same underlying data used for the health calculation.
+      const [productsResult, salesResult, itemsResult] =
+        await Promise.all([
 
-                    db.from("sales")
-                        .select("id, total_amount, status")
-                        .eq("business_id", businessId)
-                        .eq("status", "completed"),
 
-                    db.from("sale_items")
-                        .select(`
+          db.from("products")
+            .select(`
+    id,
+    stock,
+    reorder_level,
+    suppliers: suppliers!products_supplier_id_fkey (rating)
+  `)
+            .eq("business_id", businessId),
+
+
+          db.from("sales")
+            .select("id, total_amount, status")
+            .eq("business_id", businessId)
+            .eq("status", "completed"),
+
+          db.from("sale_items")
+            .select(`
                             quantity,
                             total_price,
                             products(purchase_price),
                             sales!inner(business_id, status)
                         `)
-                        .eq("sales.business_id", businessId)
-                        .eq("sales.status", "completed")
-                ]);
+            .eq("sales.business_id", businessId)
+            .eq("sales.status", "completed")
+        ]);
 
-            if (productsResult.error) throw productsResult.error;
-            if (salesResult.error) throw salesResult.error;
-            if (itemsResult.error) throw itemsResult.error;
+      if (productsResult.error) throw productsResult.error;
+      if (salesResult.error) throw salesResult.error;
+      if (itemsResult.error) throw itemsResult.error;
 
-            const products = productsResult.data || [];
-            const sales = salesResult.data || [];
-            const items = itemsResult.data || [];
+      const products = productsResult.data || [];
+      const sales = salesResult.data || [];
+      const items = itemsResult.data || [];
 
-            // 1. Profitability
-            const revenue = sales.reduce(
-                (sum, sale) => sum + Number(sale.total_amount || 0),
-                0
-            );
+      // 1. Profitability
+      const revenue = sales.reduce(
+        (sum, sale) => sum + Number(sale.total_amount || 0),
+        0
+      );
 
-            const grossProfit = items.reduce((sum, item) => {
-                const quantity = Number(item.quantity || 0);
-                const sellingTotal = Number(item.total_price || 0);
-                const cost = Number(item.products?.purchase_price || 0);
+      const grossProfit = items.reduce((sum, item) => {
+        const quantity = Number(item.quantity || 0);
+        const sellingTotal = Number(item.total_price || 0);
+        const cost = Number(item.products?.purchase_price || 0);
 
-                return sum + sellingTotal - quantity * cost;
-            }, 0);
+        return sum + sellingTotal - quantity * cost;
+      }, 0);
 
-            const profitability = revenue > 0
-                ? clamp((grossProfit / revenue) * 100)
-                : null;
+      const profitability = revenue > 0
+        ? clamp((grossProfit / revenue) * 100)
+        : null;
 
-            // 2. Inventory health
-            const lowStock = products.filter(product =>
-                Number(product.stock || 0) > 0 &&
-                Number(product.stock || 0) <=
-                    Number(product.reorder_level || 0)
-            ).length;
+      // 2. Inventory health
+      const lowStock = products.filter(product =>
+        Number(product.stock || 0) > 0 &&
+        Number(product.stock || 0) <=
+        Number(product.reorder_level || 0)
+      ).length;
 
-            const inventory = products.length
-                ? clamp(100 - (lowStock / products.length) * 100)
-                : null;
+      const inventory = products.length
+        ? clamp(100 - (lowStock / products.length) * 100)
+        : null;
 
-            // 3. Stock accuracy proxy
-            const stockAccuracy = products.length
-                ? clamp(
-                    products.filter(product =>
-                        Number(product.stock || 0) >
-                        Number(product.reorder_level || 0)
-                    ).length / products.length * 100
-                )
-                : null;
+      // 3. Stock accuracy proxy
+      const stockAccuracy = products.length
+        ? clamp(
+          products.filter(product =>
+            Number(product.stock || 0) >
+            Number(product.reorder_level || 0)
+          ).length / products.length * 100
+        )
+        : null;
 
-            // 4. Supplier performance from supplier ratings (0–5).
-            const ratings = products
-                .map(product => Number(product.suppliers?.rating || 0))
-                .filter(rating => rating > 0);
+      // 4. Supplier performance from supplier ratings (0–5).
+      const ratings = products
+        .map(product => Number(product.suppliers?.rating || 0))
+        .filter(rating => rating > 0);
 
-            const supplierPerformance = ratings.length
-                ? clamp(
-                    ratings.reduce((sum, rating) => sum + rating, 0) /
-                    ratings.length * 20
-                )
-                : null;
+      const supplierPerformance = ratings.length
+        ? clamp(
+          ratings.reduce((sum, rating) => sum + rating, 0) /
+          ratings.length * 20
+        )
+        : null;
 
-            // Average only available metrics.
-            const scores = [
-                profitability,
-                inventory,
-                stockAccuracy,
-                supplierPerformance
-            ].filter(score => score !== null);
+      // Average only available metrics.
+      const scores = [
+        profitability,
+        inventory,
+        stockAccuracy,
+        supplierPerformance
+      ].filter(score => score !== null);
 
-            const health = scores.length
-                ? clamp(scores.reduce((sum, score) => sum + score, 0) /
-                    scores.length)
-                : null;
+      const health = scores.length
+        ? clamp(scores.reduce((sum, score) => sum + score, 0) /
+          scores.length)
+        : null;
 
-            renderHealth(health);
+      renderHealth(health);
 
-            console.log("Global Business Health synced:", health);
+      console.log("Global Business Health synced:", health);
 
-        } catch (error) {
-            console.error("Global Business Health sync failed:", error);
-        } finally {
-            syncInProgress = false;
-        }
+    } catch (error) {
+      console.error('Global Business Health sync failed details:', {
+        message: error?.message,
+        details: error?.details,
+        hint: error?.hint,
+        code: error?.code
+      });
+    } finally {
+      syncInProgress = false;
     }
+  }
 
-    // Make it available to other scripts and business-switching controls.
-    window.syncBusinessHealthSidebar = syncBusinessHealth;
+  // Make it available to other scripts and business-switching controls.
+  window.syncBusinessHealthSidebar = syncBusinessHealth;
 
-    // Initial sync, including pages whose sidebar appears after DOM parsing.
-    function startSync() {
-        syncBusinessHealth();
-    }
+  // Initial sync, including pages whose sidebar appears after DOM parsing.
+  function startSync() {
+    syncBusinessHealth();
+  }
 
-    if (document.readyState === "loading") {
-        document.addEventListener("DOMContentLoaded", startSync, {
-            once: true
-        });
-    } else {
-        startSync();
-    }
-
-    // Refresh after authentication changes.
-    function watchAuth() {
-        const db = getClient();
-
-        if (!db?.auth) {
-            setTimeout(watchAuth, 300);
-            return;
-        }
-
-        db.auth.onAuthStateChange(() => {
-            setTimeout(syncBusinessHealth, 0);
-        });
-    }
-
-    watchAuth();
-
-    // Refresh when the user returns to a page.
-    document.addEventListener("visibilitychange", () => {
-        if (!document.hidden) syncBusinessHealth();
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", startSync, {
+      once: true
     });
+  } else {
+    startSync();
+  }
 
-    // Refresh after the active business changes.
-    window.addEventListener("retailmind:business-changed", syncBusinessHealth);
+  // Refresh after authentication changes.
+  function watchAuth() {
+    const db = getClient();
+
+    if (!db?.auth) {
+      setTimeout(watchAuth, 300);
+      return;
+    }
+
+    db.auth.onAuthStateChange(() => {
+      setTimeout(syncBusinessHealth, 0);
+    });
+  }
+
+  watchAuth();
+
+  // Refresh when the user returns to a page.
+  document.addEventListener("visibilitychange", () => {
+    if (!document.hidden) syncBusinessHealth();
+  });
+
+  // Refresh after the active business changes.
+  window.addEventListener("retailmind:business-changed", syncBusinessHealth);
 })();

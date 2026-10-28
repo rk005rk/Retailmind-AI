@@ -168,7 +168,8 @@ async function loadCurrentUser() {
       error: productsError
     } = await supabaseClient
       .from('products')
-      .select(`
+     
+.select(`
     id,
     name,
     sku,
@@ -177,8 +178,9 @@ async function loadCurrentUser() {
     purchase_price,
     stock,
     reorder_level,
+    expiry_date,
     supplier_id,
-    suppliers (
+    suppliers: suppliers!products_supplier_id_fkey (
       id,
       name,
       phone,
@@ -187,14 +189,17 @@ async function loadCurrentUser() {
       rating
     )
   `)
+
       .eq('business_id', membership.business_id)
       .eq('is_archived', false);
 
     if (productsError) {
-      console.error(
-        'Products loading error:',
-        productsError
-      );
+      console.error('Products loading error details:', {
+        message: productsError?.message,
+        details: productsError?.details,
+        hint: productsError?.hint,
+        code: productsError?.code
+      });
       return;
     }
 
@@ -272,7 +277,8 @@ async function loadCurrentUser() {
     ),
     sales!inner (
       business_id,
-      status
+      status,
+      sale_date
     )
   `)
       .eq(
@@ -303,12 +309,13 @@ async function loadCurrentUser() {
     );
 
     updateTopSellingProducts(saleItems);
+    updateAIBusinessInsight(products, saleItems);
     const {
       data: salesData,
       error: salesError
     } = await supabaseClient
       .from('sales')
-      .select('total_amount, sale_date, customer_id')
+      .select('total_amount, sale_date, customer_id, status')
       .eq('business_id', membership.business_id)
       .eq('status', 'completed');
 
@@ -451,11 +458,22 @@ async function loadCurrentUser() {
         });
       }
 
-      // Add sales to their corresponding dates.
+
+      // Add sales to their corresponding local calendar dates.
       (Array.isArray(sales) ? sales : []).forEach(sale => {
         if (!sale.sale_date) return;
 
-        const dateKey = String(sale.sale_date).slice(0, 10);
+        const saleDate = new Date(sale.sale_date);
+
+        if (Number.isNaN(saleDate.getTime())) return;
+
+        // Use local date components instead of the UTC date string.
+        const dateKey = [
+          saleDate.getFullYear(),
+          String(saleDate.getMonth() + 1).padStart(2, "0"),
+          String(saleDate.getDate()).padStart(2, "0")
+        ].join("-");
+
         const bucket = buckets.get(dateKey);
 
         if (!bucket) return;
@@ -469,6 +487,7 @@ async function loadCurrentUser() {
         bucket.revenue += Number(sale.total_amount) || 0;
         bucket.salesCount += 1;
       });
+
 
       const dailyData = Array.from(buckets.values());
 
@@ -1322,93 +1341,117 @@ function renderHealthProgress() {
 // ============================================================
 // INVENTORY OVERVIEW
 // ============================================================
-
 function updateInventoryOverview(products) {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
 
-  if (!Array.isArray(products)) {
-    console.warn('No product data available.');
-    return;
-  }
+  const totalProducts = products.length;
 
-  let totalProducts = products.length;
-  let inStock = 0;
-  let lowStock = 0;
-  let outOfStock = 0;
+  const inStock = products.filter(product =>
+    Number(product.stock) > Number(product.reorder_level)
+  ).length;
 
+  const lowStock = products.filter(product =>
+    Number(product.stock) > 0 &&
+    Number(product.stock) <= Number(product.reorder_level)
+  ).length;
 
-  products.forEach(product => {
+  const outOfStock = products.filter(product =>
+    Number(product.stock) <= 0
+  ).length;
 
-    const stock = Number(product.stock) || 0;
-    const reorderLevel =
-      Number(product.reorder_level) || 0;
-
-
-    if (stock === 0) {
-
-      outOfStock++;
-
-    } else if (stock <= reorderLevel) {
-
-      lowStock++;
-
-    } else {
-
-      inStock++;
-
+  // Count products expiring within the next 30 days,
+  // including products expiring today, with positive stock.
+  const nearExpiryProducts = products.filter(product => {
+    if (!product.expiry_date || Number(product.stock) <= 0) {
+      return false;
     }
 
+    const expiryDate = new Date(`${product.expiry_date}T00:00:00`);
+    const daysUntilExpiry = Math.floor(
+      (expiryDate.getTime() - today.getTime()) / 86400000
+    );
+
+    return daysUntilExpiry >= 0 && daysUntilExpiry <= 30;
   });
 
+  const setText = (id, value) => {
+    const element = document.getElementById(id);
+    if (element) element.textContent = value;
+  };
 
-  // Update dashboard HTML
+  setText('totalProductsCount', `${totalProducts} SKUs`);
+  setText('inStockCount', inStock);
+  setText('overviewLowStockCount', lowStock);
+  setText('outOfStockCount', outOfStock);
+  setText('nearExpiryCount', nearExpiryProducts.length);
 
-  const totalProductsElement =
-    document.getElementById('totalProductsCount');
+  // Stock health is based on product counts.
+  const healthyPercentage = totalProducts
+    ? Math.round((inStock / totalProducts) * 100)
+    : 0;
 
-  const inStockElement =
-    document.getElementById('inStockCount');
+  const healthLabel = document.querySelector(
+    '#totalProductsCount'
+  )?.closest('.card-body')
+    ?.querySelector('[data-stock-health-label]');
 
-  const lowStockElement =
-    document.getElementById('overviewLowStockCount');
-
-  if (lowStockElement) {
-    lowStockElement.textContent = lowStock;
+  if (healthLabel) {
+    healthLabel.textContent = `${healthyPercentage}% Healthy`;
   }
 
-  const outOfStockElement =
-    document.getElementById('outOfStockCount');
+  // Update the stacked stock-health bar.
+  const progressBar = document.querySelector(
+    '#totalProductsCount'
+  )?.closest('.card-body')
+    ?.querySelector('[data-stock-health-bar]');
 
+  if (progressBar) {
+    const segments = progressBar.children;
+    const safePercent = totalProducts
+      ? (inStock / totalProducts) * 100
+      : 0;
+    const lowPercent = totalProducts
+      ? (lowStock / totalProducts) * 100
+      : 0;
+    const outPercent = totalProducts
+      ? (outOfStock / totalProducts) * 100
+      : 0;
 
-  if (totalProductsElement) {
-    totalProductsElement.textContent =
-      `${totalProducts} SKUs`;
+    if (segments[0]) segments[0].style.width = `${safePercent}%`;
+    if (segments[1]) segments[1].style.width = `${lowPercent}%`;
+    if (segments[2]) segments[2].style.width = `${outPercent}%`;
   }
 
-  if (inStockElement) {
-    inStockElement.textContent =
-      inStock;
-  }
-
-  if (lowStockElement) {
-    lowStockElement.textContent =
-      lowStock;
-  }
-
-  if (outOfStockElement) {
-    outOfStockElement.textContent =
-      outOfStock;
-  }
-
-
-  console.log(
-    'Inventory Overview:',
-    {
-      totalProducts,
-      inStock,
-      lowStock,
-      outOfStock
-    }
+  // Calculate the cost value of stock nearing expiry.
+  const expiryValue = nearExpiryProducts.reduce(
+    (total, product) =>
+      total +
+      Number(product.stock || 0) *
+      Number(product.purchase_price || 0),
+    0
   );
+
+  const recommendation = document.getElementById(
+    'expiryRecommendation'
+  );
+
+  if (recommendation) {
+    recommendation.textContent = nearExpiryProducts.length
+      ? `${nearExpiryProducts.length} stocked products expire within 30 days. Their estimated purchase cost is ₹${expiryValue.toLocaleString('en-IN', {
+        maximumFractionDigits: 2
+      })}. Consider prioritizing these items for sale.`
+      : 'No stocked products are expiring within the next 30 days.';
+  }
+
+  console.log('Inventory overview:', {
+    totalProducts,
+    inStock,
+    lowStock,
+    outOfStock,
+    nearExpiry: nearExpiryProducts.length,
+    estimatedExpiryStockCost: expiryValue
+  });
 }
 // ============================================================
 // TOP SELLING PRODUCTS
@@ -2366,3 +2409,94 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 });
+
+
+function updateAIBusinessInsight(products, saleItems) {
+  const insight = document.getElementById("aiBusinessInsight");
+  const action = document.getElementById("aiRecommendedAction");
+  const confidence = document.getElementById("aiConfidence");
+
+  if (!insight || !action || !confidence) return;
+
+  const now = new Date();
+  const today = new Date(now);
+  today.setHours(0, 0, 0, 0);
+
+  const start = new Date(today);
+  start.setDate(start.getDate() - 30);
+
+  const salesByProduct = {};
+  const daysWithSales = new Set();
+
+  (saleItems || []).forEach(item => {
+    const product = item.products;
+    const saleDate = item.sales?.sale_date;
+
+    if (!product?.id || !saleDate) return;
+
+    const date = new Date(String(saleDate).slice(0, 10) + "T00:00:00");
+
+    if (Number.isNaN(date.getTime()) || date < start || date >= today) {
+      return;
+    }
+    daysWithSales.add(String(saleDate).slice(0, 10));
+    if (!salesByProduct[product.id]) {
+      salesByProduct[product.id] = 0;
+    }
+
+    salesByProduct[product.id] += Number(item.quantity) || 0;
+  });
+
+  const forecasts = (products || []).map(product => {
+    const stock = Math.max(0, Number(product.stock) || 0);
+    const reorderLevel = Math.max(0, Number(product.reorder_level) || 0);
+    const unitsSold30Days = salesByProduct[product.id] || 0;
+
+    // Simple baseline forecast, not a trained ML prediction.
+    const dailyDemand = unitsSold30Days / 30;
+    const demand7Days = Math.ceil(dailyDemand * 7);
+    const suggestedOrder = Math.max(0, demand7Days + reorderLevel - stock);
+
+    return {
+      ...product,
+      stock,
+      unitsSold30Days,
+      demand7Days,
+      suggestedOrder
+    };
+  });
+
+  // Prioritize products with demand and insufficient stock.
+  const candidates = forecasts
+    .filter(p => p.demand7Days > 0 && p.stock < p.demand7Days + p.reorder_level)
+    .sort((a, b) =>
+      (b.demand7Days - b.stock) - (a.demand7Days - a.stock)
+    );
+
+  if (candidates.length) {
+    const p = candidates[0];
+
+    insight.textContent =
+      `${p.name}: estimated demand of ${p.demand7Days} units over the next 7 days.`;
+
+    action.textContent = p.suggestedOrder > 0
+      ? `Suggested restock: ${p.suggestedOrder} units. Based on current stock, reorder level, and estimated demand.`
+      : `Current stock appears sufficient for estimated demand. Continue monitoring sales.`;
+  } else {
+    insight.textContent =
+      "No immediate restocking priority was identified from recent product sales.";
+
+    action.textContent =
+      "Continue monitoring sales and stock levels. Products without recent sales may need more data.";
+  }
+
+  // No trained-model confidence score is available from this calculation.
+  const coverageScore = Math.round(
+    (daysWithSales.size / 30) * 100
+  );
+
+  confidence.textContent = `${Math.min(coverageScore, 100)}%`;
+
+  console.log("7-day baseline demand estimates:", forecasts);
+}
+

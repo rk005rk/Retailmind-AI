@@ -1,0 +1,22 @@
+{
+  "data_source": "synthetic_sample_sales.csv",
+  "synthetic_data": true,
+  "test_days": 30,
+  "test_rows": 240,
+  "ensemble_weights": {
+    "xgboost": 0.75,
+    "lstm": 0.25
+  },
+  "xgboost": {
+    "mae_units": 3.888,
+    "rmse_units": 5.359
+  },
+  "lstm": {
+    "mae_units": 4.217,
+    "rmse_units": 6.041
+  },
+  "ensemble": {
+    "mae_units": 3.576,
+    "rmse_units": 5.086
+  }
+}

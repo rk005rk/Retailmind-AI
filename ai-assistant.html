@@ -1,18 +1,34 @@
+
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AI Copilot Assistant — RetailMind AI</title>
 
+  <meta
+    name="description"
+    content="RetailMind AI — your AI-powered retail business assistant for inventory, sales, suppliers, and business insights."
+  >
+
+  <title>AI Assistant — RetailMind AI</title>
+
+  <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
   <link
     href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Sora:wght@400;500;600;700;800&display=swap"
-    rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    rel="stylesheet"
+  >
 
+  <!-- Icons -->
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+  >
+
+  <!-- Project styles -->
   <link rel="stylesheet" href="css/style.css">
   <link rel="stylesheet" href="css/dashboard.css">
   <link rel="stylesheet" href="css/responsive.css">
@@ -21,143 +37,176 @@
 <body>
 
   <div class="app-layout">
-    <!-- SIDEBAR -->
+
+    <!-- ================= SIDEBAR ================= -->
     <aside class="sidebar">
+
       <div class="sidebar-header">
         <a href="dashboard.html" class="brand-logo">
           <div class="brand-icon">
-            <i class="fa-solid fa-brain"></i>
+            <i class="fa-solid fa-brain" aria-hidden="true"></i>
           </div>
+
           <span class="brand-text">RetailMind</span>
           <span class="brand-badge">AI</span>
         </a>
       </div>
 
-      <nav class="sidebar-nav">
+      <nav class="sidebar-nav" aria-label="Main navigation">
+
+        <!-- Main navigation -->
         <div>
           <div class="nav-group-title">Main</div>
+
           <ul class="nav-list">
+
             <li>
               <a href="dashboard.html" class="nav-link">
                 <div class="nav-link-content">
-                  <i class="fa-solid fa-chart-pie"></i>
+                  <i class="fa-solid fa-chart-pie" aria-hidden="true"></i>
                   <span>Dashboard</span>
                 </div>
               </a>
             </li>
+
             <li>
               <a href="inventory.html" class="nav-link">
                 <div class="nav-link-content">
-                  <i class="fa-solid fa-boxes-stacked"></i>
+                  <i class="fa-solid fa-boxes-stacked" aria-hidden="true"></i>
                   <span>Inventory</span>
                 </div>
-                <span id="inventoryLowStockBadge" class="nav-badge badge-warning"
-                  style="font-size: 0.6875rem; display: none;">
-                </span>
+
+                <span
+                  id="inventoryLowStockBadge"
+                  class="nav-badge badge-warning"
+                  style="font-size: 0.6875rem; display: none;"
+                ></span>
               </a>
             </li>
+
             <li>
               <a href="sales.html" class="nav-link">
                 <div class="nav-link-content">
-                  <i class="fa-solid fa-cart-shopping"></i>
-                  <span>Sales & POS</span>
+                  <i class="fa-solid fa-cart-shopping" aria-hidden="true"></i>
+                  <span>Sales &amp; POS</span>
                 </div>
               </a>
             </li>
+
             <li>
               <a href="orders.html" class="nav-link">
                 <div class="nav-link-content">
-                  <i class="fa-solid fa-receipt"></i>
+                  <i class="fa-solid fa-receipt" aria-hidden="true"></i>
                   <span>Orders</span>
                 </div>
               </a>
             </li>
+
             <li>
               <a href="customers.html" class="nav-link">
                 <div class="nav-link-content">
-                  <i class="fa-solid fa-users"></i>
+                  <i class="fa-solid fa-users" aria-hidden="true"></i>
                   <span>Customers</span>
                 </div>
               </a>
             </li>
+
             <li>
               <a href="suppliers.html" class="nav-link">
                 <div class="nav-link-content">
-                  <i class="fa-solid fa-truck"></i>
+                  <i class="fa-solid fa-truck" aria-hidden="true"></i>
                   <span>Suppliers</span>
                 </div>
               </a>
             </li>
+
           </ul>
         </div>
 
+        <!-- Intelligence navigation -->
         <div>
           <div class="nav-group-title">Intelligence</div>
+
           <ul class="nav-list">
+
             <li>
-              <a href="ai-assistant.html" class="nav-link active">
+              <a
+                href="ai-assistant.html"
+                class="nav-link active"
+                aria-current="page"
+              >
                 <div class="nav-link-content">
-                  <i class="fa-solid fa-robot"></i>
+                  <i class="fa-solid fa-robot" aria-hidden="true"></i>
                   <span>AI Assistant</span>
                 </div>
-                <span class="nav-badge badge-ai" style="font-size: 0.6875rem;">PRO</span>
+
+                <span class="nav-badge badge-ai" style="font-size: 0.6875rem;">
+                  AI
+                </span>
               </a>
             </li>
+
             <li>
               <a href="analytics.html" class="nav-link">
                 <div class="nav-link-content">
-                  <i class="fa-solid fa-chart-line"></i>
+                  <i class="fa-solid fa-chart-line" aria-hidden="true"></i>
                   <span>Analytics</span>
                 </div>
               </a>
             </li>
+
             <li>
               <a href="predictions.html" class="nav-link">
                 <div class="nav-link-content">
-                  <i class="fa-solid fa-brain"></i>
+                  <i class="fa-solid fa-brain" aria-hidden="true"></i>
                   <span>Predictions</span>
                 </div>
               </a>
             </li>
+
             <li>
               <a href="reports.html" class="nav-link">
                 <div class="nav-link-content">
-                  <i class="fa-solid fa-file-lines"></i>
+                  <i class="fa-solid fa-file-lines" aria-hidden="true"></i>
                   <span>Reports</span>
                 </div>
               </a>
             </li>
+
           </ul>
         </div>
 
+        <!-- Management navigation -->
         <div>
           <div class="nav-group-title">Management</div>
+
           <ul class="nav-list">
+
             <li>
               <a href="notifications.html" class="nav-link">
                 <div class="nav-link-content">
-                  <i class="fa-solid fa-bell"></i>
+                  <i class="fa-solid fa-bell" aria-hidden="true"></i>
                   <span>Notifications</span>
                 </div>
+
                 <span class="sidebar-notification-count" hidden>0</span>
               </a>
             </li>
+
             <li>
               <a href="health.html" class="nav-link">
                 <div class="nav-link-content">
                   <i class="fa-solid fa-heart-pulse"></i>
                   <span>Business Health</span>
                 </div>
-                <span class="sidebar-business-health-score" data-business-health-score>
-                  --%
-                </span>
+                <span class="nav-badge badge-success" style="font-size: 0.6875rem;">87%</span>
               </a>
             </li>
 
             <li>
               <a href="members.html" class="nav-link">
                 <div class="nav-link-content">
-                  <i class="fa-solid fa-user-group"></i>
+                  <i class="fa-solid fa-user-group" aria-hidden="true"></i>
                   <span>Business Members</span>
                 </div>
               </a>
@@ -166,154 +215,278 @@
             <li>
               <a href="setup.html" class="nav-link">
                 <div class="nav-link-content">
-                  <i class="fa-solid fa-sliders"></i>
+                  <i class="fa-solid fa-sliders" aria-hidden="true"></i>
                   <span>Setup Wizard</span>
                 </div>
               </a>
             </li>
+
           </ul>
         </div>
+
       </nav>
 
+      <!-- Sidebar account -->
       <div class="sidebar-footer">
-        <div class="user-mini-card" onclick="window.location.href='profile.html'">
-          <div class="user-avatar-circle">SM</div>
+        <a
+          href="profile.html"
+          class="user-mini-card"
+          style="text-decoration: none; color: inherit;"
+          aria-label="Open account profile"
+        >
+          <div class="user-avatar-circle">RM</div>
+
           <div class="user-info">
-            <div class="user-name">Sana Mondal</div>
-            <div class="user-role">Administrator</div>
+            <div class="user-name">My Account</div>
+            <div class="user-role">Account Profile</div>
           </div>
-          <i class="fa-solid fa-chevron-right text-muted" style="font-size: 0.75rem;"></i>
-        </div>
+
+          <i
+            class="fa-solid fa-chevron-right text-muted"
+            style="font-size: 0.75rem;"
+            aria-hidden="true"
+          ></i>
+        </a>
       </div>
+
     </aside>
 
-    <!-- MAIN WRAPPER -->
+    <!-- ================= MAIN WRAPPER ================= -->
     <div class="main-wrapper">
+
+      <!-- Top navigation -->
       <header class="topbar">
+
         <div class="topbar-left">
-          <button class="mobile-toggle" aria-label="Toggle navigation">
-            <i class="fa-solid fa-bars"></i>
+
+          <button
+            class="mobile-toggle"
+            type="button"
+            aria-label="Toggle navigation"
+          >
+            <i class="fa-solid fa-bars" aria-hidden="true"></i>
           </button>
+
           <div class="breadcrumb-area">
+
             <div class="breadcrumb">
               <a href="dashboard.html">RetailMind</a>
-              <i class="fa-solid fa-chevron-right" style="font-size: 0.625rem;"></i>
+
+              <i
+                class="fa-solid fa-chevron-right"
+                style="font-size: 0.625rem;"
+                aria-hidden="true"
+              ></i>
+
               <span>Intelligence</span>
             </div>
-            <div class="page-title">RetailMind AI Decision Copilot</div>
+
+            <div class="page-title">
+              RetailMind AI Decision Copilot
+            </div>
+
           </div>
+
         </div>
 
         <div class="topbar-right">
-          <span class="badge badge-ai"><i class="fa-solid fa-bolt text-accent"></i> Real-time Predictive Model
-            Online</span>
-          <div class="user-avatar-circle" onclick="window.location.href='profile.html'"
-            style="cursor: pointer; width: 38px; height: 38px;">SM</div>
+
+          <span class="badge badge-ai">
+            <i class="fa-solid fa-bolt text-accent" aria-hidden="true"></i>
+            AI Assistant
+          </span>
+
+          <a
+            href="profile.html"
+            class="user-avatar-circle"
+            style="cursor: pointer; width: 38px; height: 38px; text-decoration: none;"
+            aria-label="Open account profile"
+          >RM</a>
+
         </div>
+
       </header>
 
+      <!-- ================= PAGE CONTENT ================= -->
       <main class="page-container" style="padding-bottom: 1.5rem;">
-        <div class="chat-wrapper">
-          <!-- Chat Header -->
+
+        <section class="chat-wrapper" aria-label="RetailMind AI chat">
+
+          <!-- Chat header -->
           <div class="chat-header">
+
             <div style="display: flex; align-items: center; gap: 0.75rem;">
-              <div class="message-avatar ai" style="width: 40px; height: 40px; font-size: 1.125rem;">
-                <i class="fa-solid fa-robot"></i>
+
+              <div
+                class="message-avatar ai"
+                style="width: 40px; height: 40px; font-size: 1.125rem;"
+              >
+                <i class="fa-solid fa-robot" aria-hidden="true"></i>
               </div>
+
               <div>
-                <h4 style="font-weight: 800; font-family: var(--font-heading);">RetailMind Business Copilot</h4>
-                <div class="text-muted" style="font-size: 0.75rem;">Connected to inventory catalog, sales ledger, and
-                  predictive models</div>
+                <h4 style="font-weight: 800; font-family: var(--font-heading);">
+                  RetailMind Business Copilot
+                </h4>
+
+                <div class="text-muted" style="font-size: 0.75rem;">
+                  Ask questions about your available business data
+                </div>
               </div>
+
             </div>
+
             <div style="display: flex; gap: 0.5rem;">
-              <button class="btn btn-outline btn-sm"
-                onclick="showToast('Cleared conversation memory', 'info', 'fa-rotate-right'); document.getElementById('chatMessages').innerHTML='';">
-                <i class="fa-solid fa-rotate-right"></i> Reset Chat
+
+              <!-- ai-assistant.js handles the reset action -->
+              <button
+                class="btn btn-outline btn-sm"
+                id="btnResetChat"
+                type="button"
+                aria-label="Reset conversation"
+              >
+                <i class="fa-solid fa-rotate-right" aria-hidden="true"></i>
+                Reset Chat
               </button>
+
             </div>
+
           </div>
 
-          <!-- Chat Messages Container -->
-          <div class="chat-messages" id="chatMessages">
-            <!-- Initial AI Greeting -->
-            <div class="message-row ai">
-              <div class="message-avatar ai">
-                <i class="fa-solid fa-robot"></i>
-              </div>
-              <div class="message-bubble">
-                Good day Sana! I am your <strong>RetailMind AI Assistant</strong>. I am actively analyzing your store's
-                ₹8,42,650 revenue data, current stock levels across 1,248 SKUs, and predictive demand forecasts.
-                <br><br>
-                How can I assist your business decisions today? You can choose one of the suggested queries below or
-                type any custom question.
-              </div>
-            </div>
+          <!--
+            IMPORTANT:
+            Keep this container empty.
+            ai-assistant.js creates the greeting, user messages,
+            thinking indicator, and AI responses dynamically.
+          -->
+          <div
+            class="chat-messages"
+            id="chatMessages"
+            role="log"
+            aria-live="polite"
+            aria-relevant="additions"
+            aria-label="Chat conversation"
+          ></div>
 
-            <!-- Example Conversation from Spec -->
-            <div class="message-row user">
-              <div class="message-avatar user">
-                <i class="fa-solid fa-user"></i>
-              </div>
-              <div class="message-bubble">
-                Which products should I reorder today?
-              </div>
-            </div>
+          <!-- Suggested prompts -->
+          <div class="prompt-chips-bar" aria-label="Suggested questions">
 
-            <div class="message-row ai">
-              <div class="message-avatar ai">
-                <i class="fa-solid fa-robot"></i>
-              </div>
-              <div class="message-bubble">
-                Based on current stock, recent demand and forecasted sales, I recommend reordering:
-                <br><br>
-                <div style="margin-left: 1rem;">
-                  1. <strong>Fresh Milk 1L</strong> — 120 units (Supplier: Heritage Dairy)<br>
-                  2. <strong>Whole Wheat Bread 400g</strong> — 85 units (Supplier: Golden Crust)<br>
-                  3. <strong>Sunflower Cooking Oil 1L</strong> — 60 units (Supplier: AgroPure Refineries)
-                </div>
-                <br>
-                Estimated additional inventory cost: <strong>₹18,450</strong>. Expected stockout prevention:
-                <strong>99.4%</strong>.
-                <div style="margin-top: 0.875rem;">
-                  <button class="btn btn-primary btn-sm" onclick="window.location.href='predictions.html#reorder'">
-                    <i class="fa-solid fa-receipt"></i> Open Smart Reorder Table
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Suggested Prompt Chips -->
-          <div class="prompt-chips-bar">
-            <button class="prompt-chip">Which products should I reorder today?</button>
-            <button class="prompt-chip">Why did sales decrease this month?</button>
-            <button class="prompt-chip">What is my most profitable category?</button>
-            <button class="prompt-chip">Show me dead stock.</button>
-            <button class="prompt-chip">Forecast next month's revenue.</button>
-            <button class="prompt-chip">Which supplier is performing best?</button>
-          </div>
-
-          <!-- Chat Input Bar -->
-          <div class="chat-input-area">
-            <div class="input-icon-wrapper" style="flex: 1;">
-              <i class="fa-solid fa-message"></i>
-              <input type="text" id="chatInput" class="form-control chat-input-field"
-                placeholder="Ask RetailMind anything (e.g. 'What is my top category?', 'Recommend reorders')...">
-            </div>
-            <button class="btn btn-primary btn-icon" id="btnSendChat"
-              style="border-radius: 50%; width: 44px; height: 44px;">
-              <i class="fa-solid fa-paper-plane"></i>
+            <button class="prompt-chip" type="button">
+              Which products should I reorder today?
             </button>
-          </div>
-        </div>
-      </main>
-    </div>
-  </div>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="js/supabase.js"></script>
-  <script src="js/app.js"></script>
-  <script src="js/ai-assistant.js"></script>
-</body>
 
+            <button class="prompt-chip" type="button">
+              Why did sales decrease this month?
+            </button>
+
+            <button class="prompt-chip" type="button">
+              What is my most profitable category?
+            </button>
+
+            <button class="prompt-chip" type="button">
+              Show me dead stock.
+            </button>
+
+            <button class="prompt-chip" type="button">
+              Forecast next month's revenue.
+            </button>
+
+            <button class="prompt-chip" type="button">
+              Which supplier is performing best?
+            </button>
+
+          </div>
+
+          <!-- Chat input -->
+          <form class="chat-input-area" id="chatForm">
+
+            <div class="input-icon-wrapper" style="flex: 1;">
+
+              <i class="fa-solid fa-message" aria-hidden="true"></i>
+
+              <input
+                type="text"
+                id="chatInput"
+                class="form-control chat-input-field"
+                placeholder="Ask about inventory, sales, or suppliers..."
+                autocomplete="off"
+                maxlength="2000"
+                aria-label="Type your question"
+              >
+
+            </div>
+
+            <button
+              class="btn btn-primary btn-icon"
+              id="btnSendChat"
+              type="submit"
+              aria-label="Send message"
+              style="border-radius: 50%; width: 44px; height: 44px;"
+            >
+              <i class="fa-solid fa-paper-plane" aria-hidden="true"></i>
+            </button>
+
+          </form>
+
+        </section>
+
+      </main>
+
+    </div>
+
+  </div>
+
+  <!-- ================= SCRIPTS ================= -->
+
+  <!-- Supabase client library -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <!-- Supabase configuration and client initialization -->
+  <script src="js/supabase.js"></script>
+
+  <!-- Shared application functionality -->
+  <script src="js/app.js"></script>
+
+  <!-- RetailMind AI chat logic -->
+  <script src="js/ai-assistant.js"></script>
+
+  <!-- Form submission and reset button compatibility -->
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const form = document.getElementById('chatForm');
+      const input = document.getElementById('chatInput');
+      const resetButton = document.getElementById('btnResetChat');
+
+      // Prevent the browser from reloading the page on form submission.
+      // ai-assistant.js handles sending through the send button and Enter.
+      if (form) {
+        form.addEventListener('submit', (event) => {
+          event.preventDefault();
+
+          if (typeof window.sendRetailMindMessage === 'function') {
+            window.sendRetailMindMessage(input?.value || '');
+          } else {
+            document.getElementById('btnSendChat')?.click();
+          }
+        });
+      }
+
+      // Trigger the reset handler registered by ai-assistant.js.
+      if (resetButton) {
+        resetButton.addEventListener('click', () => {
+          if (typeof window.resetRetailMindChat === 'function') {
+            window.resetRetailMindChat();
+          } else {
+            // Fallback for the supplied ai-assistant.js version.
+            const messages = document.getElementById('chatMessages');
+            if (messages) {
+              messages.replaceChildren();
+            }
+          }
+        });
+      }
+    });
+  </script>
+
+</body>
 </html>

@@ -1,0 +1,10 @@
+{
+  "model": "LSTM",
+  "data_source": "synthetic_sample_sales.csv",
+  "synthetic_data": true,
+  "lookback_days": 14,
+  "test_days": 30,
+  "test_rows": 240,
+  "mae_units": 4.446,
+  "rmse_units": 6.094
+}

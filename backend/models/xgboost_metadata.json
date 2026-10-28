@@ -1,0 +1,26 @@
+{
+  "model": "XGBoost",
+  "data_source": "synthetic_sample_sales.csv",
+  "synthetic_data": true,
+  "features": [
+    "product_code",
+    "price",
+    "promotion",
+    "day_of_week",
+    "day_of_year"
+  ],
+  "product_codes": {
+    "P001": 0,
+    "P002": 1,
+    "P003": 2,
+    "P004": 3,
+    "P005": 4,
+    "P006": 5,
+    "P007": 6,
+    "P008": 7
+  },
+  "test_days": 30,
+  "test_rows": 240,
+  "mae_units": 3.643,
+  "rmse_units": 5.139
+}

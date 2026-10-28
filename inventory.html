@@ -220,22 +220,28 @@
             <h1>Inventory Catalog & Stock Control</h1>
             <p>Track real-time stock levels, reorder thresholds, OCR invoice ingestion, and batch expiries.</p>
           </div>
+
           <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
-            <button class="btn btn-outline" onclick="document.getElementById('barcodeModal').classList.add('active')">
+            <button type="button" class="btn btn-outline"
+              onclick="document.getElementById('barcodeModal').classList.add('active')">
               <i class="fa-solid fa-barcode"></i> Scan Barcode
             </button>
-            <button class="btn btn-secondary" onclick="document.getElementById('ocrModal').classList.add('active')">
+
+            <button type="button" class="btn btn-secondary"
+              onclick="document.getElementById('ocrModal').classList.add('active')">
               <i class="fa-solid fa-file-invoice"></i> OCR Invoice Import
             </button>
-            <button class="btn btn-outline"
-              onclick="showToast('Exported inventory catalog (CSV)', 'info', 'fa-file-csv')">
+
+            <button type="button" class="btn btn-outline" id="exportInventoryBtn">
               <i class="fa-solid fa-file-export"></i> Export
             </button>
-            <button class="btn btn-primary"
+
+            <button type="button" class="btn btn-primary"
               onclick="document.getElementById('addProductModal').classList.add('active')">
               <i class="fa-solid fa-plus"></i> Add Product
             </button>
           </div>
+
         </div>
 
         <!-- Inventory Stats -->
@@ -333,27 +339,32 @@
     </div>
   </div>
 
+
   <!-- ========================================== -->
   <!-- MODAL: ADD PRODUCT                         -->
   <!-- ========================================== -->
   <div class="modal-overlay" id="addProductModal">
     <div class="modal">
+
       <div class="modal-header">
         <h3 class="modal-title">Add New Product</h3>
-        <button class="btn btn-ghost btn-sm"
+        <button type="button" class="btn btn-ghost btn-sm" aria-label="Close"
           onclick="document.getElementById('addProductModal').classList.remove('active')">
           <i class="fa-solid fa-xmark"></i>
         </button>
       </div>
+
       <form id="addProductForm">
         <div class="modal-body">
+
           <div class="form-group">
-            <label class="form-label">Product Name *</label>
+            <label class="form-label" for="newProdName">Product Name *</label>
             <input type="text" id="newProdName" class="form-control" required placeholder="e.g. Organic Almond Milk 1L">
           </div>
+
           <div class="grid grid-cols-2" style="gap: 1rem;">
             <div class="form-group">
-              <label class="form-label">Category *</label>
+              <label class="form-label" for="newProdCategory">Category *</label>
               <select id="newProdCategory" class="form-select" required>
                 <option value="">Select a category</option>
                 <option value="Groceries">Groceries</option>
@@ -377,69 +388,91 @@
                 <option value="">Loading suppliers...</option>
               </select>
             </div>
-
           </div>
+
           <div class="grid grid-cols-2" style="gap: 1rem;">
             <div class="form-group">
-              <label class="form-label">Selling Price (₹) *</label>
+              <label class="form-label" for="newProdPrice">Selling Price (₹) *</label>
               <input type="number" id="newProdPrice" class="form-control" required min="1" step="0.5" placeholder="85">
             </div>
+
             <div class="form-group">
-              <label class="form-label">Cost Price (₹) *</label>
+              <label class="form-label" for="newProdCost">Cost Price (₹) *</label>
               <input type="number" id="newProdCost" class="form-control" required min="1" step="0.5" placeholder="62">
             </div>
           </div>
-          <div class="grid grid-cols-3" style="gap: 1rem;">
+
+          <div class="grid grid-cols-3" style="gap: 1rem; align-items: start;">
             <div class="form-group">
-              <label class="form-label">Initial Stock *</label>
-              <input type="number" id="newProdStock" class="form-control" required min="0" placeholder="50">
+              <label class="form-label" for="newProdStock">Initial Stock *</label>
+              <input type="number" id="newProdStock" class="form-control" required min="0" step="1" placeholder="50">
             </div>
+
             <div class="form-group">
-              <label class="form-label">Reorder Level *</label>
-              <input type="number" id="newProdReorder" class="form-control" required min="1" placeholder="20">
+              <label class="form-label" for="newProdReorder">Reorder Level *</label>
+              <input type="number" id="newProdReorder" class="form-control" required min="1" step="1" placeholder="20">
             </div>
-            <div class="form-group">
-              <label class="form-label">Expiry Date</label>
-              <input type="date" id="newProdExpiry" class="form-control" value="2027-12-31">
+
+            <div class="form-group expiry-form-group">
+              <label class="form-label" for="newProdExpiry">
+                Expiry Date <span style="font-weight: 400;">(Optional)</span>
+              </label>
+
+              <label class="expiry-checkbox-row" for="enableExpiryDate">
+                <input type="checkbox" id="enableExpiryDate">
+                <span>Add expiry date</span>
+              </label>
+
+              <input type="date" id="newProdExpiry" class="form-control" disabled>
+
+              <small id="expiryHelpText" class="text-muted">
+                Leave blank if not applicable.
+              </small>
             </div>
           </div>
+
         </div>
+
+        <!-- Footer MUST remain inside the form and modal -->
         <div class="modal-footer">
           <button type="button" class="btn btn-outline"
-            onclick="document.getElementById('addProductModal').classList.remove('active')">Cancel</button>
+            onclick="document.getElementById('addProductModal').classList.remove('active')">
+            Cancel
+          </button>
+
           <button type="submit" class="btn btn-primary">
-            <i class="fa-solid fa-plus"></i> Add to Catalog
+            <i class="fa-solid fa-plus"></i>
+            Add to Catalog
           </button>
         </div>
       </form>
+
     </div>
   </div>
+  <!-- END ADD PRODUCT MODAL -->
 
-  <!-- EDIT PRODUCT MODAL -->
-  <div class="modal-overlay" id="editProductModal">
+  <!-- ========================================== -->
+  <!-- MODAL: EDIT PRODUCT                        -->
+  <!-- ========================================== -->
+  <div class="modal-overlay" id="editProductModal" role="dialog" aria-modal="true" aria-labelledby="editProductTitle">
     <div class="modal">
       <div class="modal-header">
-        <h3 class="modal-title">Edit Product</h3>
-        <button type="button" class="btn btn-ghost btn-sm" id="closeEditProductModal"
-          aria-label="Close edit product dialog">
+        <h3 class="modal-title" id="editProductTitle">Edit Product</h3>
+        <button type="button" class="btn btn-ghost btn-sm" id="closeEditProductModal" aria-label="Close edit product modal">
           <i class="fa-solid fa-xmark"></i>
         </button>
       </div>
-
       <form id="editProductForm">
+        <input type="hidden" id="editProdId">
         <div class="modal-body">
-          <input type="hidden" id="editProdId">
-
           <div class="form-group">
             <label class="form-label" for="editProdName">Product Name *</label>
-            <input type="text" id="editProdName" class="form-control" required maxlength="150">
+            <input type="text" id="editProdName" class="form-control" required maxlength="200">
           </div>
-
           <div class="grid grid-cols-2" style="gap: 1rem;">
             <div class="form-group">
               <label class="form-label" for="editProdCategory">Category *</label>
               <select id="editProdCategory" class="form-select" required>
-                <option value="">Select a category</option>
                 <option value="Groceries">Groceries</option>
                 <option value="Beverages">Beverages</option>
                 <option value="Personal Care">Personal Care</option>
@@ -450,129 +483,91 @@
                 <option value="Dairy">Dairy</option>
                 <option value="Bakery">Bakery</option>
                 <option value="Snacks">Snacks</option>
-                <option value="Home & Kitchen">Home &amp; Kitchen</option>
+                <option value="Home &amp; Kitchen">Home &amp; Kitchen</option>
                 <option value="Other">Other</option>
               </select>
             </div>
-
             <div class="form-group">
-              <label class="form-label" for="editProdSupplier">Supplier *</label>
+              <label class="form-label" for="editProdSupplier">Primary Supplier *</label>
               <select id="editProdSupplier" class="form-select" required>
                 <option value="">Loading suppliers...</option>
               </select>
             </div>
           </div>
-
           <div class="grid grid-cols-2" style="gap: 1rem;">
             <div class="form-group">
               <label class="form-label" for="editProdPrice">Selling Price (₹) *</label>
-              <input type="number" id="editProdPrice" class="form-control" min="0.01" step="0.01" required>
+              <input type="number" id="editProdPrice" class="form-control" required min="0" step="0.01">
             </div>
-
             <div class="form-group">
               <label class="form-label" for="editProdCost">Cost Price (₹) *</label>
-              <input type="number" id="editProdCost" class="form-control" min="0.01" step="0.01" required>
+              <input type="number" id="editProdCost" class="form-control" required min="0" step="0.01">
             </div>
           </div>
-
-          <div class="grid grid-cols-2" style="gap: 1rem;">
+          <div class="grid grid-cols-3" style="gap: 1rem; align-items: start;">
             <div class="form-group">
-              <label class="form-label" for="editProdStock">Stock Quantity *</label>
-              <input type="number" id="editProdStock" class="form-control" min="0" step="1" required>
+              <label class="form-label" for="editProdStock">Current Stock *</label>
+              <input type="number" id="editProdStock" class="form-control" required min="0" step="1">
             </div>
-
             <div class="form-group">
               <label class="form-label" for="editProdReorder">Reorder Level *</label>
-              <input type="number" id="editProdReorder" class="form-control" min="1" step="1" required>
+              <input type="number" id="editProdReorder" class="form-control" required min="0" step="1">
             </div>
             <div class="form-group">
-              <label class="form-label" for="editProdExpiry">
-                Expiry Date
-              </label>
-              <input type="date" id="editProdExpiry" class="form-input" />
+              <label class="form-label" for="editProdExpiry">Expiry Date (Optional)</label>
+              <input type="date" id="editProdExpiry" class="form-control">
             </div>
           </div>
         </div>
-
         <div class="modal-footer">
-          <button type="button" class="btn btn-outline" id="cancelEditProduct">
-            Cancel
-          </button>
-
-          <button type="submit" class="btn btn-primary" id="saveEditProduct">
-            <i class="fa-solid fa-floppy-disk"></i>
-            Save Changes
-          </button>
+          <button type="button" class="btn btn-outline" id="cancelEditProduct">Cancel</button>
+          <button type="submit" class="btn btn-primary" id="saveEditProduct">Save Changes</button>
         </div>
       </form>
     </div>
   </div>
-  <!-- View Product Details Modal -->
-  <div class="modal-overlay" id="viewProductModal">
-    <div class="modal">
+  <!-- END EDIT PRODUCT MODAL -->
+
+  <!-- ========================================== -->
+  <!-- MODAL: VIEW PRODUCT                        -->
+  <!-- ========================================== -->
+  <div class="modal-overlay" id="viewProductModal" role="dialog" aria-modal="true" aria-labelledby="viewProductTitle">
+    <div class="modal" style="max-width: 620px;">
       <div class="modal-header">
-        <h3 class="modal-title">Product Details</h3>
-        <button type="button" class="btn btn-ghost btn-sm" id="closeViewProductModal"
-          aria-label="Close product details">
+        <div>
+          <h3 class="modal-title" id="viewProductTitle">Product Details</h3>
+          <div class="text-muted" id="viewProdSku" style="font-size: 0.8rem;">SKU: —</div>
+        </div>
+        <button type="button" class="btn btn-ghost btn-sm" id="closeViewProductModal" aria-label="Close product details">
           <i class="fa-solid fa-xmark"></i>
         </button>
       </div>
-
       <div class="modal-body">
-        <div class="product-detail-header">
-          <div class="product-detail-icon">
-            <i class="fa-solid fa-box-open"></i>
-          </div>
-          <div>
-            <h3 id="viewProdName">Product Name</h3>
-            <p id="viewProdSku" class="text-muted">SKU</p>
-          </div>
+        <div class="card" style="padding: 1rem; margin-bottom: 1rem;">
+          <div class="font-bold text-dark" id="viewProdName" style="font-size: 1.1rem;">—</div>
+          <div style="margin-top: 0.5rem;"><span class="badge badge-primary" id="viewProdCategory">—</span></div>
         </div>
-
-        <div class="product-detail-grid">
-          <div class="product-detail-item">
-            <span>Category</span>
-            <strong id="viewProdCategory">—</strong>
-          </div>
-          <div class="product-detail-item">
-            <span>Stock Available</span>
-            <strong id="viewProdStock">—</strong>
-          </div>
-          <div class="product-detail-item">
-            <span>Reorder Level</span>
-            <strong id="viewProdReorder">—</strong>
-          </div>
-          <div class="product-detail-item">
-            <span>Stock Status</span>
-            <strong id="viewProdStatus">—</strong>
-          </div>
-          <div class="product-detail-item">
-            <span>Selling Price</span>
-            <strong id="viewProdPrice">—</strong>
-          </div>
-          <div class="product-detail-item">
-            <span>Purchase Cost</span>
-            <strong id="viewProdCost">—</strong>
-          </div>
-          <div class="product-detail-item">
-            <span>Primary Supplier</span>
-            <strong id="viewProdSupplier">—</strong>
-          </div>
-          <div class="product-detail-item">
-            <span>Expiry Date</span>
-            <strong id="viewProdExpiry">—</strong>
-          </div>
+        <div class="grid grid-cols-2" style="gap: 1rem;">
+          <div class="form-group"><label class="form-label">Current Stock</label><div class="font-bold" id="viewProdStock">—</div></div>
+          <div class="form-group"><label class="form-label">Reorder Level</label><div class="font-bold" id="viewProdReorder">—</div></div>
+          <div class="form-group"><label class="form-label">Selling Price</label><div class="font-bold" id="viewProdPrice">—</div></div>
+          <div class="form-group"><label class="form-label">Cost Price</label><div class="font-bold" id="viewProdCost">—</div></div>
+          <div class="form-group"><label class="form-label">Supplier</label><div id="viewProdSupplier">—</div></div>
+          <div class="form-group"><label class="form-label">Expiry Date</label><div id="viewProdExpiry">—</div></div>
+        </div>
+        <div class="form-group" style="margin-bottom: 0;">
+          <label class="form-label">Inventory Status</label>
+          <div id="viewProdStatus">—</div>
         </div>
       </div>
-
       <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" id="closeViewProductFooter">Close</button>
-        <button type="button" class="btn btn-primary" id="viewProdEditBtn">
-          <i class="fa-solid fa-pen-to-square"></i> Edit Product
-        </button>
+        <button type="button" class="btn btn-outline" id="closeViewProductFooter">Close</button>
+        <button type="button" class="btn btn-primary" id="viewProdEditBtn"><i class="fa-solid fa-pen-to-square"></i> Edit Product</button>
       </div>
     </div>
   </div>
+  <!-- END VIEW PRODUCT MODAL -->
+
   <!-- ========================================== -->
   <!-- MODAL: OCR BILL / INVOICE SCANNER          -->
   <!-- ========================================== -->

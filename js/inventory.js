@@ -15,6 +15,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   setupBarcodeScanner();
   setupEditProductModal();
   setupViewProductModal();
+  setupOptionalExpiryDate();
 });
 
 async function loadInventorySuppliers(businessId) {
@@ -94,12 +95,14 @@ async function initializeInventory() {
       await supabaseClient
         .from('products')
 
-        .select(`
+       
+.select(`
   id, business_id, supplier_id, name, sku, category,
   selling_price, purchase_price, stock, reorder_level,
   image_url, expiry_date, created_at, updated_at,
-  suppliers ( name )
+  suppliers: suppliers!products_supplier_id_fkey ( name )
 `)
+
 
         .eq('business_id', inventoryBusinessId)
         .eq('is_archived', false)
@@ -111,13 +114,24 @@ async function initializeInventory() {
       const stock = Number(product.stock || 0);
       const reorder = Number(product.reorder_level || 0);
 
+
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+
+      const expiryDate = product.expiry_date
+        ? new Date(`${product.expiry_date}T00:00:00`)
+        : null;
+
       let status = 'In Stock';
 
-      if (stock === 0) {
+      if (expiryDate && !Number.isNaN(expiryDate.getTime()) && expiryDate < today) {
+        status = 'Expired';
+      } else if (stock === 0) {
         status = 'Out of Stock';
       } else if (stock <= reorder) {
         status = 'Low Stock';
       }
+
 
       return {
         id: product.id,
@@ -244,10 +258,19 @@ function loadInventoryTable(filterList = null) {
   }
 
   products.forEach(p => {
+
     let badgeClass = 'badge-success';
-    if (p.status === 'Critical') badgeClass = 'badge-danger';
-    else if (p.status === 'Low Stock') badgeClass = 'badge-warning';
-    else if (p.status === 'Out of Stock') badgeClass = 'badge-danger';
+
+    if (
+      p.status === 'Expired' ||
+      p.status === 'Critical' ||
+      p.status === 'Out of Stock'
+    ) {
+      badgeClass = 'badge-danger';
+    } else if (p.status === 'Low Stock') {
+      badgeClass = 'badge-warning';
+    }
+
 
     const tr = document.createElement('tr');
     tr.innerHTML = `
@@ -442,7 +465,7 @@ function setupAddProductModal() {
   id, business_id, supplier_id, name, sku, category,
   selling_price, purchase_price, stock, reorder_level,
   image_url, expiry_date, created_at, updated_at,
-  suppliers ( name )
+  suppliers: suppliers!products_supplier_id_fkey ( name )
 `)
         .single();
 
@@ -476,6 +499,7 @@ function setupAddProductModal() {
       setupInventoryFiltersRefresh();
 
       form.reset();
+      setupOptionalExpiryDate();
 
       const modal = document.getElementById('addProductModal');
       if (modal) modal.classList.remove('active');
@@ -571,7 +595,7 @@ function setupEditProductModal() {
           id, business_id, supplier_id, name, sku, category,
           selling_price, purchase_price, stock, reorder_level,
           image_url, expiry_date, created_at, updated_at,
-suppliers ( name )
+suppliers: suppliers!products_supplier_id_fkey ( name )
         `)
         .single();
 
@@ -589,10 +613,25 @@ suppliers ( name )
         supplier: data.suppliers?.name || '—',
         supplierId: data.supplier_id,
         expiry: data.expiry_date || '',
-        status:
-          data.stock === 0 ? 'Out of Stock' :
-            data.stock <= data.reorder_level ? 'Low Stock' :
-              'In Stock'
+        status: (() => {
+          const today = new Date();
+          today.setHours(0, 0, 0, 0);
+
+          const expiry = data.expiry_date
+            ? new Date(`${data.expiry_date}T00:00:00`)
+            : null;
+
+          if (expiry && !Number.isNaN(expiry.getTime()) && expiry < today) {
+            return 'Expired';
+          }
+
+          const stock = Number(data.stock) || 0;
+          const reorder = Number(data.reorder_level) || 0;
+
+          if (stock === 0) return 'Out of Stock';
+          if (stock <= reorder) return 'Low Stock';
+          return 'In Stock';
+        })()
       };
 
       inventoryProducts = inventoryProducts.map(product =>
@@ -855,3 +894,103 @@ function setupBarcodeScanner() {
     }, 2000);
   });
 }
+
+
+function setupOptionalExpiryDate() {
+  const checkbox = document.getElementById('enableExpiryDate');
+  const expiryInput = document.getElementById('newProdExpiry');
+  const helpText = document.getElementById('expiryHelpText');
+
+  if (!checkbox || !expiryInput) return;
+
+  function updateExpiryField() {
+    expiryInput.disabled = !checkbox.checked;
+
+    if (!checkbox.checked) {
+      expiryInput.value = '';
+    }
+
+    if (helpText) {
+      helpText.textContent = checkbox.checked
+        ? 'Select the product expiry date.'
+        : 'No expiry date selected. This product will display N/A.';
+    }
+  }
+
+  checkbox.addEventListener('change', updateExpiryField);
+  updateExpiryField();
+}
+
+
+function exportInventoryCSV() {
+  try {
+    const products = window.inventoryProducts || getProducts();
+
+    if (!Array.isArray(products) || products.length === 0) {
+      alert('No inventory products found. Please wait for inventory to load.');
+      return;
+    }
+
+    const headers = [
+      'Product Name', 'SKU', 'Category', 'Selling Price',
+      'Cost Price', 'Stock', 'Reorder Level',
+      'Supplier', 'Expiry Date', 'Status'
+    ];
+
+    const escapeCSV = value =>
+      '"' + String(value ?? '').replace(/"/g, '""') + '"';
+
+    const csvRows = [
+      headers,
+      ...products.map(p => [
+        p.name,
+        p.sku,
+        p.category,
+        p.price,
+        p.cost,
+        p.stock,
+        p.reorder,
+        p.supplier,
+        p.expiry || 'N/A',
+        p.status
+      ])
+    ];
+
+    const csv = '\uFEFF' +
+      csvRows.map(row => row.map(escapeCSV).join(',')).join('\r\n');
+
+    const blob = new Blob([csv], {
+      type: 'text/csv;charset=utf-8;'
+    });
+
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+
+    link.href = url;
+    link.download = `retailmind-inventory-${new Date().toISOString().slice(0, 10)}.csv`;
+    link.style.display = 'none';
+
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+
+    if (typeof showToast === 'function') {
+      showToast(`Exported ${products.length} products.`, 'success', 'fa-file-csv');
+    }
+  } catch (error) {
+    console.error('Inventory export failed:', error);
+    alert('Export failed. Open the browser console (F12) to see the error.');
+  }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  const exportButton = document.getElementById('exportInventoryBtn');
+
+  if (exportButton && exportButton.dataset.exportReady !== 'true') {
+    exportButton.dataset.exportReady = 'true';
+    exportButton.addEventListener('click', exportInventoryCSV);
+  }
+});
+

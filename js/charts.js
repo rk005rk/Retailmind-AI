@@ -61,15 +61,15 @@ function renderSalesOverviewChart(
   // Do not display fabricated sales figures.
   const selected =
     chartData &&
-    Array.isArray(chartData.labels) &&
-    Array.isArray(chartData.revenue) &&
-    Array.isArray(chartData.salesCount)
+      Array.isArray(chartData.labels) &&
+      Array.isArray(chartData.revenue) &&
+      Array.isArray(chartData.salesCount)
       ? chartData
       : {
-          labels: [],
-          revenue: [],
-          salesCount: []
-        };
+        labels: [],
+        revenue: [],
+        salesCount: []
+      };
 
   // Keep labels and datasets aligned.
   const length = Math.min(
@@ -388,164 +388,238 @@ function renderSalesOverviewChart(
 
 let demandForecastInstance = null;
 
-function renderDemandForecastChart(
-  canvasId = 'demandForecastChart'
+async function renderDemandForecastChart(
+  canvasId = "demandForecastChart"
 ) {
   const canvas = document.getElementById(canvasId);
 
-  if (!canvas || typeof Chart === 'undefined') {
-    return;
-  }
-
-  const ctx = canvas.getContext('2d');
+  if (!canvas || typeof Chart === "undefined") return;
 
   if (demandForecastInstance) {
     demandForecastInstance.destroy();
     demandForecastInstance = null;
   }
 
-  const labels = [
-    'Thu',
-    'Fri',
-    'Sat',
-    'Sun (Hist)',
-    'Mon',
-    'Tue',
-    'Wed',
-    'Thu',
-    'Fri',
-    'Sat',
-    'Sun'
-  ];
+  const parent = canvas.parentElement;
+  let status = document.getElementById("demandForecastStatus");
 
-  demandForecastInstance = new Chart(ctx, {
-    type: 'line',
+  if (!status && parent) {
+    status = document.createElement("p");
+    status.id = "demandForecastStatus";
+    status.style.cssText =
+      "font-size:13px;color:#6B7280;padding:8px 12px;margin:0;";
+    parent.insertBefore(status, canvas);
+  }
 
-    data: {
-      labels: labels,
+  if (status) {
+    status.textContent = "Loading real sales and forecast data…";
+  }
 
-      datasets: [
-        {
-          label: 'Historical Units Sold',
+  try {
+    if (typeof supabaseClient === "undefined") {
+      throw new Error("Supabase client is not initialized.");
+    }
 
-          data: [
-            135, 142, 178, 160,
-            null, null, null, null,
-            null, null, null
-          ],
+    const { data, error } = await supabaseClient.auth.getSession();
 
-          borderColor: '#9CA3AF',
-          backgroundColor: '#9CA3AF',
-          borderWidth: 2,
-          pointRadius: 4,
-          tension: 0.3
-        },
+    if (error) throw error;
 
-        {
-          label: 'AI Forecast (Units)',
+    const token = data?.session?.access_token;
 
-          data: [
-            null, null, null, 160,
-            120, 145, 162, 180,
-            210, 248, 225
-          ],
+    if (!token) {
+      throw new Error("Please sign in to view the demand forecast.");
+    }
 
-          borderColor: '#00D4A0',
-          backgroundColor: 'rgba(0, 212, 160, 0.15)',
-          borderWidth: 3,
-          fill: true,
-          pointRadius: 5,
-
-          pointBackgroundColor: '#FFFFFF',
-          pointBorderColor: '#00D4A0',
-          pointBorderWidth: 2,
-
-          tension: 0.4
-        },
-
-        {
-          label: 'Upper Confidence (+10%)',
-
-          data: [
-            null, null, null, 160,
-            132, 160, 178, 198,
-            231, 272, 248
-          ],
-
-          borderColor: 'transparent',
-          backgroundColor: 'rgba(0, 212, 160, 0.08)',
-          fill: '+1',
-          pointRadius: 0
-        },
-
-        {
-          label: 'Lower Confidence (-10%)',
-
-          data: [
-            null, null, null, 160,
-            108, 130, 146, 162,
-            189, 223, 202
-          ],
-
-          borderColor: 'transparent',
-          fill: false,
-          pointRadius: 0
+    const response = await fetch(
+      "http://127.0.0.1:5000/api/predictions/units?days=7",
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          Accept: "application/json"
         }
-      ]
-    },
+      }
+    );
 
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
+    const result = await response.json().catch(() => ({}));
 
-      plugins: {
-        legend: {
-          display: true,
-          position: 'top',
+    if (!response.ok) {
+      throw new Error(
+        result.error || `Forecast request failed (${response.status}).`
+      );
+    }
 
-          labels: {
-            filter: item =>
-              item.text.includes('Historical') ||
-              item.text.includes('AI Forecast'),
+    if (
+      !Array.isArray(result.history) ||
+      !Array.isArray(result.forecast)
+    ) {
+      throw new Error("Unexpected forecast API response.");
+    }
 
-            usePointStyle: true,
+    const history = result.history;
+    const forecast = result.forecast;
 
-            font: {
-              size: 11,
-              weight: '600'
+    if (!history.length || !forecast.length) {
+      throw new Error("Insufficient data to display the forecast.");
+    }
+
+    const formatDay = value => {
+      const date = new Date(`${value}T12:00:00`);
+
+      return Number.isNaN(date.getTime())
+        ? value
+        : date.toLocaleDateString("en-IN", {
+          weekday: "short",
+          day: "numeric"
+        });
+    };
+
+    // Keep the historical and forecast periods aligned.
+    const labels = [
+      ...history.map(item => formatDay(item.date)),
+      ...forecast.map(item => formatDay(item.date))
+    ];
+
+    const actualValues = [
+      ...history.map(item => Math.max(0, Number(item.actual_units) || 0)),
+      ...forecast.map(() => null)
+    ];
+
+    // Connect the forecast to the final historical observation.
+    // Connect the forecast line to the last actual observation.
+    const lastActual = Math.max(
+      0,
+      Number(history[history.length - 1].actual_units) || 0
+    );
+
+    const forecastValues = [
+      ...history.map((item, index) =>
+        index === history.length - 1
+          ? lastActual
+          : null
+      ),
+      ...forecast.map(item =>
+        Math.max(0, Number(item.predicted_units) || 0)
+      )
+    ];
+
+    demandForecastInstance = new Chart(canvas.getContext("2d"), {
+      type: "line",
+
+      data: {
+        labels,
+        datasets: [
+          {
+            label: "Historical Units Sold",
+            data: actualValues,
+            borderColor: "#9CA3AF",
+            backgroundColor: "#9CA3AF",
+            borderWidth: 2,
+            pointRadius: 4,
+            pointHoverRadius: 6,
+            tension: 0.3,
+            spanGaps: false
+          },
+          {
+            label: "Weekday-Aware Forecast (Units)",
+            data: forecastValues,
+            borderColor: "#00D4A0",
+            backgroundColor: "rgba(0, 212, 160, 0.13)",
+            borderWidth: 3,
+            pointRadius: 5,
+            pointHoverRadius: 7,
+            pointBackgroundColor: "#FFFFFF",
+            pointBorderColor: "#00D4A0",
+            pointBorderWidth: 2,
+            tension: 0.3,
+            fill: "origin",
+            spanGaps: true
+          }
+        ]
+      },
+
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+
+        // Reserve room for date labels at the bottom.
+        layout: {
+          padding: {
+            bottom: 18
+          }
+        },
+
+        interaction: {
+          mode: "index",
+          intersect: false
+        },
+
+        plugins: {
+          legend: {
+            display: true,
+            position: "top",
+            labels: {
+              usePointStyle: true,
+              padding: 12,
+              font: {
+                size: 11,
+                weight: "600"
+              }
+            }
+          },
+
+          tooltip: {
+            callbacks: {
+              label(context) {
+                if (context.raw == null) return null;
+
+                return ` ${context.dataset.label}: ${context.raw} units`;
+              }
             }
           }
         },
 
-        tooltip: {
-          callbacks: {
-            label: context =>
-              ` ${context.dataset.label}: ${context.raw} units`
-          }
-        }
-      },
-
-      scales: {
-        x: {
-          grid: {
-            display: false
-          }
-        },
-
-        y: {
-          beginAtZero: true,
-
-          grid: {
-            color: CHART_COLORS.grid
+        scales: {
+          x: {
+            grid: {
+              display: false
+            },
+            ticks: {
+              autoSkip: true,
+              maxTicksLimit: 12,
+              maxRotation: 0,
+              minRotation: 0,
+              padding: 8
+            }
           },
 
-          ticks: {
-            callback: value => value + ' units'
+          y: {
+            beginAtZero: true,
+            grace: "5%",
+            ticks: {
+              precision: 0,
+              callback: value => `${value} units`
+            },
+            grid: {
+              color: CHART_COLORS.grid
+            }
           }
         }
       }
+    });
+
+    if (status) {
+      status.textContent =
+         "Weekday-aware forecast loaded from completed sales data.";
     }
-  });
+
+  } catch (error) {
+    console.error("Demand forecast chart error:", error);
+
+    if (status) {
+      status.textContent =
+        error.message || "Unable to load the demand forecast.";
+    }
+  }
 }
 
 // ============================================================

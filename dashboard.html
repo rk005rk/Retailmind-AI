@@ -215,12 +215,7 @@
         </div>
 
         <div class="topbar-right">
-          <!-- Live Search Input -->
-          <div class="topbar-search">
-            <i class="fa-solid fa-magnifying-glass"></i>
-            <input type="text" placeholder="Search inventory, orders, SKUs..."
-              onkeydown="if(event.key==='Enter') window.location.href='inventory.html'">
-          </div>
+
 
           <!-- Quick AI Assistant Action -->
           <button class="btn-ai-quick" id="aiQuickBtn">
@@ -295,12 +290,7 @@
             <p>Here's what's happening with your business today across retail intelligence and sales streams.</p>
           </div>
           <div style="display: flex; gap: 0.75rem; align-items: center;">
-            <div class="chart-time-pills">
-              <button class="time-pill">7D</button>
-              <button class="time-pill active" data-timeframe="30D">Last 30 days ▼</button>
-              <button class="time-pill">90D</button>
-              <button class="time-pill">1Y</button>
-            </div>
+
             <button class="btn btn-primary btn-sm" onclick="window.location.href='sales.html'">
               <i class="fa-solid fa-cash-register"></i> Open POS
             </button>
@@ -411,32 +401,42 @@
         </section>
 
         <!-- ========================================== -->
-        <!-- AI BUSINESS INSIGHTS BANNER                -->
-        <!-- ========================================== -->
+
+
+        <!-- AI BUSINESS INSIGHTS BANNER -->
         <section class="ai-insight-banner">
           <div class="ai-insight-content">
             <div class="ai-badge-chip">
-              <i class="fa-solid fa-sparkles"></i> AI Business Insight
+              <i class="fa-solid fa-sparkles"></i>
+              AI BUSINESS INSIGHT
             </div>
+
             <div class="ai-insight-text">
-              Your beverage category is expected to experience a <strong>21% demand surge</strong> next week driven by
-              rising ambient temperature and local weekend events.
-            </div>
-            <div class="ai-insight-action-box">
-              <i class="fa-solid fa-circle-check"></i> Recommended Action: <span>Increase beverage inventory by approx.
-                85 units before Friday.</span>
+              <p id="aiBusinessInsight" class="ai-insight-headline">
+                Analyzing your business performance...
+              </p>
+
+              <p id="aiRecommendedAction" class="ai-insight-recommendation">
+                <i class="fa-solid fa-lightbulb"></i>
+                Preparing a recommendation based on your sales and inventory.
+              </p>
             </div>
           </div>
+
           <div class="ai-insight-metrics">
             <div class="confidence-box">
-              <div class="confidence-val">92%</div>
-              <div class="confidence-label">AI Confidence</div>
+              <div class="confidence-val" id="aiConfidence">N/A</div>
+              <div class="confidence-label">SALES DATA COVERAGE</div>
             </div>
+
             <a href="predictions.html" class="btn btn-accent btn-sm">
-              <i class="fa-solid fa-arrow-right"></i> View Prediction
+              <i class="fa-solid fa-arrow-right"></i>
+              View Prediction
             </a>
           </div>
         </section>
+
+
 
         <!-- ========================================== -->
         <!-- CHARTS SECTION: SALES OVERVIEW + FORECAST  -->
@@ -469,8 +469,11 @@
                   <span class="badge badge-ai"><i class="fa-solid fa-brain"></i> Predictive AI</span>
                   <h3 class="card-title">Next 7 Days Demand Forecast</h3>
                 </div>
-                <p class="card-subtitle">Historical actuals vs. machine learning projections with confidence envelope.
+
+                <p class="card-subtitle">
+                  Historical sales compared with weekday-aware demand predictions for the next 7 days.
                 </p>
+
               </div>
               <a href="predictions.html" class="btn btn-ghost btn-sm text-primary">
                 Deep Dive <i class="fa-solid fa-arrow-right"></i>
@@ -602,7 +605,8 @@
                   <div
                     style="background: #FAF5FF; padding: 0.75rem; border-radius: var(--radius-md); border: 1px solid #E9D5FF;">
                     <div style="font-size: 0.75rem; color: var(--primary); font-weight: 600;">Near Expiry</div>
-                    <div style="font-size: 1.25rem; font-weight: 800; color: var(--primary);">29</div>
+                    <div id="nearExpiryCount" style="font-size: 1.25rem; font-weight: 800; color: var(--primary);">—
+                    </div>
                   </div>
                 </div>
 
@@ -611,9 +615,10 @@
                   <div
                     style="font-size: 0.75rem; color: var(--muted); margin-bottom: 0.375rem; display: flex; justify-content: space-between;">
                     <span>Stock Health Ratio</span>
-                    <span>88.3% Healthy</span>
+                    <span data-stock-health-label>88.3%</span>
                   </div>
-                  <div style="height: 8px; border-radius: 999px; display: flex; overflow: hidden; background: #E5E7EB;">
+                  <div data-stock-health-bar
+                    style="height: 8px; border-radius: 999px; display: flex; overflow: hidden; background: #E5E7EB;">
                     <div style="width: 88%; background: var(--success);" title="In Stock"></div>
                     <div style="width: 8%; background: var(--warning);" title="Low Stock"></div>
                     <div style="width: 4%; background: var(--danger);" title="Critical"></div>
@@ -623,7 +628,9 @@
                 <div
                   style="background: var(--surface-subtle); padding: 0.875rem; border-radius: var(--radius-md); border: 1px dashed var(--border); font-size: 0.8125rem;">
                   <i class="fa-solid fa-lightbulb text-warning"></i>
-                  AI suggests bundling <strong>29 near-expiry products</strong> to recover ₹14,200 in working capital.
+                  <span id="expiryRecommendation">
+                    Expiry insights will appear when real expiry-date data is connected.
+                  </span>
                 </div>
               </div>
             </div>

@@ -1,8 +1,8 @@
-
 /* =========================================================
    RETAILMIND AI — SUPPLIERS MODULE
    Supabase: Suppliers, Purchase Orders, KPIs, View, Edit, Archive
    ========================================================= */
+
 let SUPPLIERS_BUSINESS_ID = null;
 
 const SUPPLIER_CATEGORIES = [
@@ -22,6 +22,7 @@ const SUPPLIER_CATEGORIES = [
 
 let suppliersCache = [];
 let purchaseOrdersCache = [];
+let supplierSalesMetrics = new Map();
 let pendingArchiveSupplierId = null;
 
 document.addEventListener('DOMContentLoaded', async () => {
@@ -34,18 +35,23 @@ document.addEventListener('DOMContentLoaded', async () => {
         await loadSuppliers();
     } catch (error) {
         console.error('Supplier initialization failed:', error);
+
         showSupplierMessage(
             error.message || 'Could not initialize suppliers.',
             'error'
         );
     }
 });
+
 /* =========================================================
    AUTHENTICATION AND BUSINESS ACCESS
    ========================================================= */
+
 async function initializeSupplierBusiness() {
-    const { data: { user }, error: authError } =
-        await supabaseClient.auth.getUser();
+    const {
+        data: { user },
+        error: authError
+    } = await supabaseClient.auth.getUser();
 
     if (authError) throw authError;
 
@@ -73,6 +79,7 @@ async function initializeSupplierBusiness() {
 
     SUPPLIERS_BUSINESS_ID = memberships[0].business_id;
 }
+
 async function verifySupplierAccess() {
     const {
         data: { user },
@@ -80,7 +87,10 @@ async function verifySupplierAccess() {
     } = await supabaseClient.auth.getUser();
 
     if (authError) throw authError;
-    if (!user) throw new Error('Please log in first.');
+
+    if (!user) {
+        throw new Error('Please log in first.');
+    }
 
     const { data: membership, error: membershipError } =
         await supabaseClient
@@ -109,7 +119,7 @@ async function loadSuppliers() {
     if (tbody) {
         tbody.innerHTML = `
             <tr>
-                <td colspan="8" style="text-align:center;padding:2rem;">
+                <td colspan="7" style="text-align:center;padding:2rem;">
                     Loading suppliers...
                 </td>
             </tr>`;
@@ -118,31 +128,37 @@ async function loadSuppliers() {
     try {
         await verifySupplierAccess();
 
-        const { data: suppliers, error: supplierError } =
-            await supabaseClient
-                .from('suppliers')
-                .select('*')
-                .eq('business_id', SUPPLIERS_BUSINESS_ID)
-                .eq('is_archived', false)
-                .order('created_at', { ascending: false });
+        const {
+            data: suppliers,
+            error: supplierError
+        } = await supabaseClient
+            .from('suppliers')
+            .select('*')
+            .eq('business_id', SUPPLIERS_BUSINESS_ID)
+            .eq('is_archived', false)
+            .order('created_at', { ascending: false });
 
         if (supplierError) throw supplierError;
 
-        const { data: orders, error: ordersError } =
-            await supabaseClient
-                .from('purchase_orders')
-                .select(`
-                    id,
-                    supplier_id,
-                    order_date,
-                    total_amount,
-                    status,
-                    expected_delivery_date,
-                    actual_delivery_date
-                `)
-                .eq('business_id', SUPPLIERS_BUSINESS_ID);
+        const {
+            data: orders,
+            error: ordersError
+        } = await supabaseClient
+            .from('purchase_orders')
+            .select(`
+                id,
+                supplier_id,
+                order_date,
+                total_amount,
+                status,
+                expected_delivery_date,
+                actual_delivery_date
+            `)
+            .eq('business_id', SUPPLIERS_BUSINESS_ID);
 
         if (ordersError) throw ordersError;
+
+        await loadSupplierSalesMetrics();
 
         suppliersCache = suppliers || [];
         purchaseOrdersCache = orders || [];
@@ -161,7 +177,7 @@ async function loadSuppliers() {
         if (tbody) {
             tbody.innerHTML = `
                 <tr>
-                    <td colspan="8"
+                    <td colspan="7"
                         style="text-align:center;padding:2rem;color:#dc2626;">
                         Unable to load suppliers:
                         ${escapeSupplierHTML(error.message)}
@@ -177,11 +193,106 @@ async function loadSuppliers() {
 }
 
 /* =========================================================
+   SUPPLIER SALES METRICS
+   Uses completed sales for products assigned to each supplier.
+   Sales revenue = sum of sale_items.total_price.
+   ========================================================= */
+
+async function loadSupplierSalesMetrics() {
+    supplierSalesMetrics = new Map();
+
+    const {
+        data: products,
+        error: productsError
+    } = await supabaseClient
+        .from('products')
+        .select('id, supplier_id')
+        .eq('business_id', SUPPLIERS_BUSINESS_ID);
+
+    if (productsError) throw productsError;
+
+    if (!products || products.length === 0) return;
+
+    const productSupplier = new Map(
+        products.map(product => [
+            product.id,
+            product.supplier_id
+        ])
+    );
+
+    const productIds = products.map(product => product.id);
+
+    const {
+        data: saleItems,
+        error: saleItemsError
+    } = await supabaseClient
+        .from('sale_items')
+        .select('id, sale_id, product_id, quantity, total_price')
+        .in('product_id', productIds);
+
+    if (saleItemsError) throw saleItemsError;
+
+    if (!saleItems || saleItems.length === 0) return;
+
+    const saleIds = [
+        ...new Set(
+            saleItems
+                .map(item => item.sale_id)
+                .filter(Boolean)
+        )
+    ];
+
+    if (saleIds.length === 0) return;
+
+    const {
+        data: sales,
+        error: salesError
+    } = await supabaseClient
+        .from('sales')
+        .select('id, status')
+        .eq('business_id', SUPPLIERS_BUSINESS_ID)
+        .eq('status', 'completed')
+        .in('id', saleIds);
+
+    if (salesError) throw salesError;
+
+    const completedSaleIds = new Set(
+        (sales || []).map(sale => sale.id)
+    );
+
+    for (const item of saleItems) {
+        if (!completedSaleIds.has(item.sale_id)) continue;
+
+        const supplierId = productSupplier.get(item.product_id);
+
+        if (!supplierId) continue;
+
+        const current = supplierSalesMetrics.get(supplierId) || {
+            productsSold: 0,
+            salesRevenue: 0
+        };
+
+        current.productsSold += Number(item.quantity) || 0;
+        current.salesRevenue += Number(item.total_price) || 0;
+
+        supplierSalesMetrics.set(supplierId, current);
+    }
+}
+
+function getSupplierSalesMetric(supplierId) {
+    return supplierSalesMetrics.get(supplierId) || {
+        productsSold: 0,
+        salesRevenue: 0
+    };
+}
+
+/* =========================================================
    DATE AND ORDER HELPERS
    ========================================================= */
 
 function getLocalDateString() {
     const now = new Date();
+
     const year = now.getFullYear();
     const month = String(now.getMonth() + 1).padStart(2, '0');
     const day = String(now.getDate()).padStart(2, '0');
@@ -199,22 +310,8 @@ function isDeliveredOrder(order) {
     );
 }
 
-function isCompletedOrder(order) {
-    return getOrderStatus(order) === 'completed';
-}
-
 function getSupplierDeliveryMetrics(orders) {
     const today = getLocalDateString();
-
-    const deliveredWithDates = orders.filter(order =>
-        isDeliveredOrder(order) &&
-        order.expected_delivery_date &&
-        order.actual_delivery_date
-    );
-
-    const onTimeCount = deliveredWithDates.filter(order =>
-        order.actual_delivery_date <= order.expected_delivery_date
-    ).length;
 
     const delayedCount = orders.filter(order => {
         const expected = order.expected_delivery_date;
@@ -223,45 +320,39 @@ function getSupplierDeliveryMetrics(orders) {
 
         if (!expected) return false;
 
-        // Delivered orders are late only when actual date is after expected.
+        // Delivered orders are delayed when the actual date
+        // is later than the expected date.
         if (delivered && actual) {
             return actual > expected;
         }
 
-        // An undelivered order is overdue if its expected date has passed.
+        // Undelivered orders are delayed when their expected
+        // delivery date has already passed.
         return !delivered && expected < today;
     }).length;
 
     return {
-        onTimeRate: deliveredWithDates.length > 0
-            ? (onTimeCount / deliveredWithDates.length) * 100
-            : null,
-        deliveredOrdersWithDates: deliveredWithDates.length,
-        onTimeCount,
         delayedCount
     };
 }
-
-function getYearToDatePurchase(orders) {
-    const currentYear = new Date().getFullYear();
-
-    return orders
-        .filter(order => {
-            if (!order.order_date) return false;
-
-            const date = new Date(order.order_date);
-
-            return Number.isFinite(date.getTime()) &&
-                date.getFullYear() === currentYear;
-        })
-        .reduce(
-            (sum, order) => sum + Number(order.total_amount || 0),
-            0
+function getTotalPurchase(orders) {
+    return (orders || []).reduce((sum, order) => {
+        const amount = Number(order.total_amount ?? 0);
+        return sum + (
+            Number.isFinite(amount) ? amount : 0
         );
+    }, 0);
 }
-
 /* =========================================================
    RENDER SUPPLIER TABLE
+   Columns:
+   Supplier Organization
+   Primary Line
+   Products Sold
+   Sales Revenue
+   Total Purchase
+   Status
+   Action
    ========================================================= */
 
 function renderSuppliersWithPurchases(suppliers, orders) {
@@ -272,10 +363,12 @@ function renderSuppliersWithPurchases(suppliers, orders) {
     if (!suppliers.length) {
         tbody.innerHTML = `
             <tr>
-                <td colspan="8" style="text-align:center;padding:2rem;">
+                <td colspan="7"
+                    style="text-align:center;padding:2rem;">
                     No suppliers found. Add your first supplier.
                 </td>
             </tr>`;
+
         return;
     }
 
@@ -284,33 +377,12 @@ function renderSuppliersWithPurchases(suppliers, orders) {
             order => order.supplier_id === supplier.id
         );
 
-        const deliveryMetrics =
-            getSupplierDeliveryMetrics(supplierOrders);
-
-        const onTimeDisplay = deliveryMetrics.onTimeRate === null
-            ? '—'
-            : `${deliveryMetrics.onTimeRate.toFixed(1)}%`;
-
-        const completedOrders = supplierOrders.filter(
-            isCompletedOrder
-        ).length;
-
-        const yearToDatePurchase =
-            getYearToDatePurchase(supplierOrders);
-
-        const rating = supplier.rating == null ||
-            supplier.rating === ''
-            ? null
-            : Number(supplier.rating);
+        const totalPurchase = getTotalPurchase(supplierOrders);
+        const salesMetrics = getSupplierSalesMetric(supplier.id);
 
         const status = String(
             supplier.status || 'active'
         ).toLowerCase();
-
-        const ratingDisplay = rating !== null &&
-            Number.isFinite(rating)
-            ? `${rating.toFixed(1)} ★`
-            : '—';
 
         const statusClass = status === 'active'
             ? 'status-active'
@@ -319,31 +391,43 @@ function renderSuppliersWithPurchases(suppliers, orders) {
         return `
             <tr>
                 <td>
-                    <strong>${escapeSupplierHTML(supplier.name)}</strong>
+                    <strong>
+                        ${escapeSupplierHTML(supplier.name)}
+                    </strong>
+
                     <div class="text-muted" style="font-size:0.8rem;">
                         ${escapeSupplierHTML(
-            supplier.contact_person || 'No contact person'
-        )}
+                            supplier.contact_person || 'No contact person'
+                        )}
                     </div>
                 </td>
 
                 <td>
                     ${escapeSupplierHTML(
-            supplier.category || 'Uncategorized'
-        )}
+                        supplier.category || 'Uncategorized'
+                    )}
                 </td>
 
-                <td>${completedOrders}</td>
-                <td>${onTimeDisplay}</td>
-                <td>${ratingDisplay}</td>
-                <td>${formatSupplierCurrency(yearToDatePurchase)}</td>
+                <td>
+                    ${salesMetrics.productsSold}
+                </td>
+
+                <td>
+                    ${formatSupplierCurrency(
+                        salesMetrics.salesRevenue
+                    )}
+                </td>
+
+                <td>
+                    ${formatSupplierCurrency(totalPurchase)}
+                </td>
 
                 <td>
                     <span class="status-badge ${statusClass}">
                         ${escapeSupplierHTML(
-            status.charAt(0).toUpperCase() +
-            status.slice(1)
-        )}
+                            status.charAt(0).toUpperCase() +
+                            status.slice(1)
+                        )}
                     </span>
                 </td>
 
@@ -465,15 +549,27 @@ function initializeSupplierForm() {
 
             const supplier = {
                 business_id: SUPPLIERS_BUSINESS_ID,
-                name: String(formData.get('name') || '').trim(),
+
+                name: String(
+                    formData.get('name') || ''
+                ).trim(),
+
                 contact_person: String(
                     formData.get('contact_person') || ''
                 ).trim(),
-                phone: String(formData.get('phone') || '').trim(),
-                category: String(formData.get('category') || '').trim(),
+
+                phone: String(
+                    formData.get('phone') || ''
+                ).trim(),
+
+                category: String(
+                    formData.get('category') || ''
+                ).trim(),
+
                 lead_time_days: Number(
                     formData.get('lead_time_days')
                 ),
+
                 status: 'active',
                 is_archived: false
             };
@@ -542,7 +638,9 @@ function initializeSupplierModals() {
         <div class="modal">
             <div class="modal-header">
                 <h3 class="modal-title">Edit Supplier</h3>
-                <button type="button" class="btn btn-ghost btn-sm"
+
+                <button type="button"
+                    class="btn btn-ghost btn-sm"
                     aria-label="Close edit supplier modal"
                     onclick="closeEditSupplierModal()">
                     <i class="fa-solid fa-xmark"></i>
@@ -551,15 +649,21 @@ function initializeSupplierModals() {
 
             <form id="editSupplierForm">
                 <div class="modal-body">
-                    <input type="hidden" name="id" id="editSupplierId">
+                    <input type="hidden"
+                        name="id"
+                        id="editSupplierId">
 
                     <div class="form-group">
-                        <label class="form-label" for="editSupplierName">
+                        <label class="form-label"
+                            for="editSupplierName">
                             Company / Vendor Name *
                         </label>
+
                         <input class="form-control"
                             id="editSupplierName"
-                            name="name" type="text" required>
+                            name="name"
+                            type="text"
+                            required>
                     </div>
 
                     <div class="grid grid-cols-2" style="gap:1rem;">
@@ -568,9 +672,12 @@ function initializeSupplierModals() {
                                 for="editSupplierContact">
                                 Contact Representative *
                             </label>
+
                             <input class="form-control"
                                 id="editSupplierContact"
-                                name="contact_person" type="text" required>
+                                name="contact_person"
+                                type="text"
+                                required>
                         </div>
 
                         <div class="form-group">
@@ -578,9 +685,12 @@ function initializeSupplierModals() {
                                 for="editSupplierPhone">
                                 Phone Number *
                             </label>
+
                             <input class="form-control"
                                 id="editSupplierPhone"
-                                name="phone" type="tel" required>
+                                name="phone"
+                                type="tel"
+                                required>
                         </div>
                     </div>
 
@@ -593,13 +703,17 @@ function initializeSupplierModals() {
 
                             <select class="form-control"
                                 id="editSupplierCategory"
-                                name="category" required>
+                                name="category"
+                                required>
                                 <option value="" disabled>
                                     Select a category
                                 </option>
-                                ${SUPPLIER_CATEGORIES.map(category =>
-        `<option value="${escapeSupplierHTML(category)}">${escapeSupplierHTML(category)}</option>`
-    ).join('')}
+
+                                ${SUPPLIER_CATEGORIES.map(category => `
+                                    <option value="${escapeSupplierHTML(category)}">
+                                        ${escapeSupplierHTML(category)}
+                                    </option>
+                                `).join('')}
                             </select>
                         </div>
 
@@ -608,10 +722,13 @@ function initializeSupplierModals() {
                                 for="editSupplierLeadTime">
                                 Standard Lead Time (Days) *
                             </label>
+
                             <input class="form-control"
                                 id="editSupplierLeadTime"
                                 name="lead_time_days"
-                                type="number" min="1" required>
+                                type="number"
+                                min="1"
+                                required>
                         </div>
                     </div>
 
@@ -620,9 +737,11 @@ function initializeSupplierModals() {
                             for="editSupplierStatus">
                             Status *
                         </label>
+
                         <select class="form-control"
                             id="editSupplierStatus"
-                            name="status" required>
+                            name="status"
+                            required>
                             <option value="active">Active</option>
                             <option value="inactive">Inactive</option>
                         </select>
@@ -630,11 +749,14 @@ function initializeSupplierModals() {
                 </div>
 
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-outline"
+                    <button type="button"
+                        class="btn btn-outline"
                         onclick="closeEditSupplierModal()">
                         Cancel
                     </button>
-                    <button type="submit" class="btn btn-primary">
+
+                    <button type="submit"
+                        class="btn btn-primary">
                         Save Changes
                     </button>
                 </div>
@@ -696,6 +818,7 @@ async function saveSupplierEdits(event) {
     event.preventDefault();
 
     const form = event.currentTarget;
+
     const submitButton =
         form.querySelector('button[type="submit"]');
 
@@ -711,21 +834,35 @@ async function saveSupplierEdits(event) {
         await verifySupplierAccess();
 
         const formData = new FormData(form);
-        const supplierId = String(formData.get('id') || '');
+        const supplierId = String(
+            formData.get('id') || ''
+        );
 
         const updates = {
-            name: String(formData.get('name') || '').trim(),
+            name: String(
+                formData.get('name') || ''
+            ).trim(),
+
             contact_person: String(
                 formData.get('contact_person') || ''
             ).trim(),
-            phone: String(formData.get('phone') || '').trim(),
-            category: String(formData.get('category') || '').trim(),
+
+            phone: String(
+                formData.get('phone') || ''
+            ).trim(),
+
+            category: String(
+                formData.get('category') || ''
+            ).trim(),
+
             lead_time_days: Number(
                 formData.get('lead_time_days')
             ),
+
             status: String(
                 formData.get('status') || 'active'
             ).toLowerCase(),
+
             updated_at: new Date().toISOString()
         };
 
@@ -739,10 +876,15 @@ async function saveSupplierEdits(event) {
             updates.lead_time_days < 1 ||
             !['active', 'inactive'].includes(updates.status)
         ) {
-            throw new Error('Please check all supplier fields.');
+            throw new Error(
+                'Please check all supplier fields.'
+            );
         }
 
-        const { data, error } = await supabaseClient
+        const {
+            data,
+            error
+        } = await supabaseClient
             .from('suppliers')
             .update(updates)
             .eq('id', supplierId)
@@ -815,6 +957,7 @@ function initializeArchiveModal() {
 
 function openArchiveConfirmation(supplier) {
     const modal = document.getElementById('archiveConfirmModal');
+
     const message = document.getElementById('archiveModalMessage');
 
     if (!modal || !message) {
@@ -881,6 +1024,7 @@ async function confirmArchiveSupplier() {
 
     if (button) {
         button.disabled = true;
+
         button.innerHTML =
             '<i class="fa-solid fa-spinner fa-spin"></i> Archiving...';
     }
@@ -888,7 +1032,10 @@ async function confirmArchiveSupplier() {
     try {
         await verifySupplierAccess();
 
-        const { data, error } = await supabaseClient
+        const {
+            data,
+            error
+        } = await supabaseClient
             .from('suppliers')
             .update({
                 is_archived: true,
@@ -927,6 +1074,7 @@ async function confirmArchiveSupplier() {
     } finally {
         if (button) {
             button.disabled = false;
+
             button.innerHTML =
                 '<i class="fa-solid fa-box-archive"></i><span>Archive Supplier</span>';
         }
@@ -939,6 +1087,7 @@ async function confirmArchiveSupplier() {
 
 async function viewSupplierDetails(supplierId) {
     const modal = document.getElementById('supplierDetailsModal');
+
     const content = document.getElementById('supplierDetailsContent');
 
     if (!modal || !content) {
@@ -954,56 +1103,62 @@ async function viewSupplierDetails(supplierId) {
     try {
         await verifySupplierAccess();
 
-        const { data: supplier, error: supplierError } =
-            await supabaseClient
-                .from('suppliers')
-                .select('*')
-                .eq('id', supplierId)
-                .eq('business_id', SUPPLIERS_BUSINESS_ID)
-                .eq('is_archived', false)
-                .single();
+        const {
+            data: supplier,
+            error: supplierError
+        } = await supabaseClient
+            .from('suppliers')
+            .select('*')
+            .eq('id', supplierId)
+            .eq('business_id', SUPPLIERS_BUSINESS_ID)
+            .eq('is_archived', false)
+            .single();
 
         if (supplierError) throw supplierError;
 
-        const { data: orders, error: ordersError } =
-            await supabaseClient
-                .from('purchase_orders')
-                .select(`
-                    id,
-                    order_date,
-                    total_amount,
-                    status,
-                    expected_delivery_date,
-                    actual_delivery_date
-                `)
-                .eq('business_id', SUPPLIERS_BUSINESS_ID)
-                .eq('supplier_id', supplierId)
-                .order('order_date', { ascending: false });
+        const {
+            data: orders,
+            error: ordersError
+        } = await supabaseClient
+            .from('purchase_orders')
+            .select(`
+                id,
+                order_date,
+                total_amount,
+                status,
+                expected_delivery_date,
+                actual_delivery_date
+            `)
+            .eq('business_id', SUPPLIERS_BUSINESS_ID)
+            .eq('supplier_id', supplierId)
+            .order('order_date', { ascending: false });
 
         if (ordersError) throw ordersError;
 
         const supplierOrders = orders || [];
 
-        const completedOrders = supplierOrders.filter(
-            isCompletedOrder
-        ).length;
-
         const deliveryMetrics =
             getSupplierDeliveryMetrics(supplierOrders);
 
-        const yearToDatePurchase =
-            getYearToDatePurchase(supplierOrders);
+        const totalPurchase = getTotalPurchase(supplierOrders);
 
-        const rating = supplier.rating == null ||
-            supplier.rating === ''
-            ? '—'
-            : `${Number(supplier.rating).toFixed(1)} ★`;
+        const salesMetrics =
+            getSupplierSalesMetric(supplier.id);
 
         const row = (label, value) => `
-            <div style="display:flex;justify-content:space-between;gap:1rem;
-                padding:0.75rem 0;border-bottom:1px solid var(--border-color, #e5e7eb);">
+            <div style="
+                display:flex;
+                justify-content:space-between;
+                gap:1rem;
+                padding:0.75rem 0;
+                border-bottom:1px solid var(--border-color, #e5e7eb);
+            ">
                 <span class="text-muted">${label}</span>
-                <strong style="text-align:right;overflow-wrap:anywhere;">
+
+                <strong style="
+                    text-align:right;
+                    overflow-wrap:anywhere;
+                ">
                     ${value}
                 </strong>
             </div>`;
@@ -1021,31 +1176,42 @@ async function viewSupplierDetails(supplierId) {
                                 <th>Amount</th>
                             </tr>
                         </thead>
+
                         <tbody>
                             ${supplierOrders.slice(0, 5).map(order => `
                                 <tr>
                                     <td>
                                         ${escapeSupplierHTML(
-                formatSupplierDate(order.order_date)
-            )}
+                                            formatSupplierDate(order.order_date)
+                                        )}
                                     </td>
-                                    <td>
-                                        ${escapeSupplierHTML(order.status || 'Unknown')}
-                                    </td>
+
                                     <td>
                                         ${escapeSupplierHTML(
-                formatSupplierDate(order.expected_delivery_date)
-            )}
+                                            order.status || 'Unknown'
+                                        )}
                                     </td>
+
                                     <td>
                                         ${escapeSupplierHTML(
-                formatSupplierDate(order.actual_delivery_date)
-            )}
+                                            formatSupplierDate(
+                                                order.expected_delivery_date
+                                            )
+                                        )}
                                     </td>
+
+                                    <td>
+                                        ${escapeSupplierHTML(
+                                            formatSupplierDate(
+                                                order.actual_delivery_date
+                                            )
+                                        )}
+                                    </td>
+
                                     <td>
                                         ${formatSupplierCurrency(
-                Number(order.total_amount || 0)
-            )}
+                                            Number(order.total_amount || 0)
+                                        )}
                                     </td>
                                 </tr>
                             `).join('')}
@@ -1060,57 +1226,62 @@ async function viewSupplierDetails(supplierId) {
             </h2>
 
             <p class="text-muted" style="margin-bottom:1rem;">
-                ${escapeSupplierHTML(supplier.category || 'Uncategorized')}
+                ${escapeSupplierHTML(
+                    supplier.category || 'Uncategorized'
+                )}
             </p>
 
             ${row(
-            'Contact Person',
-            escapeSupplierHTML(supplier.contact_person || '—')
-        )}
+                'Contact Person',
+                escapeSupplierHTML(supplier.contact_person || '—')
+            )}
 
             ${row(
-            'Phone',
-            escapeSupplierHTML(supplier.phone || '—')
-        )}
+                'Phone',
+                escapeSupplierHTML(supplier.phone || '—')
+            )}
 
             ${row(
-            'Email',
-            escapeSupplierHTML(supplier.email || '—')
-        )}
+                'Email',
+                escapeSupplierHTML(supplier.email || '—')
+            )}
 
             ${row(
-            'Status',
-            escapeSupplierHTML(supplier.status || 'Active')
-        )}
-
-            ${row('Rating', rating)}
+                'Status',
+                escapeSupplierHTML(supplier.status || 'Active')
+            )}
 
             ${row(
-            'Lead Time',
-            supplier.lead_time_days == null
-                ? '—'
-                : `${Number(supplier.lead_time_days)} days`
-        )}
-
-            ${row('Total Purchase Orders', supplierOrders.length)}
-            ${row('Completed Orders', completedOrders)}
+                'Lead Time',
+                supplier.lead_time_days == null
+                    ? '—'
+                    : `${Number(supplier.lead_time_days)} days`
+            )}
 
             ${row(
-            'On-Time Delivery',
-            deliveryMetrics.onTimeRate === null
-                ? '—'
-                : `${deliveryMetrics.onTimeRate.toFixed(1)}%`
-        )}
+                'Total Purchase Orders',
+                supplierOrders.length
+            )}
 
             ${row(
-            'Delayed Shipments',
-            deliveryMetrics.delayedCount
-        )}
+                'Products Sold',
+                salesMetrics.productsSold
+            )}
 
             ${row(
-            'Purchase Value This Year',
-            formatSupplierCurrency(yearToDatePurchase)
-        )}
+                'Sales Revenue (Product Line Total)',
+                formatSupplierCurrency(salesMetrics.salesRevenue)
+            )}
+
+            ${row(
+                'Delayed Shipments',
+                deliveryMetrics.delayedCount
+            )}
+
+            ${row(
+                'Total Purchase',
+                formatSupplierCurrency(totalPurchase)
+            )}
 
             <h4 style="margin:1.25rem 0 0.5rem;">
                 Recent Purchase Orders
@@ -1118,14 +1289,29 @@ async function viewSupplierDetails(supplierId) {
 
             ${recentOrdersHTML}
 
-            <div style="display:flex;gap:0.5rem;margin-top:1rem;flex-wrap:wrap;">
-                <button type="button" class="btn btn-primary"
-                    onclick="document.getElementById('supplierDetailsModal').classList.remove('active');editSupplier('${supplier.id}')">
+            <div style="
+                display:flex;
+                gap:0.5rem;
+                margin-top:1rem;
+                flex-wrap:wrap;
+            ">
+                <button type="button"
+                    class="btn btn-primary"
+                    onclick="
+                        document.getElementById('supplierDetailsModal')
+                            .classList.remove('active');
+                        editSupplier('${supplier.id}')
+                    ">
                     Edit Supplier
                 </button>
 
-                <button type="button" class="btn btn-outline"
-                    onclick="document.getElementById('supplierDetailsModal').classList.remove('active');archiveSupplier('${supplier.id}')">
+                <button type="button"
+                    class="btn btn-outline"
+                    onclick="
+                        document.getElementById('supplierDetailsModal')
+                            .classList.remove('active');
+                        archiveSupplier('${supplier.id}')
+                    ">
                     Archive Supplier
                 </button>
             </div>`;
@@ -1150,6 +1336,7 @@ function formatSupplierDate(value) {
 
     if (/^\d{4}-\d{2}-\d{2}$/.test(text)) {
         const [year, month, day] = text.split('-');
+
         return `${day}/${month}/${year}`;
     }
 

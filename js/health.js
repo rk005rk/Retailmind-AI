@@ -165,9 +165,27 @@
     );
 
     const [productsResult, saleItemsResult, salesResult] = await Promise.all([
-      db.from("products")
-        .select("id,name,category,selling_price,purchase_price,stock,reorder_level,supplier_id,suppliers(id,name,rating,lead_time_days)")
-        .eq("business_id", businessId),
+      
+        
+db.from("products")
+  .select(`
+    id,
+    name,
+    category,
+    selling_price,
+    purchase_price,
+    stock,
+    reorder_level,
+    supplier_id,
+    suppliers: suppliers!products_supplier_id_fkey (
+      id,
+      name,
+      rating,
+      lead_time_days
+    )
+  `)
+  .eq("business_id", businessId),
+
 
       db.from("sale_items")
         .select("quantity,total_price,products(id,name,purchase_price),sales!inner(business_id,status)")
