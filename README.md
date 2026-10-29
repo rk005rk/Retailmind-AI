@@ -1,24 +1,14 @@
-# RetailMind AI -- Intelligent Inventory & Sales Prediction System
 
-```{=html}
-<p align="center">
-```
-`<strong>`{=html}An intelligent retail management platform for
-inventory, sales insights, and demand prediction.`</strong>`{=html}
-```{=html}
-</p>
-```
-```{=html}
-<p align="center">
-```
-`<a href="https://retailmind-ai-phi.vercel.app">`{=html}Live
-Demo`</a>`{=html} ·
-`<a href="https://retailmind-ai-1tt7.onrender.com/api/health">`{=html}Backend
-Health`</a>`{=html}
-```{=html}
-</p>
-```
+# RetailMind AI – Intelligent Inventory & Sales Prediction System
+
+**An intelligent retail management platform for inventory, sales insights, and demand prediction.**
+
+[Live Demo](https://retailmind-ai-phi.vercel.app) · [Backend Health](https://retailmind-ai-1tt7.onrender.com/api/health)
+
+---
+
 ## 📌 Project Overview
+
 
 **RetailMind AI -- Intelligent Inventory & Sales Prediction System** is
 a final-year group project developed as part of our **B.Tech in Computer
@@ -249,18 +239,14 @@ This project was developed collaboratively by:
 
 ## 🎓 Academic Information
 
-**RetailMind AI -- Intelligent Inventory & Sales Prediction System**\
-Final-Year Group Project\
-B.Tech in Computer Science Engineering (Artificial Intelligence &
-Machine Learning)\
-**Brainware University**
+**RetailMind AI – Intelligent Inventory & Sales Prediction System**
 
-------------------------------------------------------------------------
+- **Project Type:** Final-Year Group Project
+- **Degree:** B.Tech – Computer Science Engineering (AIML)
+- **University:** Brainware University
+- **Domain:** Artificial Intelligence, Machine Learning & Retail Technology
 
-```{=html}
 <p align="center">
-```
-Made with 💻 by the RetailMind AI team
-```{=html}
+  Made with 💻 by the RetailMind AI team
 </p>
-```
+
