@@ -431,14 +431,15 @@ async function renderDemandForecastChart(
     }
 
     const response = await fetch(
-      "http://127.0.0.1:5000/api/predictions/units?days=7",
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          Accept: "application/json"
-        }
-      }
-    );
+  "https://retailmind-ai-1tt7.onrender.com/api/predictions/units?days=7",
+  {
+    method: "GET",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      Accept: "application/json"
+    }
+  }
+);
 
     const result = await response.json().catch(() => ({}));
 
