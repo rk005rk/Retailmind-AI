@@ -12,7 +12,7 @@
  * No fabricated sales, revenue, or profit figures.
  */
 
-const API_BASE_URL = https://retailmind-ai-1tt7.onrender.com";
+const API_BASE_URL = "https://retailmind-ai-1tt7.onrender.com";
 const DEMAND_API = `${API_BASE_URL}/api/predictions/demand`;
 
 let forecastRows = [];
