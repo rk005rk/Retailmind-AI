@@ -2,7 +2,11 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import { resolve } from 'node:path';
-import { readdirSync } from 'node:fs';
+import {
+  existsSync,
+  readdirSync,
+  cpSync
+} from 'node:fs';
 
 const htmlPages = Object.fromEntries(
   readdirSync(process.cwd())
@@ -14,7 +18,24 @@ const htmlPages = Object.fromEntries(
 );
 
 export default defineConfig({
-  plugins: [react()],
+  plugins: [
+    react(),
+    {
+      name: 'copy-retailmind-static-files',
+      closeBundle() {
+        for (const folder of ['js', 'css']) {
+          const source = resolve(process.cwd(), folder);
+          const destination = resolve(process.cwd(), 'dist', folder);
+
+          if (existsSync(source)) {
+            cpSync(source, destination, { recursive: true });
+            console.log(`Copied ${folder}/ to dist/${folder}/`);
+          }
+        }
+      },
+    },
+  ],
+
   build: {
     rollupOptions: {
       input: htmlPages,
